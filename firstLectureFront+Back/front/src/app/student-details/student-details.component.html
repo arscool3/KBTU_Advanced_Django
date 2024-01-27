@@ -1,0 +1,31 @@
+<div class="list">
+  <h2>Student</h2>
+  <p>{{student.name}} {{student.age}} {{student.sex}}</p>
+  <button class="delete" type="button" (click)="onDelete()" routerLink="">Delete</button>
+</div>
+
+<div  class="form">
+  <h2>Update student:</h2>
+  <div>
+    <label for="name">Name</label>
+    <br>
+    <input required type="text" id="name" [(ngModel)]="updatedStudent.name" name="name">
+  </div>
+
+  <div>
+    <label for="age">Age</label>
+    <br>
+    <input required type="number" min="0" id="age" [(ngModel)]="updatedStudent.age" name="age">
+  </div>
+
+  <div>
+    <label for="sex">Choose</label>
+    <br>
+    <select class="form-control" id="sex" required  [(ngModel)]="updatedStudent.sex">
+      <option *ngFor="let sex of sexes" [value]="sex">{{sex}}</option>
+    </select>
+  </div>
+
+  <button type="submit" (click)="onSubmit()">Save student</button>
+
+</div>
