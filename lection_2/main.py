@@ -25,7 +25,7 @@ def get_films_by_id(id: Annotated[int, Path(gt=-1)]) -> Film:
 
 
 @app.get("/films_by_rating")
-def get_films_by_age(rating: Annotated[float, Query(gt=0, lt=100)]) -> list[Film]:
+def get_films_by_rating(rating: Annotated[float, Query(gt=0, lt=10)]) -> list[Film]:
     return [film for film in films if film.rating == rating]
 
 
