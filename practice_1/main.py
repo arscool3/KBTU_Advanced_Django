@@ -27,7 +27,7 @@ def get_films() -> list[Film]:
 
 
 @app.get("/films/{id}")
-def get_film(id: Annotated[int, Path(ge=-1)]) -> Film:
+def get_film(id: Annotated[int, Path(ge=0)]) -> Film:
     return films[id]
 
 
