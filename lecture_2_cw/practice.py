@@ -12,6 +12,7 @@ class Film(BaseModel):
     genre: str = Field(max_length=10)
     name: str = Field(max_length=10)
     description: str = Field(max_length=200)
+    director: str = Field(max_length=40)
     rating: float = Field(gt=0, lt=10)
 
 
