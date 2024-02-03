@@ -16,9 +16,7 @@ films = []
 
 
 @app.get("/films")
-def get_films(name: str) -> List[Film]:
-    if name:
-        return [film for film in films if film.name == name]
+def get_films() -> List[Film]:
     return films
 
 
