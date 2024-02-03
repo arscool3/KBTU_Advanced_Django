@@ -11,7 +11,7 @@ films = []
 class Film(BaseModel):
     name: str = Field()
     desc: str = Field()
-    rating: float = Field(gt=0, lt=11)
+    rating: float = Field(ge=0, le=10)
     director: str = Field(max_length=50)
 
 
@@ -26,7 +26,7 @@ def get_film_by_id(id: Annotated[int, Path(ge=0)]) -> Film:
 
 
 @app.get("/films_by_rating")
-def get_films_by_age(rating: Annotated[float, Query(gt=0, lt=11)]) -> list[Film]:
+def get_films_by_age(rating: Annotated[float, Query(ge=0, le=10)]) -> list[Film]:
     return [film for film in films if film.rating == rating]
 
 
