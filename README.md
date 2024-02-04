@@ -1,7 +1,7 @@
 # KBTU_FIT_BACKEND_ADVANCED_DJANGO
 **KBTU FIT BACKEND ADVANCED DJANGO WIKI**
 
-> Here you can find anything you want
+> Korganbek Dinmukhammed
 
 
 **For you project (homework, midterm / endterm), just fork it**
