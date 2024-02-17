@@ -28,7 +28,7 @@ class UserDependency:
 
         return "User was added"
 
-# Dependency as a function
+
 def student_dependency(user: User) -> str:
     students.append(user)
     return "Student was added"
@@ -73,3 +73,4 @@ def get_students() -> list[Student]:
 @app.get('/teachers')
 def get_teachers() -> list[Teacher]:
     return teachers
+
