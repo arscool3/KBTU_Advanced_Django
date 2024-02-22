@@ -59,3 +59,4 @@ async def get_film_by_rating(rating: float):
     if not filtered_films:
         raise HTTPException(status_code=404, detail="No films found with the given rating")
     return filtered_films
+
