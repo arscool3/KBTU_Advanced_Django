@@ -1,28 +1,45 @@
 from fastapi import FastAPI, Depends
 from pydantic import BaseModel
+from sqlalchemy import select
+
+import database as db
 
 app = FastAPI()
 
-class Book(BaseModel):
-    title: str
-    author: str
 
-class BorrowRequest(BaseModel):
-    user_name: str
-    book_title:str
+class Teacher(BaseModel):
+    name: str
+    yoe: int
 
-available_books = [
-    {"title": "1984", "author": "Georgie Orwell"},
-    {"title": "To Kill a Mockingbird", "author": "Harper Lee"}
-]
+    class Config:
+        from_attributes = True
 
-def check_book_availability(borrow_request: BorrowRequest):
-    for book in available_books:
-        if book['title'] == borrow_request.book_title:
-            return f"Book '{borrow_request.book_title}' by {book['author']} is available for you, {borrow_request.user_name}!"
-    return f"Sorry, the book '{borrow_request.book_title}' is not available right now."
 
-@app.post("/borrow_book")
-def borrow_book(message: str = Depends(check_book_availability)):
-    return {"message": message}
-# 1 handler and 1 Function that is injected as DI
+class Student(BaseModel):
+    name: str
+    age: int
+
+    class Config:
+        from_attributes = True
+
+
+def get_db():
+    session = db.session
+    yield session
+    session.commit()
+    session.close()
+
+
+@app.post('/student')
+def student(student: Student, session: db.Session = Depends(get_db)):
+    session.add(db.Student(**student.model_dump()))
+    return f"Student {student.name} was added"
+
+
+@app.get('/student')
+def student() -> list[Student]:
+    db_students = db.session.execute(select(db.Student)).scalars().all()
+    students = []
+    for db_student in db_students:
+        students.append(Student.model_validate(db_student))
+    return students
