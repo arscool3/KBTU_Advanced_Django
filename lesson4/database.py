@@ -4,7 +4,7 @@ from sqlalchemy import create_engine
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import Mapped, Session, mapped_column
 
-url = 'postgresql://postgres:Haker15987@localhost:5432/postgres'
+url = 'postgresql://postgres:Haker15987@db/postgres'
 
 engine = create_engine(url)
 session = Session(engine)

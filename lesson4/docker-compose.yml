@@ -1,0 +1,23 @@
+version: '3.9'
+services:
+  web:
+    build: .
+    volumes:
+      - .:/app
+    ports:
+      - "8000:8000"
+    environment:
+      - DB_USER=postgres
+      - DB_PASSWORD=Haker15987
+      - DB_HOST=db
+      - DB_NAME=postgres
+    depends_on:
+      - db
+  db:
+    image: postgres
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=Haker15987
+      - POSTGRES_DB=postgres
+    ports:
+      - "5432:5432"
