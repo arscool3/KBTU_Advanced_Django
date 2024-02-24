@@ -1,4 +1,3 @@
-
 # CREATE 3 VIEWS WITH DEPENDECY INJECTION
 # 2 WITH FUNCTION DEPENDENCY INJECTION
 # 1 WITH INSTANCE OF CLASS AS CALLABLE DI
@@ -45,7 +44,6 @@ async def read_item(item_name: str, inventory: Inventory = Depends(get_inventory
         return {"item_name": item_name, "available": True}
     else:
         return {"item_name": item_name, "available": False}
-
 
 
 # Function with Dependency Injection
