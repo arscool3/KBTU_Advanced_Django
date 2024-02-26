@@ -1,15 +1,12 @@
 from __future__ import annotations
 
-from typing import Annotated, Callable
+from typing import Annotated
 
 import punq
 from pydantic import BaseModel
 from fastapi import FastAPI, Depends
 
 app = FastAPI()
-
-books = []
-magazines = []
 
 
 class Magazine(BaseModel):
@@ -35,131 +32,90 @@ sports = []
 business = []
 
 
-class Literature(BaseModel):
-    title: str
-    author: str
+class MagazineSubLayer:
 
-
-class Book(Literature):
-    pass
-
-
-class Magazine(Literature):
-    pass
-
-
-# class LiteratureDependency:
-#     def __init__(self, literature_type: type[Book] | type[Magazine]):
-#         self.literature_type = literature_type
-#
-#     def __call__(self, literature: Literature) -> str:
-#         if self.literature_type == Book:
-#             books.append(literature)
-#         else:
-#             magazines.append(literature)
-#         return "Literature was added"
-
-
-class LiteratureSubLayer:
     def __init__(self, log_message: str):
         self.log_message = log_message
 
-    def add_literature(self, literature: Book | Magazine):
+    async def __call__(self):
+        # return {"message": self.log_message, "name": "Golovkin"}
+        return sports
+
+    def add_magazine(self, magazine: Fashion | Sport | Business):
+
         print(self.log_message)
-        books.append(literature) if isinstance(literature, Book) else magazines.append(literature)
+
+        if isinstance(magazine, Fashion):
+            fashions.append(magazine)
+
+        elif isinstance(magazine, Sport):
+            sports.append(magazine)
+
+        else:
+            business.append(magazine)
 
 
-class LiteratureMainLayer:
-    def __init__(self, repo: LiteratureSubLayer):
+class MagazineMainLayer:
+    def __init__(self, repo: MagazineSubLayer):
         self.repo = repo
 
-    def add_literature(self, literature: Book | Magazine):
-        print("SOME LOGGING")
-        self.repo.add_literature(literature)
-        print("END LOGGING")
+    def add_magazine(self, magazine: Fashion | Sport | Business) -> str:
+        self.repo.add_magazine(magazine)
+        return "Data was added"
 
-        return "literature was added"
+    def add_fashion(self, fashion: Fashion) -> str:
+        return self.add_magazine(fashion)
 
-    def add_book(self, book: Book) -> str:
-        return self.add_literature(book)
+    def add_sport(self, sport: Sport):
+        return self.add_magazine(sport)
 
-    def add_magazine(self, magazine: Magazine) -> str:
-        return self.add_literature(magazine)
+    def add_business(self, firm: Business):
+        return self.add_magazine(firm)
 
 
 def get_container() -> punq.Container:
     container = punq.Container()
-    container.register(LiteratureSubLayer, instance=LiteratureSubLayer(log_message='I AM INSIDE SUB LAYER'))
-    container.register(LiteratureMainLayer)
+    container.register(
+        MagazineSubLayer,
+        instance=MagazineSubLayer(log_message="Inside SUB LAYER")
+    )
+    container.register(MagazineMainLayer)
     return container
 
 
-@app.post('/books')
-def add_book(book: Annotated[str, Depends(get_container().resolve(LiteratureMainLayer).add_book)]) -> str:
-    return book
+@app.get("/fashions")
+async def get_fashions() -> list[Fashion]:
+    return fashions
 
 
-@app.post('/magazines')
-def add_magazine(magazine: Annotated[str, Depends(get_container().resolve(LiteratureMainLayer).add_book)]) -> str:
-    return magazine
+@app.get("/sports")
+async def get_sports() -> list[Sport]:
+    return sports
 
 
-@app.get('/books')
-def get_books() -> list[Book]:
-    return books
+@app.get("/business")
+async def get_business() -> list[Business]:
+    return business
 
-# @app.get('/magazines')
-# def get_magazines() -> list[Magazine]:
-#     return magazine_dep
 
-# CREATE 3 VIEWS WITH DEPENDECY INJECTION
-# 2 WITH FUNCTION DEPENDENCY INJECTION
-# 1 WITH INSTANCE OF CLASS AS CALLABLE DI
+@app.post("/fashions/add_fashion")
+def add_fashion(fashion: Annotated[str, Depends(get_container().resolve(MagazineMainLayer).add_fashion)]) -> str:
+    return fashion
 
-#
-# class Stub:
-#     def __init__(self, dependency: Callable, **kwargs):
-#         self._dependency = dependency
-#         self._kwargs = kwargs
-#
-#     def __call__(self):
-#         raise NotImplementedError
-#
-#     def __eq__(self, other) -> bool:
-#         if isinstance(other, Stub):
-#             return (
-#                     self._dependency == other._dependency
-#                     and self._kwargs == other._kwargs
-#             )
-#         else:
-#             if not self._kwargs:
-#                 return self._dependency == other
-#             return False
-#
-#     def __hash__(self):
-#         if not self._kwargs:
-#             return hash(self._dependency)
-#         serial = (
-#             self._dependency,
-#             *self._kwargs.items(),
-#         )
-#         return hash(serial)
-#
-#
-# class Repo:
-#     def __init__(self, a: int):
-#         self.a = a
-#
-#
-# @app.get("/")
-# async def root(repo: Repo = Depends(Stub(Repo))) -> int:
-#     return repo.a
-#
-#
-# @app.get("/1")
-# async def root(repo: Repo = Depends(Stub(Repo, key="1"))) -> int:
-#     return repo.a
-#
-#
-# app.dependency_overrides[Repo] = lambda: Repo(0)
-# app.dependency_overrides[Stub(Repo, key="1")] = lambda: Repo(1)
+
+@app.post("/sports/add_sport")
+def add_sport(sport: Annotated[str, Depends(get_container().resolve(MagazineMainLayer).add_sport)]) -> str:
+    return sport
+
+
+@app.post("/business/add_business")
+def add_business(firm: Annotated[str, Depends(get_container().resolve(MagazineMainLayer).add_business)]) -> str:
+    return firm
+
+
+magazineSubLayer = MagazineSubLayer("Callable DI with SUB LAYER")
+
+
+@app.get("/sports/v1")
+async def get_sports_v1(sport: list[Sport] = Depends(magazineSubLayer)):
+    return sport
