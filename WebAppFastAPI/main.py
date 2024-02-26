@@ -33,8 +33,8 @@ def add_film(film: Film) -> str:
     return "Successfully added!"
 
 
-@app.get("/films/{rating}")
-def films_by_rating(rating: float) -> list[tuple[str, Any]]:
+@app.get("/films/rating/{rating}")
+def films_by_rating(rating: float) -> list[Film]:
     return [film for film in films if film.rating == rating]
 
 # python3 -m uvicorn main:app --reload
