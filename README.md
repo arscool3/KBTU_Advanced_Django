@@ -8,5 +8,5 @@
 >https://docs.github.com/ru/pull-requests/collaborating-with-pull-requests/working-with-forks/fork-a-repo
 
 
-#### Actually used different repo before (You can watch a commit history there)
+# Actually used different repo before (You can watch a commit history there)
 [Link](https://github.com/Danila-Khlebokazov/KBTU_Advanced_Django_1)
