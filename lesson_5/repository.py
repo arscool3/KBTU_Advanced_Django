@@ -31,7 +31,7 @@ class CitizenRepository(AbcRepository):
 
 
 class CountryRepository(AbcRepository):
-    def __init__(self, session: Session):
+    def __init__(self, session:a Session):
         self._session = session
 
     def get_by_id(self, id: int) -> Country:
