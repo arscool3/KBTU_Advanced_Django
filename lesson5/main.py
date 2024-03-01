@@ -1,10 +1,10 @@
 import punq
 
 import database as db
+import models
+import schemas
 from fastapi import FastAPI, Depends
-from reposiroty import CitizenRepository, AbcRepository
-from schemas import ReturnType, CreateCitizen, CreateType
-from models import Citizen as CitizenModel
+from reposiroty import CitizenRepository, AbcRepository, CountryRepository, PresidentRepository
 app = FastAPI()
 
 
@@ -12,11 +12,10 @@ class Dependency:
     def __init__(self, repo: AbcRepository):
         self._repo = repo
 
-    def __call__(self, id: int) -> ReturnType:
-        return self._repo.get_by_id(id)
-
-    # def add(self, data: CreateType):
-    #     return self._repo.add(data)
+    def __call__(self, id: int) -> schemas.ReturnType:
+        if id:
+            return self._repo.get_by_id(id)
+        return "Hello"
 
 
 def get_container(repository: type[AbcRepository]) -> punq.Container:
@@ -26,9 +25,25 @@ def get_container(repository: type[AbcRepository]) -> punq.Container:
     return container
 
 
-# app.add_api_route("/citizens", get_container(CitizenRepository).resolve(Dependency.add), methods=["POST"])
 app.add_api_route("/citizens", get_container(CitizenRepository).resolve(Dependency), methods=["GET"])
+app.add_api_route("/countries", get_container(CountryRepository).resolve(Dependency), methods=["GET"])
+# app.add_api_route("/citizens", get_container(PresidentRepository).resolve(Dependency), methods=["GET"])
 
+
+@app.post('/citizens')
+def add_citizens(citizen: schemas.CreateCitizen):
+    db.session.add(models.Citizen(**citizen.model_dump()))
+    db.session.commit()
+    db.session.close()
+    return f"{citizen.name} was added"
+
+
+@app.post('/countries')
+def add_countries(country: schemas.CreateCountry):
+    db.session.add(models.Country(**country.model_dump()))
+    db.session.commit()
+    db.session.close()
+    return f"{country.name} was added"
 
 # @app.post('/citizens')
 # def add_citizens(data: CreateType, dep_func=Depends(get_container(CitizenRepository).resolve(Dependency))):
@@ -57,11 +72,5 @@ app.add_api_route("/citizens", get_container(CitizenRepository).resolve(Dependen
 #     return citizens
 #
 #
-# @app.post('/citizens')
-# def add_citizens(citizen: CreateCitizen):
-#     db.session.add(CitizenModel(**citizen.model_dump()))
-#     db.session.commit()
-#     db.session.close()
-#     return f"{citizen.name} was added"
 
 

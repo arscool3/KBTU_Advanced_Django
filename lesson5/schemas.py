@@ -18,8 +18,7 @@ class CreateCitizen(BaseCitizen):
     pass
 
 
-class Country(BaseModel):
-    id: int
+class BaseCountry(BaseModel):
     name: str
     created_at: date
 
@@ -27,13 +26,29 @@ class Country(BaseModel):
         from_attributes = True
 
 
-class President(BaseModel):
+class Country(BaseModel):
     id: int
+
+
+class CreateCountry(BaseCountry):
+    pass
+
+
+class BasePresident(BaseModel):
     name: str
 
     class Config:
         from_attributes = True
 
 
+class President(BaseModel):
+    id: int
+
+
+class CreatePresident(BasePresident):
+    pass
+
 ReturnType = Citizen | Country | President
-CreateType = CreateCitizen
+CreateType = CreateCitizen | CreateCountry | CreatePresident
+
+
