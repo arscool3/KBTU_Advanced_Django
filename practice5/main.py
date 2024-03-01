@@ -2,38 +2,34 @@ from fastapi.params import Depends
 from pydantic import BaseModel
 from sqlalchemy import select, insert
 from fastapi import FastAPI
+from database import session
 
 import models as db
-from database import session
-from schemas import Citizen, CreateCitizen, Country, CreateCountry, CreatePresident, President
-from repository import CitizenRepository, AbcRepository
+from schemas import Citizen,CreateCitizen, CreateCountry,Country, CreatePresident, President
+app=FastAPI()
 
-app = FastAPI()
+@app.get('/citizens')
+def get_citizens(name:str=None):
+    if name is None:
+        db_citizens=session.execute(
+            select(db.Citizen)
+        ).scalars().all()
+    else:
+        db_citizens=session.execute(
+            select(db.Citizen).where(db.Citizen.name==name)
+        ).scalars().all()
 
+    citizens=[]
+    for db_citizen in db_citizens:
+        citizens.append(Citizen.model_validate(db_citizen))
+    return citizens
 
-class Dependency:
-    def __init__(self, repo: AbcRepository):
-        self.repo = repo
-
-    def __call__(self, id: int) -> BaseModel:
-        return self.repo.get_by_id(id)
-
-
-dep_citizen = Dependency(repo=CitizenRepository(session=session))
-
-
-@app.get("/citizens")
-def get_citizens(dependency_func: BaseModel = Depends(dep_citizen)):
-    return dependency_func
-
-
-@app.post("/citizens")
-def add_citizens(citizen: CreateCitizen) -> str:
+@app.post('/citizens')
+def add_citizens(citizen:CreateCitizen)->str:
     session.add(db.Citizen(**citizen.model_dump()))
     session.commit()
-    session.close()
-    return "Citizen was added"
-
+    session.close()    
+    return 'Citizen was added'
 
 @app.post("/country")
 def add_country(country: CreateCountry):
@@ -41,7 +37,6 @@ def add_country(country: CreateCountry):
     session.commit()
     session.close()
     return "Country was added"
-
 
 @app.get("/country")
 def get_country():
@@ -51,14 +46,12 @@ def get_country():
         countries.append(Country.model_validate(db_country))
     return countries
 
-
-@app.post("/president")
-def add_president(president: CreatePresident):
+@app.post('/president')
+def add_president(president:CreatePresident)->str:
     session.add(db.President(**president.model_dump()))
     session.commit()
-    session.close()
+    session.close()    
     return "President was added"
-
 
 @app.get("/president")
 def get_presidents():
@@ -67,25 +60,3 @@ def get_presidents():
     for db_president in db_presidents:
         presidents.append(President.model_validate(db_president))
     return presidents
-
-# Database Transactions
-# A -> B
-# x, y, z packages
-
-# Begin
-# A x-> B
-# A y-> B
-# A z-> B
-# Close
-
-# Tinkoff Bank <-> Arslan <-> Nursultan
-# Tinkoff Bank Deposit 100 tenge
-
-# Tinkoff Bank 50 Tenge
-
-# network Атомарность
-# Open Session
-# Arslan -50 tenge
-# Nursultan +50 tenge
-# Commit Session
-# Close session

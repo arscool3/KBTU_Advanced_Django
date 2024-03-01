@@ -1,0 +1,6 @@
+alembic init alembic
+py manage.py dbshell
+docker run --name fastapi -e POSTGRES_PASSWORD=aru -p 5432:5432 postgres
+alembic revision -m 'initial_migration' --autogenerate
+alembic upgrade head
+uvicorn main:app --reload

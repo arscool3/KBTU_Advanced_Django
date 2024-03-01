@@ -1,50 +1,13 @@
-# pip install fastapi uvicorn sqlalchemy alembic psycopg2-binary
-from datetime import date
-from typing import Annotated
-
-import sqlalchemy
 from sqlalchemy import create_engine
+from sqlalchemy.orm import Session
 from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy.orm import Session, Mapped, mapped_column, relationship
+from sqlalchemy.orm import Session
 
-url = 'postgresql://postgres:postgres@localhost/postgres'
-engine = create_engine(url)
-session = Session(engine)
+#db, user,password, db_name
 
-Base = declarative_base()
-_id = Annotated[int, mapped_column(sqlalchemy.Integer, primary_key=True)]
+url='postgresql://postgres:aru@localhost/fastapi'
 
+engine=create_engine(url)
+session=Session(engine)
 
-class Country(Base):
-    __tablename__ = 'countries'
-
-    id: Mapped[_id]
-    name: Mapped[str]
-    created_at: Mapped[date] = mapped_column(sqlalchemy.DATE, default=date.today())
-    president: Mapped['President'] = relationship(back_populates='country')
-
-class President(Base):
-    __tablename__ = 'presidents'
-
-    id: Mapped[_id]
-    name: Mapped[str]
-    country_id: Mapped[int] = mapped_column(sqlalchemy.ForeignKey('countries.id'))
-    country: Mapped[Country] = relationship(back_populates='president')
-
-
-class Citizen(Base):
-    __tablename__ = 'citizens'
-
-    id: Mapped[_id]
-    name: Mapped[str]
-    age: Mapped[int]
-
-# Country <-> President one to one
-# Country Person <-> One to Many
-
-#alembic init alembic
-
-#docker run --name postgres -e POSTGRES_PASSWORD=postgres -p 5432:5432 postgres
-
-# alembic revision -m "initial_migration" --autogenerate
-# alembic upgrade head / 8c9b2abc8029
+Base=declarative_base()
