@@ -3,4 +3,12 @@ from sqlalchemy.orm import Session
 
 url = 'postgresql://postgres:postgres@localhost:5432/lesson6'
 engine = create_engine(url)
-session = Session(engine)
+
+
+def get_db():
+    dbb = Session(engine)
+    try:
+        yield dbb
+    finally:
+        dbb.close()
+

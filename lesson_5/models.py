@@ -1,9 +1,7 @@
 from typing import Annotated
 from datetime import date
-
 import sqlalchemy
 from sqlalchemy.orm import Mapped, mapped_column, relationship
-
 from database import Base
 
 _id = Annotated[int, mapped_column(sqlalchemy.Integer, primary_key=True)]
@@ -16,6 +14,7 @@ class Country(Base):
     name: Mapped[str]
     created_at: Mapped[date] = mapped_column(sqlalchemy.DATE, default=date.today())
     president: Mapped['President'] = relationship(back_populates='country')
+
 
 class President(Base):
     __tablename__ = 'presidents'
