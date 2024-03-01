@@ -15,7 +15,8 @@ class CreateCitizen(BaseCitizen):
 
 
 class BaseCountry(BaseModel):
-    name:str
+    
+    name: str | None
     created_at:date
     class Config:
         from_attributes=True

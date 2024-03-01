@@ -1,0 +1,19 @@
+
+# at least 8 endpoints 
+# at least 4 model   
+student(one to many relationship to faculty)
+teacher(one to many relationship to school)
+faculty(one to many relationship to school)
+school(one to many relationship to university)
+university
+# at least 3 relationships
+# at least 1 dependency injection as class and 2 as methods
+
+
+
+alembic init alembic
+py manage.py dbshell
+docker run --name fastapi2 -e POSTGRES_PASSWORD=aru -p 5432:5433 postgres
+alembic revision -m 'initial_migration' --autogenerate
+alembic upgrade head
+uvicorn main:app --reload
