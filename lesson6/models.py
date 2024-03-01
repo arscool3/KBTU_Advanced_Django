@@ -5,7 +5,6 @@ from sqlalchemy.ext.declarative import declarative_base
 
 _id = Annotated[int, mapped_column(sq.Integer, primary_key=True)]
 
-
 Base = declarative_base()
 
 post_category = sq.Table(
@@ -38,6 +37,7 @@ class Post(Base):
         secondary="post_category",  # Association table needed for many-to-many
         back_populates="posts",
     )
+    comments: Mapped[list["Comment"]] = relationship("Comment", back_populates="post")
     author: Mapped["User"] = relationship("User", back_populates="posts")
 
 
@@ -49,6 +49,7 @@ class Comment(Base):
     post_id: Mapped[Annotated[int, mapped_column(sq.Integer, sq.ForeignKey('t_post.id'))]]
     author: Mapped["User"] = relationship("User", back_populates="comments")
     post: Mapped["Post"] = relationship("Post", back_populates="comments")
+    post_id: Mapped[Annotated[int, mapped_column(sq.Integer, sq.ForeignKey('t_post.id'))]]
 
 
 class Category(Base):
