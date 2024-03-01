@@ -3,7 +3,7 @@ from pydantic import BaseModel
 
 class BaseHuman(BaseModel):
     name: str
-    age: int
+
 
     class Config:
         from_attributes = True
@@ -35,7 +35,7 @@ class CreateDog(BaseDog):
 
 class BaseCat(BaseModel):
     name: str
-    age: int
+    human: int
 
     class Config:
         from_attributes = True

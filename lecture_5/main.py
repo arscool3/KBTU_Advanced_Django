@@ -48,7 +48,7 @@ def get_presidents(
 
 @app.post('/citizens')
 def add_citizens(citizen: sc.Citizen):
-    db.session.add(db.Citizen(**citizen.model))
+    db.session.add(db.Citizen(**citizen.model_dump()))
     db.session.commit()
     db.session.close()
     return "ok!"
@@ -68,7 +68,7 @@ def get_countries(name: str = None):
 
 @app.post('/country')
 def add_citizens(country: sc.Country):
-    db.session.add(md.Country(**country.model))
+    db.session.add(md.Country(**country.model_dump()))
     db.session.commit()
     db.session.close()
     return "ok!"

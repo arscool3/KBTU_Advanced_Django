@@ -58,17 +58,28 @@ def get_house(address: str = None):
         houses.append(sc.House.model_validate(db_house))
     return houses
 
+@app.post('/human')
+def add_human(human: sc.Human):
+    db.session.add(md.Human(**human.model_dump()))
+    db.session.commit()
+    db.session.close()
 
 @app.post('/cats')
-def add_citizens(cat: sc.Cat):
-    db.session.add(md.Cat(**cat.model))
+def add_cats(cat: sc.Cat):
+    db.session.add(md.Cat(**cat.model_dump()))
     db.session.commit()
     db.session.close()
-    return "ok!"
+    return "Cat added!"
 
 @app.post('/Dog')
-def add_citizens(dog: sc.Dog):
-    db.session.add(md.Dog(**dog.model))
+def add_dogs(dog: sc.Dog):
+    db.session.add(md.Dog(**dog.model_dump()))
     db.session.commit()
     db.session.close()
-    return "ok!"
+    return "Dog added!"
+
+@app.post('/house')
+def add_house(house: sc.House):
+    db.session.add(md.House(**house.model_dump()))
+    db.session.commit()
+    db.session.close()

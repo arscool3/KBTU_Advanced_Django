@@ -14,6 +14,8 @@ class Human(Base):
     id: Mapped[_id]
     name: Mapped[str]
     birth_day: Mapped[date]
+    cats: Mapped["Cat"] = relationship(back_populates='human')
+    dogs: Mapped["Dog"] = relationship(back_populates='human')
 
 
 class Dog(Base):
@@ -21,20 +23,21 @@ class Dog(Base):
 
     id: Mapped[_id]
     name: Mapped[str]
-    human: Mapped[Human] = relationship(back_populates='dog')
+    human_id: Mapped[int] = mapped_column(sqlalchemy.ForeignKey('Human.id'))
+    human: Mapped[Human] = relationship(back_populates='dogs')
 
 
 class Cat(Base):
     __tablename__ = 'Cat'
     id: Mapped[_id]
     name: Mapped[str]
-    human: Mapped[Human] = relationship(back_populates='cat')
+    human_id: Mapped[int] = mapped_column(sqlalchemy.ForeignKey('Human.id'))
+    human: Mapped[Human] = relationship(back_populates='cats')
 
 
 class House(Base):
     __tablename__ = 'House'
     id: Mapped[_id]
     address: Mapped[str]
-    owner: Mapped[int] = mapped_column(sqlalchemy.ForeignKey('Human.id'))
-    cats: Mapped[Cat] = relationship(back_populates='house')
-    dogs: Mapped[Dog] = relationship(back_populates='house')
+    owner_id: Mapped[int] = mapped_column(sqlalchemy.ForeignKey('Human.id'))
+    owner: Mapped[Human] = relationship("Human", backref="house")
