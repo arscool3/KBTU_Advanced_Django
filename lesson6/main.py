@@ -30,7 +30,7 @@ def get_posts():
     db_posts = db.session.execute(select(models.Post)).scalars().all()
     posts = []
     for post in db_posts:
-        post.append(post)
+        posts.append(post)
     return posts
 
 

@@ -1,4 +1,4 @@
-from typing import Annotated
+from typing import Annotated, List
 
 import sqlalchemy
 from sqlalchemy import ForeignKey
@@ -17,7 +17,7 @@ class User(Base):
     name: Mapped[str]
     age: Mapped[int]
 
-    posts: Mapped[list['Post']] = relationship(back_populates='user')
+    posts: Mapped[List['Post']] = relationship(back_populates='user')
 
 
 class Post(Base):
