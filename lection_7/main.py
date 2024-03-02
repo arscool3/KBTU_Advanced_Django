@@ -1,7 +1,5 @@
 import database as db
 import punq
-
-import models
 import schemas as s
 from fastapi import *
 from repository import *

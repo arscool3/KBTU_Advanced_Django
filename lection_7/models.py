@@ -7,12 +7,12 @@ from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 _id = Annotated[int, mapped_column(sqlalchemy.Integer, primary_key=True)]
 
-union_country_table = sqlalchemy.Table('association', Base.metadata,
-                                       sqlalchemy.Column('union_id', sqlalchemy.Integer,
-                                                         sqlalchemy.ForeignKey('unions.id')),
-                                       sqlalchemy.Column('country_id', sqlalchemy.Integer,
-                                                         sqlalchemy.ForeignKey('countries.id'))
-                                       )
+union_country_table = sqlalchemy.Table(
+    "association",
+    Base.metadata,
+    sqlalchemy.Column("union_id", sqlalchemy.Integer, sqlalchemy.ForeignKey("unions.id")),
+    sqlalchemy.Column("country_id", sqlalchemy.Integer, sqlalchemy.ForeignKey("countries.id")),
+)
 
 
 # Country <-> President one to one
