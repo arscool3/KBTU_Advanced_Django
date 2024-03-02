@@ -17,25 +17,7 @@ _id = Annotated[int, mapped_column(sqlalchemy.Integer, primary_key=True)]
 
 
 #student,faculty,school,university,teacher
-"""
-class Parent(Base):
-    __tablename__ = "parents"
 
-    id = Column(Integer, primary_key=True, index=True)
-    name = Column(String(255), index=True)
-
-    children = relationship("Child", back_populates="parent")
-
-
-class Child(Base):
-    __tablename__ = "children"
-
-    id = Column(Integer, primary_key=True, index=True)
-    name = Column(String(255), index=True)
-    parent_id = Column('parent_id', Integer(), ForeignKey('parents.id'), nullable=False)
-
-    parent = relationship("Parent", back_populates="children")
-"""
 class University(Base):
     __tablename__ = 'universities'
     id: Mapped[_id]
@@ -51,6 +33,7 @@ class School(Base):
     university_id: Mapped[int] = mapped_column(sqlalchemy.ForeignKey('universities.id'))
     university: Mapped[University] = relationship(back_populates='school' )
     faculty: Mapped['Faculty'] = relationship(back_populates='school')
+    teacher: Mapped['Teacher'] = relationship(back_populates='school')
     
 class Faculty(Base):
     __tablename__ = 'faculties'
@@ -60,7 +43,6 @@ class Faculty(Base):
     school_id: Mapped[int] = mapped_column(sqlalchemy.ForeignKey('schools.id'))
     school: Mapped[School] = relationship(back_populates='faculty' )
     student: Mapped['Student'] = relationship(back_populates='faculty')
-    teacher:Mapped['Teacher']=relationship(back_populates='faculty')
 
 
         
@@ -70,13 +52,13 @@ class Student(Base):
     name:Mapped[str]
     gpa:Mapped[int]
     faculty_id: Mapped[int] = mapped_column(sqlalchemy.ForeignKey('faculties.id'))
-    faculty: Mapped[Faculty] = relationship(back_populates='Student')
+    faculty: Mapped[Faculty] = relationship(back_populates='student')
 class Teacher(Base):
     __tablename__='teachers'
     id:Mapped[_id]
     name:Mapped[str]
     degree:Mapped[str]
     school_id: Mapped[int] = mapped_column(sqlalchemy.ForeignKey('schools.id'))
-    school: Mapped[School] = relationship(back_populates='Teacher' )
+    school: Mapped[School] = relationship(back_populates='teacher' )
 
 

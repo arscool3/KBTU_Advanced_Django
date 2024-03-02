@@ -1,3 +1,10 @@
+alembic init alembic
+py manage.py dbshell
+docker run --name fastapi -e POSTGRES_PASSWORD=aru -p 5432:5432 postgres
+alembic revision -m 'initial_migration' --autogenerate
+alembic upgrade head
+uvicorn main:app --reload
+
 
 # at least 8 endpoints 
 # at least 4 model   
@@ -10,10 +17,3 @@ university
 # at least 1 dependency injection as class and 2 as methods
 
 
-
-alembic init alembic
-
-docker run --name fastapi2 -e POSTGRES_PASSWORD=aru -p 5433:5433 postgres
-alembic revision -m 'initial_migration' --autogenerate
-alembic upgrade head
-uvicorn main:app --reload
