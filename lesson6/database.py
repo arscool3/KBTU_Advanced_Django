@@ -6,3 +6,5 @@ url = 'postgresql://postgres:postgres@localhost:5433/postgres'
 
 engine = create_engine(url)
 session = Session(engine)
+
+Base = declarative_base()

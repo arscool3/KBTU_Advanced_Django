@@ -1,11 +1,43 @@
-from fastapi import FastAPI
+from typing import Annotated
+
+import punq
+from fastapi import FastAPI, Depends
 from sqlalchemy import select
 
 import database as db
 import schemas
 import models
+from repository import AbsRepository, UserRepository
 
 app = FastAPI()
+
+# Create Web Application using FastAPI
+# You need to implement
+# at least 8 endpoints // I have 6 endpoints
+# at least 4 models // I have 3 working models
+# at least 3 relationships // I have 3 relationships - User-Post, Post-Comment, User-Comment (one to many)
+# at least 1 dependency injection as class and 2 as methods // Not implemented yet
+
+
+class Dependency:
+    def __init__(self, repo: AbsRepository):
+        self.repo = repo
+
+    def get_list(self):
+        self.repo.get_list()
+
+
+def get_container(repository: type[AbsRepository]) -> punq.Container:
+    container = punq.Container()
+    container.register(AbsRepository, repository, instance=repository(session=db.session))
+    container.register(Dependency)
+    return container
+
+# trying to use DI
+
+# @app.get('/users')
+# def get_users(users: Annotated[list[schemas.User], Depends(get_container(UserRepository).resolve(Dependency).get_list)]) -> list[schemas.User]:
+#     return users
 
 
 @app.get('/users')
@@ -40,3 +72,20 @@ def add_post(post: schemas.CreatePost):
     db.session.commit()
     db.session.close()
     return f"{post.title} was published"
+
+
+@app.get('/comments')
+def get_comments():
+    db_comments = db.session.execute(select(models.Comment)).scalars().all()
+    comments = []
+    for comment in db_comments:
+        comments.append(comment)
+    return comments
+
+
+@app.post('/comments')
+def add_comment(comment: schemas.CreateComment):
+    db.session.add(models.Comment(**comment.model_dump()))
+    db.session.commit()
+    db.session.close()
+    return f"{comment.text} was published"
