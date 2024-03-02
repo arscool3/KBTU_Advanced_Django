@@ -33,8 +33,5 @@ class CreateMovie(BaseModel):
 
 
 class Movie(Base):
-    description: str
-    rating: float
-    duration: int
     director: Director
-    genre: Genre
+    genres: Genre

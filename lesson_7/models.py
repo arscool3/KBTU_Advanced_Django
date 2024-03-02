@@ -21,12 +21,12 @@ class Genre(Cinema, Base):
 
 class Director(Cinema, Base):
     __tablename__ = 'directors'
-    film: Mapped['Film'] = relationship(back_populates='directors')
+    films: Mapped['Film'] = relationship(back_populates='director')
 
 
 class Film(Cinema, Base):
     __tablename__ = 'films'
     director_id: Mapped[int] = mapped_column(sqlalchemy.ForeignKey('directors.id'))
     genre_id: Mapped[int] = mapped_column(sqlalchemy.ForeignKey('genres.id'))
-    directors: Mapped[list[Director]] = relationship(back_populates='film')
+    director: Mapped[list[Director]] = relationship(back_populates='films')
     genres: Mapped[list[Genre]] = relationship(back_populates='film')

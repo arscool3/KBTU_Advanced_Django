@@ -2,7 +2,7 @@ from fastapi import FastAPI, Depends
 from sqlalchemy.orm.session import Session
 from sqlalchemy import select
 
-from database import session as db_session
+from database import session as db_session, get_db
 from schemas import CreateGenre, Genre, CreateDirector, CreateMovie, Movie
 import models as db
 
@@ -17,17 +17,6 @@ movies = [
     'Space Odyssey',
     '1+1',
 ]
-
-
-def get_db():
-    session = db_session()
-    try:
-        yield session
-        session.commit()
-    except:
-        raise
-    finally:
-        session.close()
 
 
 @app.post('/genre')

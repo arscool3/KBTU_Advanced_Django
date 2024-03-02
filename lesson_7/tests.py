@@ -28,6 +28,7 @@ def override_get_session():
 
 app.dependency_overrides[get_db] = override_get_session
 
+
 @pytest.fixture
 def test_db():
     Base.metadata.create_all(bind=engine)
@@ -61,10 +62,12 @@ def test_get_directors(test_db):
 
 
 def test_add_movie(test_db):
+    client.post("/director", json={"name": "dir"})
+    client.post("/genre", json={'name': 'drama'})
     response = client.post("/film", json={
         "director_id": 1,
         "genre_id": 1,
-        "name": "string"
+        "name": "string",
     })
     assert response.status_code == 200
     response = client.get("/films")
