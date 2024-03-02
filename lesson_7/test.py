@@ -10,7 +10,7 @@ from schemas import CreateGenre
 
 client = TestClient(app)
 
-url = 'postgresql://postgres:601246@localhost:5432/lesson7'
+url = 'postgresql://postgres:postgres@localhost:5433/lesson7'
 engine = sqlalchemy.create_engine(url)
 session = Session(engine)
 
