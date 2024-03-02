@@ -32,6 +32,7 @@ app.add_api_route("/planets", get_container(PlanetRepository).resolve(Dependency
 app.add_api_route("/satellites", get_container(SatelliteRepository).resolve(Dependency), methods=["GET"])
 
 
+
 @app.post("/stars")
 def add_citizens(star: StarCreate) -> str:
     session.add(db.Star(**star.model_dump()))

@@ -37,15 +37,15 @@ class PlanetRepository(AbcRepository):
         print(2)
         db_planet = self._session.get(db.Planet, id)
         print(db_planet)
-        return Star.model_validate(db_planet)
+        return Planet.model_validate(db_planet)
 
 
 class SatelliteRepository(AbcRepository):
     def __init__(self, session: Session):
         self.session = session
 
-    def get_by_id(self, id: int) -> Planet:
+    def get_by_id(self, id: int) -> Satellite:
         print(2)
-        db_planet = self._session.get(db.Planet, id)
-        print(db_planet)
-        return Star.model_validate(db_planet)
+        db_satellite = self._session.get(db.Satellite, id)
+        print(db_satellite)
+        return Satellite.model_validate(db_satellite)
