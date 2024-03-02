@@ -1,6 +1,6 @@
 from pydantic import BaseModel
 
-__all__ = ("Genre", "Director", "Movie", "CreateGenre")
+__all__ = ("Genre", "Director", "Movie", "CreateGenre", "CreateMovie", "CreateDirector")
 
 
 class Base(BaseModel):
@@ -24,11 +24,23 @@ class Director(Base):
 
 
 class Movie(Base):
-    description: str
-    rating: int
-    duration: float
+    # description: str
+    # rating: int
+    # duration: float
     director: Director
     genres: list[Genre]
+
+
+class CreateMovie(BaseModel):
+    name: str
+    # description: str
+    # rating: int
+    # duration: float
+    director_id: int
+
+
+class CreateDirector(BaseModel):
+    name: str
 
 # Movie m2o Director
 # Movie m2m Genre
