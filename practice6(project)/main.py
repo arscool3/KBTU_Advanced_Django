@@ -4,6 +4,7 @@ from pydantic import BaseModel
 import database as db
 import core.schemas as sch
 import core.models as mdl
+from fastapi import HTTPException
 
 app = FastAPI()
 
@@ -61,13 +62,25 @@ def add_to_cart(cartitem: sch.CartItem)-> str:
 
 @app.get("/cartitems")
 def get_cartitems():
-    db_customers = db.session.execute(
+    db_cartitems = db.session.execute(
             select(mdl.CartItem)
         ).scalars().all()
    
-    customers = []
-    for customer in db_customers:
-        customers.append(sch.Customer.model_validate(customer))
-    return customers
+    cartitems = []
+    for cartitem in db_cartitems:
+        cartitems.append(sch.CartItem.model_validate(cartitem))
+    return cartitems
 
 
+@app.get("/cartitems/{customer_id}")
+def get_cartitems_for_customer(customer_id: int):
+    customer = db.session.query(mdl.Customer).filter(mdl.Customer.id == customer_id).first()
+    if not customer:
+        raise HTTPException(status_code=404, detail="Customer not found")
+
+    cartitems = db.session.query(mdl.CartItem).join(mdl.Cart).filter(mdl.Cart.customer_id == customer_id).all()
+
+    validated_cartitems = []
+    for cartitem in cartitems:
+        validated_cartitems.append(sch.CartItem.model_validate(cartitem))
+    return validated_cartitems
