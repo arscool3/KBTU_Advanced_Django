@@ -15,6 +15,6 @@ films = [
 def get_films() -> list:
     return films
 
-@app.post('/genre')
-def add_genre() -> str:
+# @app.post('/genre')
+# def add_genre() -> str:
     
