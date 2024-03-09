@@ -70,4 +70,5 @@ class CreateFollow(BaseFollow):
 
 
 ReturnType = User | Post | Comment
+CreationType = CreateUser | CreatePost | CreateComment
 
