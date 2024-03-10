@@ -32,7 +32,7 @@ async def delete_follower(uid: int, db: Session = Depends(dependencies.get_db)):
     return db_follower
 
 
-@router.read("/", response_model=list[schemas.Following])
+@router.get("/", response_model=list[schemas.Following])
 async def read_followings(db: Session = Depends(dependencies.get_db)):
     followings = db.query(models.Following).all()
     return followings

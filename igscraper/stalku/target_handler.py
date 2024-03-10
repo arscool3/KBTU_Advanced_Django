@@ -104,7 +104,7 @@ async def fetch_target_uid(username: str):
     return {"uid": uid}
 
 
-@router.get("/{uid}", response_model=schemas.Target, status_code=201)
+@router.post("/{uid}", response_model=schemas.Target, status_code=201)
 async def create_target(uid: str, db: Session = Depends(dependencies.get_db)):
     db_target = models.Target(uid=uid)
     db.add(db_target)
