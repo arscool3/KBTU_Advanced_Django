@@ -37,6 +37,7 @@ class Vehicle(ModelBase, IdBase):
     mark_id: Mapped[int] = mapped_column(sqlalchemy.ForeignKey("marks.id"))
     mark: Mapped[Mark] = relationship(back_populates="vehicles")
     name: Mapped[str]
+    vin: Mapped[str] = mapped_column(sqlalchemy.String, unique=True)
     owner_id: Mapped[str] = mapped_column(sqlalchemy.ForeignKey("people.iin"))
     owner: Mapped["Person"] = relationship(back_populates="vehicles")
     fines: Mapped[list["Fine"]] = relationship(back_populates="fined_vehicle")
