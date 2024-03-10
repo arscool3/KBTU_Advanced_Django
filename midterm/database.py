@@ -1,7 +1,7 @@
 from sqlalchemy import create_engine
 from sqlalchemy.orm import Session
 
-url = "postgresql://postgres:postgres@localhost/postgres"
+url = "postgresql://postgres:password@postgres/postgres"
 
 engine = create_engine(url)
 

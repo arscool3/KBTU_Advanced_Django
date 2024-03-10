@@ -12,7 +12,7 @@ from models import ModelBase
 
 client = TestClient(app)
 
-url = 'postgresql://postgres:postgres@localhost:5433/postgres'
+url = 'postgresql://postgres:password@postgres-test:5433/postgres'
 engine = sqlalchemy.create_engine(url)
 test_session = Session(engine)
 

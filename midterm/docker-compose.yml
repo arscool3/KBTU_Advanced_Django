@@ -1,0 +1,40 @@
+version: "3.8"
+services:
+  fastapi:
+    restart: always
+    container_name: fastapiapp
+    build:
+      context: .
+      dockerfile: Dockerfile
+    volumes:
+      - .:/fastapiapp
+    ports:
+      - "80:8000"
+    env_file:
+      - .env
+    depends_on:
+      - postgres-test
+      - postgres
+
+  postgres:
+    restart: always
+    container_name: database
+    image: postgres
+    volumes:
+      - postgres-data:/var/lib/postgresql/data/
+    ports:
+      - "5432:5432"
+    environment:
+      - POSTGRES_PASSWORD=password
+
+  postgres-test:
+    restart: always
+    container_name: test_database
+    image: postgres
+    ports:
+      - "5433:5432"
+    environment:
+      - POSTGRES_PASSWORD=password
+
+volumes:
+  postgres-data:
