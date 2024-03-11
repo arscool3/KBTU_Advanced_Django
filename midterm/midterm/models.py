@@ -3,13 +3,13 @@ from sqlalchemy.orm import Mapped, mapped_column, relationship
 from database import Base
 
 ''' 
- Models: User, Post, Favorite, Comment, Like, Category
- Relationships
- User one to many Post, Comment, Like
- User one to one Favorite
- Favorite many to many Post
- Post one to many Like, Comment
- Post one to one Category
+Models: User, Post, Favorite, Comment, Like, Category
+Relationships
+User one to many Post, Comment, Like
+User one to one Favorite
+Favorite many to many Post
+Post one to many Like, Comment
+Post one to one Category
 '''
 
 
