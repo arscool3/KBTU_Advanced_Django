@@ -41,6 +41,7 @@ class BasicJob(BaseModel):
     salary: float
     time: str
     year_of_experience: int
+    employer_id: int
 
     class Config:
         from_attributes = True
