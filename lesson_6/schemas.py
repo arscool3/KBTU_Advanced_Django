@@ -19,7 +19,6 @@ class Item(ItemBase):
     id: int
 
 
-
 class UserBase(BaseModel):
     name: str
     email: str

@@ -1,10 +1,10 @@
 from typing import Annotated
 import sqlalchemy
 from sqlalchemy.orm import Mapped, mapped_column, relationship
-from sqlalchemy.ext.declarative import declarative_base
+from database import Base
 
 _id = Annotated[int, mapped_column(sqlalchemy.Integer, primary_key=True)]
-Base = declarative_base()
+
 
 class Item(Base):
     __tablename__ = 'items'
