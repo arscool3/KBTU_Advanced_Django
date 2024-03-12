@@ -2,7 +2,6 @@ from pydantic import BaseModel
 
 
 class User(BaseModel):
-
     class Config:
         from_attributes = True
 
@@ -17,3 +16,22 @@ class CreateUser(BaseModel):
     first_name: str
     last_name: str
     password: str
+
+
+class GetFavorite(BaseModel):
+    class Config:
+        from_attributes = True
+
+    id: str
+    owner_id: str
+
+
+class CreateCategory(BaseModel):
+    name: str
+
+
+class CreatePost(BaseModel):
+    title: str
+    content: str
+    author_id: str
+    category_id: str
