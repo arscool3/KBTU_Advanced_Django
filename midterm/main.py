@@ -11,9 +11,9 @@
 
 # Requirements:
 # Use all topics in syllabus
-# Minimum 15 api handlers (post, get) // 12
+# Minimum 15 api handlers (post, get) // 16
 # Use DI as class, as function // 0 - callable and with methods
-# 6 Models, 4 relationships // 6 models, 5 relationships
+# 6 Models, 4 relationships // 6 models, 6 relationships
 # Write min 10 tests // 0
 
 
@@ -26,7 +26,9 @@ app = FastAPI()
 
 @app.get('/employers')
 def get_employers():
-    pass
+    db_employers = db.session.execute().scalars().all()
+    employers = [schemas.Employer.model_validate(employer) for employer in db_employers]
+    return employers
 
 
 @app.post('/employers')
@@ -35,6 +37,13 @@ def add_employer(employer: schemas.CreateEmployer):
     db.session.commit()
     db.session.close()
     return f"{employer.name} was added"
+
+
+@app.get('/jobs')
+def get_jobs():
+    db_jobs = db.session.execute().scalars().all()
+    jobs = [schemas.Job.model_validate(job) for job in db_jobs]
+    return jobs
 
 
 @app.post('/jobs')
@@ -142,4 +151,19 @@ def get_job_skills(job_id: int):
     return f"Skills that is {job.title} required: {skills}"
 
 
-# get all methods
+@app.get('/jobs/applications')
+def get_job_applications(job_id: int):
+    db_job = db.session.get(models.Job, job_id)
+    db_applications = db_job.applications
+    applications = [schemas.Application.model_validate(application) for application in db_applications]
+    return applications
+
+
+@app.put('/applications')
+def get_job_applications(application_id: int, status: str):
+    db_applications = db.session.get(models.Application, application_id)
+    setattr(db_applications, 'status', status)
+    application = schemas.Application.model_validate(db_applications)
+    db.session.commit()
+    db.session.close()
+    return application
