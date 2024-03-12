@@ -96,27 +96,29 @@ def get_candidate_resumes(candidate_id: int):
 
 
 @app.post('/candidates/applications')
-def add_application_to_candidate(candidate_id: int, job_id: int):
-    db_candidate = db.session.get(models.Candidate, candidate_id)
-    db_job = db.session.get(models.Job, job_id)
+def add_application_to_candidate(application: schemas.CreateApplication):
+    db.session.add(models.Application(**application.model_dump()))
 
-    db_candidate.jobs.append(db_job)
-    db_job.candidates.append(db_candidate)
+    db_candidate = db.session.get(models.Candidate, application.candidate_id)
+    db_job = db.session.get(models.Job, application.job_id)
+    db_resume = db.session.get(models.Resume, application.resume_id)
 
     candidate = schemas.Candidate.model_validate(db_candidate)
     job = schemas.Job.model_validate(db_job)
+    resume = schemas.Resume.model_validate(db_resume)
+
     db.session.commit()
     db.session.close()
-    return f"{candidate.name} applied to the job: {job.title}"
+    return f"{candidate.name} applied to the job: {job.title} with resume {resume.title}"
 
 
-@app.get('/candidates/jobs')
+@app.get('/candidates/applications')
 def get_candidate_skills(candidate_id: int):
     db_candidate = db.session.get(models.Candidate, candidate_id)
     candidate = schemas.Candidate.model_validate(db_candidate)
-    db_jobs = db_candidate.jobs
-    jobs = [schemas.Job.model_validate(job) for job in db_jobs]
-    return f"Jobs that is {candidate.name} applied: {jobs}"
+    db_applications = db_candidate.applications
+    applications = [schemas.Application.model_validate(application) for application in db_applications]
+    return f"Jobs that is {candidate.name} applied: {applications}"
 
 
 @app.post('/jobs/skills')
@@ -139,3 +141,5 @@ def get_job_skills(job_id: int):
     skills = [schemas.Skill.model_validate(skill) for skill in db_skills]
     return f"Skills that is {job.title} required: {skills}"
 
+
+# get all methods

@@ -90,7 +90,8 @@ class CreateApplication(BasicApplication):
 
 
 class BasicResume(BaseModel):
-    candidate_id: str
+    title: str
+    candidate_id: int
     location: str
     education: str
     years_of_experience: int

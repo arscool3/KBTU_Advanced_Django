@@ -41,7 +41,8 @@ class Candidate(Base):
     name: Mapped[str]
     age: Mapped[int]
 
-    applications: Mapped[list['Application']] = relationship(back_populates='candidates')
+    applications: Mapped[list['Application']] = relationship(back_populates='candidate')
+    resumes: Mapped[list['Resume']] = relationship(back_populates='candidate')
 
 
 class Job(Base):
@@ -87,7 +88,9 @@ class Application(Base):
 
 class Resume(Base):
     __tablename__ = 'resumes'
+
     id: Mapped[_id]
+    title: Mapped[str]
     candidate_id: Mapped[int] = mapped_column(ForeignKey('candidates.id'))
     location: Mapped[str]
     education: Mapped[str]
@@ -95,4 +98,5 @@ class Resume(Base):
 
     skills: Mapped[list['Skill']] = relationship(secondary=resume_skills_association, back_populates='resumes')
     applications: Mapped[list['Application']] = relationship(back_populates='resume')
+    candidate: Mapped['Candidate'] = relationship(back_populates='resumes')
 
