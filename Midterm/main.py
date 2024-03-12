@@ -1,32 +1,22 @@
-from fastapi import FastAPI, Depends
+from fastapi import FastAPI, HTTPException, Depends, Body
 from sqlalchemy.orm import Session
-from category.models import Category
-from category.schemas import CreateCategory
+
 from database import get_db
+from user.repository import UserRepo
 
 
 app = FastAPI()
 
-
-# @app.get("/category")
-# async def get(db: Session = Depends(get_db)):
-#     repo = CategoryRepo(session=db)
-#     return repo.list()
-
-@app.post("/category", response_model=CreateCategory)
-async def create_category(category: CreateCategory, db: Session = Depends(get_db)):
-    db_category = Category(**category.dict())
-    db.add(db_category)
-    db.commit()
-    db.refresh(db_category)
-    return db_category
-
-# @app.post("/category")
-# async def post(request_body: CreateCategory, db: Session = Depends(get_db)):
-#     repo = CategoryRepo(session=db)
-#     return repo.create(request_body)
+@app.post("/users/")
+def create_category(user_request: UserRepo, db: Session = Depends(get_db)):
+    new_user = user_request.create()
+    db.add(new_user)
+    try:
+        db.commit()
+        db.refresh(new_user)
+    except Exception as e:
+        db.rollback()
+        raise HTTPException(status_code=400, detail=str(e))
+    return new_user
 
 
-@app.get("/hello/{name}")
-async def say_hello(name: str):
-    return {"message": f"Hello {name}"}

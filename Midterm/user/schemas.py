@@ -1,16 +1,16 @@
-from cart.schemas import Cart
+from cart import schemas
 from helpers import BaseSchema
 
 
-class BaseProduct(BaseSchema):
+class BaseUser(BaseSchema):
     name: str
     email: str
 
 
-class User(BaseProduct):
+class User(BaseUser):
     id: int
-    cart: Cart
+    cart: schemas.Cart
 
 
-class CreateUser(BaseProduct):
+class CreateUser(BaseUser):
     pass

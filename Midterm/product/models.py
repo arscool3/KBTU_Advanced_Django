@@ -12,9 +12,9 @@ class Product(Base):
     name: Mapped[str]
     description: Mapped[str] = mapped_column(nullable=True)
     price: Mapped[float]
-    category_id: Mapped[int] = mapped_column(sqlalchemy.ForeignKey('category.id'))
-    firm_id: Mapped[int] = mapped_column(sqlalchemy.ForeignKey('firm.id'))
+    category_id: Mapped[int] = mapped_column(sqlalchemy.ForeignKey("category.id"))
+    firm_id: Mapped[int] = mapped_column(sqlalchemy.ForeignKey("firm.id"))
 
-    category = relationship("Category", back_populates='products')
+    category = relationship("Category", back_populates="products")
     firm = relationship("Firm", back_populates='products')
     cart_items = relationship("CartItem", back_populates="product")

@@ -6,6 +6,8 @@ class BaseSchema(BaseModel):
 
     class Config:
         from_attributes = True
+        arbitrary_types_allowed = True
+        orm_mode = True
 
 
 class AbcRepository:

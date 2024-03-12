@@ -8,11 +8,11 @@ _id = Annotated[int, mapped_column(sqlalchemy.Integer, primary_key=True)]
 
 
 class Category(Base):
-    __tablename__ = 'category'
+    __tablename__ = "category"
     id: Mapped[_id]
     name: Mapped[str]
     description: Mapped[str] = mapped_column(nullable=True)
 
-    products = relationship("Product", back_populates='category')
+    products = relationship("Product", back_populates="category")
 
 

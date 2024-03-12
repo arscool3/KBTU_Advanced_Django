@@ -12,7 +12,9 @@ class CartItem(Base):
     amount: Mapped[int] = mapped_column(default=1)
 
     product_id: Mapped[int] = mapped_column(sqlalchemy.ForeignKey("product.id"))
-    cart_id: Mapped[int] = mapped_column(sqlalchemy.ForeignKey('cart.id'))
+    cart_id: Mapped[int] = mapped_column(sqlalchemy.ForeignKey("cart.id"))
 
     product = relationship("Product", back_populates="cart_item")
-    cart = relationship("Cart", back_populates='cart_items')
+    cart = relationship("cart_item", back_populates="cart_items")
+
+
