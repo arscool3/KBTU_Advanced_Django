@@ -65,12 +65,18 @@ class OrderCreate(BaseModel):
     total_price: float
     status: str
 
+    class Config:
+        from_attributes = True
+
 
 class OrderItemCreate(BaseModel):
     order_id: int
     book_id: int
     quantity: int
     price: float
+
+    class Config:
+        from_attributes = True
 
 
 class OrderItem(OrderItemCreate):
@@ -82,10 +88,7 @@ class Order(OrderCreate):
     id: int
     date: datetime
     user: User
-    items: List[ForwardRef('OrderItem')] = []
-
-
-Order.update_forward_refs()
+    items: List[OrderItem] = []
 
 
 ReturnType = Union[Book, Genre, Publisher, Order, OrderItem]

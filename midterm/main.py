@@ -34,10 +34,19 @@ class Dependency:
         return self.repo.get_by_id(id)
 
 
+class DependencyAll:
+    def __init__(self, repo: AbcRepository):
+        self.repo = repo
+
+    def __call__(self) -> list[ReturnType]:
+        return self.repo.get_all()
+
+
 def get_container(repository: type[AbcRepository]) -> punq.Container:
     container = punq.Container()
     container.register(AbcRepository, repository, instance=repository(session=session))
     container.register(Dependency)
+    container.register(DependencyAll)
     return container
 
 
@@ -46,6 +55,17 @@ app.add_api_route("/genres", get_container(GenreRepository).resolve(Dependency),
 app.add_api_route("/publishers", get_container(PublisherRepository).resolve(Dependency), methods=["GET"])
 app.add_api_route("/orders", get_container(OrderRepository).resolve(Dependency), methods=["GET"])
 app.add_api_route("/order_items", get_container(OrderItemRepository).resolve(Dependency), methods=["GET"])
+
+app.add_api_route("/all_books", get_container(BookRepository).resolve(DependencyAll), methods=["GET"])
+app.add_api_route("/all_genres", get_container(GenreRepository).resolve(DependencyAll), methods=["GET"])
+app.add_api_route("/all_publishers", get_container(PublisherRepository).resolve(DependencyAll), methods=["GET"])
+app.add_api_route("/all_orders", get_container(OrderRepository).resolve(DependencyAll), methods=["GET"])
+app.add_api_route("/all_order_items", get_container(OrderItemRepository).resolve(DependencyAll), methods=["GET"])
+
+@app.get("/books_by_price")
+def get_books_by_price(session: Session = Depends(get_db)):
+    books = session.query(db.Book).order_by(db.Book.price).all()
+    return books
 
 
 @app.post("/users")
