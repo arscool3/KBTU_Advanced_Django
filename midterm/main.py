@@ -1,5 +1,7 @@
 # Job site
+from typing import Annotated
 
+import punq
 # job -> title, salary, time, experience, employer(many to one)(1), skills (many to many)(2)
 # employer -> name, location, jobs (one to many)(1)
 # candidate -> name, age, applications(one to many)(3), resumes(one to many)(4)
@@ -11,17 +13,40 @@
 
 # Requirements:
 # Use all topics in syllabus
-# Minimum 15 api handlers (post, get) // 16
+# Minimum 15 api handlers (post, get) // 17
 # Use DI as class, as function // 0 - callable and with methods
-# 6 Models, 4 relationships // 6 models, 6 relationships
+# 6 Models, 4 relationships // 6 models, 5 relationships
 # Write min 10 tests // 0
 
 
-from fastapi import FastAPI
+from fastapi import FastAPI, Depends
 import database as db
 import models
 import schemas
+from repository import BasicRepository, JobBasicRepository
+
 app = FastAPI()
+
+
+class BasicDependency:
+    def __init__(self, repo: BasicRepository):
+        self.repo = repo
+
+    def __call__(self, id: int) -> schemas.ReturnType:
+        return self.repo
+
+    def get_all(self) -> list[schemas.ReturnType]:
+        return self.repo.get_all()
+
+    def add(self, data: schemas.CreateType):
+        return self.repo.add(data)
+
+
+def get_basic_container(repository: type[BasicRepository]) -> punq.Container:
+    container = punq.Container()
+    container.register(BasicRepository, repository, instance=repository(session=db.session))
+    container.register(BasicDependency)
+    return container
 
 
 @app.get('/employers')
@@ -40,18 +65,17 @@ def add_employer(employer: schemas.CreateEmployer):
 
 
 @app.get('/jobs')
-def get_jobs():
-    db_jobs = db.session.execute().scalars().all()
-    jobs = [schemas.Job.model_validate(job) for job in db_jobs]
+def get_jobs(jobs: Annotated[list[schemas.Job], Depends(get_basic_container(JobBasicRepository).resolve(BasicDependency).get_all)]):
+    if jobs is None:
+        return 'No jobs'
     return jobs
 
 
 @app.post('/jobs')
-def add_job(job: schemas.CreateJob):
-    db.session.add(models.Job(**job.model_dump()))
-    db.session.commit()
-    db.session.close()
-    return f"{job.title} was added"
+def add_job(job: Annotated[schemas.CreateJob, Depends(get_basic_container(JobBasicRepository).resolve(BasicDependency).add)]):
+    if job is None:
+        return 'Try again'
+    return job
 
 
 @app.post('/candidates')
@@ -78,6 +102,13 @@ def add_skill(skill: schemas.CreateSkill):
 
 
 @app.get('/skills')
+def get_skills():
+    db_skills = db.session.execute().scalars().all()
+    skills = [schemas.Skill.model_validate(skill) for skill in db_skills]
+    return skills
+
+
+@app.get('/skills/{title}')
 def get_skill_by_title(title: str):
     db_skill = db.session.query(models.Skill).filter(models.Skill.title == title).first()
     skill = schemas.Skill.model_validate(db_skill)
