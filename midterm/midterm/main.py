@@ -1,7 +1,8 @@
-from fastapi import FastAPI, Depends
+import http
+import models as db
+from fastapi import FastAPI, Depends, HTTPException
 from sqlalchemy import select, delete
 from sqlalchemy.orm import Session
-import models as db
 from database import session
 from schemas import CreateUser, User
 
@@ -12,33 +13,55 @@ def get_db():
     try:
         yield session
         session.commit()
-    except:
-        raise
+    except Exception as e:
+        session.rollback()
+        raise HTTPException(status_code=500, detail=str(e))
     finally:
         session.close()
 
 
-@app.post("/users")
+@app.post("/users", response_model=dict)
 def add_user(user: CreateUser, session: Session = Depends(get_db)) -> dict:
-    session.add(db.User(**user.model_dump()))
-    return {"message": "User added successfully"}
+    try:
+        new_user = db.User(**user.model_dump())
+        session.add(new_user)
+        return {"message": "User added successfully"}
+    except Exception as e:
+        session.rollback()
+        raise HTTPException(status_code=500, detail=str(e))
 
 
-@app.get("/users")
+@app.get("/users", response_model=list[User])
 def get_users(session: Session = Depends(get_db)):
-    users = session.execute(select(db.User)).scalars().all()
-    user_response = [User.validate(user) for user in users]
-    return user_response
+    try:
+        users = session.execute(select(db.User)).scalars().all()
+        user_response = [User.validate(user) for user in users]
+        return user_response
+    except Exception as e:
+        session.rollback()
+        raise HTTPException(status_code=500, detail=str(e))
 
 
 @app.get("/users/{user_id}", response_model=User)
 def get_user_by_id(user_id: str, session: Session = Depends(get_db)):
-    user = session.query(db.User).filter(db.User.id == user_id).first()
-    return User.validate(user)
+    try:
+        user = session.query(db.User).filter(db.User.id == user_id).first()
+        if user.id:
+            return User.model_validate(user)
+        else:
+            raise HTTPException(status_code=http.HTTPStatus.NOT_FOUND, detail={"message": "User not found"})
+    except Exception as e:
+        session.rollback()
+        raise HTTPException(status_code=500, detail=str(e))
 
 
-@app.delete("/users/{user_id}")
+@app.delete("/users/{user_id}", response_model=dict)
 def delete_user(user_id: str, session: Session = Depends(get_db)):
-    item = session.execute(delete(db.User).where(db.User.id == user_id))
-    print(item.scalars().all())
-    return "User deleted successfully"
+    try:
+        deleted_count = session.execute(delete(db.User).where(db.User.id == user_id)).rowcount
+        if deleted_count == 0:
+            raise HTTPException(status_code=http.HTTPStatus.NOT_FOUND, detail="User not found")
+        return {"message": "User deleted successfully"}
+    except Exception as e:
+        session.rollback()
+        raise HTTPException(status_code=500, detail=str(e))
