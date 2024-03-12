@@ -1,3 +1,5 @@
+from datetime import datetime
+
 from pydantic import BaseModel
 
 
@@ -19,9 +21,7 @@ class CreateEmployer(BasicEmployer):
 
 class BasicCandidate(BaseModel):
     name: str
-    location: str
-    education: str
-    years_of_experience: int
+    age: int
 
     class Config:
         from_attributes = True
@@ -40,7 +40,7 @@ class BasicJob(BaseModel):
     location: str
     salary: float
     time: str
-    year_of_experience: int
+    years_of_experience: int
     employer_id: int
 
     class Config:
@@ -69,3 +69,39 @@ class Skill(BasicSkill):
 class CreateSkill(BasicSkill):
     pass
 
+
+class BasicApplication(BaseModel):
+    candidate_id: int
+    job_id: int
+    resume_id: int
+    date: datetime
+    status: str
+
+    class Config:
+        from_attributes = True
+
+
+class Application(BasicApplication):
+    id: int
+
+
+class CreateApplication(BasicApplication):
+    pass
+
+
+class BasicResume(BaseModel):
+    candidate_id: str
+    location: str
+    education: str
+    years_of_experience: int
+
+    class Config:
+        from_attributes = True
+
+
+class Resume(BasicResume):
+    id: int
+
+
+class CreateResume(BasicResume):
+    pass

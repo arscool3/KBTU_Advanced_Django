@@ -1,11 +1,20 @@
 # Job site
 
-# job -> title, salary, time, experience, employer, skills, candidates,
-# employer -> name, location, jobs
-# candidate -> name, education, experience, location,  jobs (applied)
-# skill -> title, candidates, jobs
+# job -> title, salary, time, experience, employer(many to one)(1), skills (many to many)(2)
+# employer -> name, location, jobs (one to many)(1)
+# candidate -> name, age, applications(one to many)(3), resumes(one to many)(4)
+# skill -> title, jobs(2), applications(many to many)(5)
+# application -> candidate_id, job_id, date, status, candidate(many to one)(3)
+# resume -> candidates_id, skills(many to many)(5), candidate(many to one)(4), experience, education
 
 # try yield finally
+
+# Requirements:
+# Use all topics in syllabus
+# Minimum 15 api handlers (post, get) // 12
+# Use DI as class, as function // 0 - callable and with methods
+# 6 Models, 4 relationships // 6 models, 5 relationships
+# Write min 10 tests // 0
 
 
 from fastapi import FastAPI
@@ -66,30 +75,28 @@ def get_skill_by_title(title: str):
     return skill
 
 
-@app.post('/candidates/skills')
-def add_skill_to_candidate(candidate_id: int, skill_title: str):
-    db_candidate = db.session.get(models.Candidate, candidate_id)
-    db_skill = db.session.query(models.Skill).filter(models.Skill.title == skill_title).first()
-
-    db_candidate.skills.append(db_skill)
-    db_skill.candidates.append(db_candidate)
+@app.post('/candidates/resumes')
+def add_resume_to_candidate(resume: schemas.CreateResume):
+    db_candidate = db.session.get(models.Candidate, resume.candidate_id)
     candidate = schemas.Candidate.model_validate(db_candidate)
+
+    db.session.add(models.Resume(**resume.model_dump()))
     db.session.commit()
     db.session.close()
-    return f"{skill_title} was added to candidate: {candidate.name}"
+    return f"New resume was added to candidate: {candidate.name}"
 
 
-@app.get('/candidates/skills')
-def get_candidate_skills(candidate_id: int):
+@app.get('/candidates/resumes')
+def get_candidate_resumes(candidate_id: int):
     db_candidate = db.session.get(models.Candidate, candidate_id)
     candidate = schemas.Candidate.model_validate(db_candidate)
-    db_skills = db_candidate.skills
-    skills = [schemas.Skill.model_validate(skill) for skill in db_skills]
-    return f"{candidate.name}'s skills: {skills}"
+    db_resumes = db_candidate.resumes
+    resumes = [schemas.Resume.model_validate(resume) for resume in db_resumes]
+    return f"{candidate.name}'s resumes: {resumes}"
 
 
-@app.post('/candidates/jobs')
-def add_skill_to_candidate(candidate_id: int, job_id: int):
+@app.post('/candidates/applications')
+def add_application_to_candidate(candidate_id: int, job_id: int):
     db_candidate = db.session.get(models.Candidate, candidate_id)
     db_job = db.session.get(models.Job, job_id)
 
