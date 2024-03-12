@@ -85,4 +85,50 @@ def get_candidate_skills(candidate_id: int):
     candidate = schemas.Candidate.model_validate(db_candidate)
     db_skills = db_candidate.skills
     skills = [schemas.Skill.model_validate(skill) for skill in db_skills]
-    return skills
+    return f"{candidate.name}'s skills: {skills}"
+
+
+@app.post('/candidates/jobs')
+def add_skill_to_candidate(candidate_id: int, job_id: int):
+    db_candidate = db.session.get(models.Candidate, candidate_id)
+    db_job = db.session.get(models.Job, job_id)
+
+    db_candidate.jobs.append(db_job)
+    db_job.candidates.append(db_candidate)
+
+    candidate = schemas.Candidate.model_validate(db_candidate)
+    job = schemas.Job.model_validate(db_job)
+    db.session.commit()
+    db.session.close()
+    return f"{candidate.name} applied to the job: {job.title}"
+
+
+@app.get('/candidates/jobs')
+def get_candidate_skills(candidate_id: int):
+    db_candidate = db.session.get(models.Candidate, candidate_id)
+    candidate = schemas.Candidate.model_validate(db_candidate)
+    db_jobs = db_candidate.jobs
+    jobs = [schemas.Job.model_validate(job) for job in db_jobs]
+    return f"Jobs that is {candidate.name} applied: {jobs}"
+
+
+@app.post('/jobs/skills')
+def add_skill_to_job(job_id: int, skill_title: str):
+    db_job = db.session.get(models.Job, job_id)
+    db_skill = db.session.query(models.Skill).filter(models.Skill.title == skill_title).first()
+    db_skill.jobs.append(db_job)
+    db_job.skills.append(db_skill)
+    job = schemas.Job.model_validate(db_job)
+    db.session.commit()
+    db.session.close()
+    return f"{skill_title} was added to candidate: {job.title}"
+
+
+@app.get('/jobs/skills')
+def get_job_skills(job_id: int):
+    db_job = db.session.get(models.Job, job_id)
+    job = schemas.Job.model_validate(db_job)
+    db_skills = db_job.skills
+    skills = [schemas.Skill.model_validate(skill) for skill in db_skills]
+    return f"Skills that is {job.title} required: {skills}"
+
