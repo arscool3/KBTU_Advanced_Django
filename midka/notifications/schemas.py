@@ -9,7 +9,6 @@ class BaseNotification(BaseSchema):
 
 class CreateNotification(BaseNotification):
     user_id: int
-    created_at: datetime
 
 
 class Notification(BaseNotification):
