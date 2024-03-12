@@ -48,9 +48,12 @@ class BaseRepository(AbcRepository):
         return schema.model_validate(instance)
 
     def create(self, body: BaseModel):
-        self.session.add(self.model(**body.model_dump()))
+        instance = self.model(**body.model_dump())
+        self.session.add(instance)
         self.session.commit()
-        return body
+
+        schema: BaseModel = self.get_schema("create")
+        return schema.model_validate(instance)
 
     def delete(self, id: int):
         self.session.execute(delete(self.model).where(self.model.id == id))

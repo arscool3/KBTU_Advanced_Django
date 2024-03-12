@@ -14,6 +14,11 @@ class CreateUser(BaseUser):
     project_id: int
 
 
+class CreateUserResponse(BaseUser):
+    id: int
+    notifications: list[Notification]
+
+
 class User(BaseUser):
     id: int
     notifications: list[Notification]

@@ -8,5 +8,5 @@ class TaskCommentRepo(BaseRepository):
     action_schema = {
         "list": schemas.TaskComment,
         "retrieve": schemas.TaskComment,
-        "create": schemas.CreateTaskComment,
+        "create": schemas.CreateTaskCommentResponse,
     }

@@ -8,6 +8,6 @@ class CategoryRepo(BaseRepository):
     action_schema = {
         "list": schemas.Category,
         "retrieve": schemas.Category,
-        "create": schemas.CreateCategory,
+        "create": schemas.Category,
     }
 

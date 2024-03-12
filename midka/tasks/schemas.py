@@ -1,6 +1,7 @@
 from typing import Optional, List
 
 from category.schemas import Category
+from projects.schemas import Project
 from task_comments.schemas import TaskComment
 from tasks import choices
 from users.schemas import User
@@ -24,5 +25,4 @@ class Task(BaseTask):
     user: User
     category: Category
     comments: List[TaskComment]
-
-
+    project: Project

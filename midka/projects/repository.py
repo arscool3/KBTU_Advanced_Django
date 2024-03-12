@@ -8,5 +8,5 @@ class ProjectRepo(BaseRepository):
     action_schema = {
         "list": schemas.Project,
         "retrieve": schemas.Project,
-        "create": schemas.CreateProject,
+        "create": schemas.CreateProjectResponse,
     }

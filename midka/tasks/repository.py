@@ -8,5 +8,5 @@ class TaskRepo(BaseRepository):
     action_schema = {
         "list": schemas.Task,
         "retrieve": schemas.Task,
-        "create": schemas.CreateTask,
+        "create": schemas.Task,
     }

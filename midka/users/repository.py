@@ -8,5 +8,5 @@ class UserRepo(BaseRepository):
     action_schema = {
         "list": schemas.User,
         "retrieve": schemas.User,
-        "create": schemas.CreateUser,
+        "create": schemas.CreateUserResponse,
     }

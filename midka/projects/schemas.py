@@ -13,6 +13,10 @@ class CreateProject(BaseProject):
     pass
 
 
+class CreateProjectResponse(BaseProject):
+    id: int
+
+
 class Project(BaseProject):
     id: int
     users: List[User]

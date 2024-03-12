@@ -11,6 +11,11 @@ class CreateTaskComment(BaseTaskComment):
     task_id: int
 
 
+class CreateTaskCommentResponse(BaseTaskComment):
+    id: int
+    user: User
+
+
 class TaskComment(BaseTaskComment):
     id: int
     user: User

@@ -1,4 +1,3 @@
-from typing import List
 from utils.schemas_config import BaseSchema
 
 
