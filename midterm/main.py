@@ -5,6 +5,7 @@ from repository import *
 from typing import Type
 import punq
 from typing import List
+import models as db
 
 app = FastAPI()
 
@@ -51,6 +52,20 @@ app.add_api_route("/seller_by_id", get_container(SellerRepository).resolve(Depen
 app.add_api_route("/customer_by_id", get_container(CustomerRepository).resolve(Dependency1), methods=["GET"])
 app.add_api_route("/shop_by_id", get_container(ShopRepository).resolve(Dependency1), methods=["GET"])
 app.add_api_route("/order_by_id", get_container(OrderRepository).resolve(Dependency1), methods=["GET"])
+
+
+def delete_item(item_id: int, session: Session = Depends(get_db)) -> str:
+    item = session.get(db.Item, item_id)
+    if not item:
+        raise HTTPException(status_code=404, detail="Item not found")
+    session.delete(item)
+    return "Item deleted"
+
+
+@app.delete("/items/{item_id}")
+def del_item(item_id: int, item: str = Depends(delete_item)):
+    return item
+
 
 
 @app.post('/items')
