@@ -20,9 +20,11 @@ def get_db():
         session.close()
 
 
-@app.post("/users", response_model=dict)
+@app.post("/users", response_model=dict, tags=["User"])
 def add_user(user: CreateUser, session: Session = Depends(get_db)) -> dict:
     try:
+        if user.password == "":
+            return {"message": "Password is empty"}
         new_user = db.User(**user.model_dump())
         session.add(new_user)
         return {"message": "User added successfully"}
@@ -31,7 +33,7 @@ def add_user(user: CreateUser, session: Session = Depends(get_db)) -> dict:
         raise HTTPException(status_code=500, detail=str(e))
 
 
-@app.get("/users", response_model=list[User])
+@app.get("/users", response_model=list[User], tags=["User"])
 def get_users(session: Session = Depends(get_db)):
     try:
         users = session.execute(select(db.User)).scalars().all()
@@ -42,7 +44,7 @@ def get_users(session: Session = Depends(get_db)):
         raise HTTPException(status_code=500, detail=str(e))
 
 
-@app.get("/users/{user_id}", response_model=User)
+@app.get("/users/{user_id}", response_model=User, tags=["User"])
 def get_user_by_id(user_id: str, session: Session = Depends(get_db)):
     try:
         user = session.query(db.User).filter(db.User.id == user_id).first()
@@ -55,7 +57,7 @@ def get_user_by_id(user_id: str, session: Session = Depends(get_db)):
         raise HTTPException(status_code=500, detail=str(e))
 
 
-@app.delete("/users/{user_id}", response_model=dict)
+@app.delete("/users/{user_id}", response_model=dict, tags=["User"])
 def delete_user(user_id: str, session: Session = Depends(get_db)):
     try:
         deleted_count = session.execute(delete(db.User).where(db.User.id == user_id)).rowcount
