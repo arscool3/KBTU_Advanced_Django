@@ -1,4 +1,3 @@
-from cart.schemas import Cart
 from helpers import BaseSchema
 from product.schemas import Product
 
@@ -10,7 +9,6 @@ class BaseCartItem(BaseSchema):
 class CartItem(BaseCartItem):
     id: int
     product: Product
-    cart: Cart
 
 
 class CreateCartItem(BaseCartItem):

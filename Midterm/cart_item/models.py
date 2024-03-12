@@ -2,6 +2,7 @@ from typing import Annotated
 import sqlalchemy
 from sqlalchemy.orm import mapped_column, Mapped, relationship
 from database import Base
+from product.models import Product
 
 _id = Annotated[int, mapped_column(sqlalchemy.Integer, primary_key=True)]
 
@@ -14,7 +15,7 @@ class CartItem(Base):
     product_id: Mapped[int] = mapped_column(sqlalchemy.ForeignKey("product.id"))
     cart_id: Mapped[int] = mapped_column(sqlalchemy.ForeignKey("cart.id"))
 
-    product = relationship("Product", back_populates="cart_item")
-    cart = relationship("cart_item", back_populates="cart_items")
+    product = relationship(Product, back_populates="cart_item")
+    cart = relationship("Cart", back_populates="cart_items")
 
 

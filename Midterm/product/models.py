@@ -17,4 +17,4 @@ class Product(Base):
 
     category = relationship("Category", back_populates="products")
     firm = relationship("Firm", back_populates='products')
-    cart_items = relationship("CartItem", back_populates="product")
+    cart_item = relationship("CartItem", back_populates="product")

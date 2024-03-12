@@ -1,22 +1,19 @@
 from fastapi import FastAPI, HTTPException, Depends, Body
+from pydantic import BaseModel
 from sqlalchemy.orm import Session
 
 from database import get_db
+from user.models import User
 from user.repository import UserRepo
-
+from user.schemas import BaseUser, CreateUser
 
 app = FastAPI()
 
 @app.post("/users/")
-def create_category(user_request: UserRepo, db: Session = Depends(get_db)):
-    new_user = user_request.create()
-    db.add(new_user)
-    try:
-        db.commit()
-        db.refresh(new_user)
-    except Exception as e:
-        db.rollback()
-        raise HTTPException(status_code=400, detail=str(e))
+def create_category(user: CreateUser, session: Session = Depends(get_db)):
+    user_repo = UserRepo()
+    user_repo.session = session
+    new_user = user_repo.create(user)
     return new_user
 
 
