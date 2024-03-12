@@ -1,8 +1,8 @@
 from pydantic import BaseModel
 from typing import Union
 
+
 class OrderBase(BaseModel):
-    name: str
     quantity: int
     total_value: int
 
@@ -65,8 +65,10 @@ class CreateCustomer(CustomerBase):
 
 class Item(ItemBase):
     id: int
-    shop: Shop
-    order: Order
+
+
+class Seller(SellerBase):
+    id: int
 
 
 class Shop(ShopBase):
@@ -75,20 +77,14 @@ class Shop(ShopBase):
     seller: Seller
 
 
-class Seller(SellerBase):
+class Customer(CustomerBase):
     id: int
-    shop: Shop
 
 
 class Order(OrderBase):
     id: int
     item: Item
-    customer: 'Customer'
-
-
-class Customer(CustomerBase):
-    id: int
-    order: Order
+    customer: Customer
 
 
 ReturnType = Union[Order, Seller, Customer, Shop, Item]
