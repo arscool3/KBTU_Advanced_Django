@@ -1,6 +1,5 @@
 from datetime import date
 from typing import Annotated
-
 import sqlalchemy
 from sqlalchemy import create_engine
 from sqlalchemy.orm import Session, declarative_base, mapped_column, Mapped, relationship

@@ -1,5 +1,4 @@
 from datetime import date
-
 import punq
 from fastapi import FastAPI, Depends
 from sqlalchemy import select

@@ -16,6 +16,7 @@ class AbcRepository:
         raise NotImplementedError()
 
 
+
 class UserRepository(AbcRepository):
     def __init__(self, session: Session):
         self._session = session

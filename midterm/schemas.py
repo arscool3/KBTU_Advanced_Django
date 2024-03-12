@@ -10,6 +10,7 @@ class BaseUser(BaseModel):
     class Config:
         from_attributes = True
 
+
 class User(BaseUser):
     id: int
 
