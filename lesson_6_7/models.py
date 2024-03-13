@@ -1,6 +1,6 @@
 from typing import Annotated
 
-import sqlalchemy
+import `sqlalchemy`
 from sqlalchemy.orm import mapped_column, Mapped, relationship
 
 from database import Base
@@ -15,17 +15,17 @@ class Cinema:
 
 class Genre(Cinema, Base):
     tablename = 'genres'
-    film: Mapped['Film'] = relationship(back_populates='genres')
+    film: Mapped[list('Film')] = relationship(back_populates='genres')
 
 
 class Director(Cinema, Base):
     tablename = 'directors'
-    film: Mapped['Film'] = relationship(back_populates='directors')
+    film: Mapped[list('Film')] = relationship(back_populates='directors')
 
 
 class Film(Cinema, Base):
     tablename = 'films'
     director_id: Mapped[int] = mapped_column(sqlalchemy.ForeignKey('directors.id'))
     genre_id: Mapped[int] = mapped_column(sqlalchemy.ForeignKey('genres.id'))
-    directors: Mapped[list[Director]] = relationship(back_populates='film')
-    genres: Mapped[list[Genre]] = relationship(back_populates='film')
+    director: Mapped[Director] = relationship(back_populates='film')
+    genre: Mapped[Genre] = relationship(back_populates='film')

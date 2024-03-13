@@ -15,6 +15,7 @@ class AbcRepository:
         pass
 
     @abstractmethod
+    
     def get_by_id(self, id: int) -> ReturnType:
         raise NotImplementedError()
 
