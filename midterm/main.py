@@ -46,6 +46,7 @@ app.add_api_route("/sellers", get_container(SellerRepository).resolve(Dependency
 app.add_api_route("/customers", get_container(CustomerRepository).resolve(Dependency), methods=["GET"])
 app.add_api_route("/shops", get_container(ShopRepository).resolve(Dependency), methods=["GET"])
 app.add_api_route("/order", get_container(OrderRepository).resolve(Dependency), methods=["GET"])
+app.add_api_route("/favorites", get_container(FavRepository).resolve(Dependency), methods=["GET"])
 
 app.add_api_route("/item_by_id", get_container(ItemRepository).resolve(Dependency1), methods=["GET"])
 app.add_api_route("/seller_by_id", get_container(SellerRepository).resolve(Dependency1), methods=["GET"])
@@ -65,7 +66,6 @@ def delete_item(item_id: int, session: Session = Depends(get_db)) -> str:
 @app.delete("/items/{item_id}")
 def del_item(item_id: int, item: str = Depends(delete_item)):
     return item
-
 
 
 @app.post('/items')
@@ -96,5 +96,11 @@ def add_shop(shop: CreateShop, session: Session = Depends(get_db)) -> str:
 def add_shop(order: CreateOrder, session: Session = Depends(get_db)) -> str:
     session.add(db.Order(**order.model_dump()))
     return "Order was added"
+
+
+@app.post('/favorite')
+def add_fav(fav: CreateFav, session: Session = Depends(get_db)) -> str:
+    session.add(db.Favorites(**fav.model_dump()))
+    return "Added"
 
 

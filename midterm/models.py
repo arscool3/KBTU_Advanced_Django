@@ -29,8 +29,9 @@ class Item(Base):
     price: Mapped[int]
     description: Mapped[str]
     rating: Mapped[float]
-    shop: Mapped['Shop'] = relationship(back_populates='items')
+    shop: Mapped['Shop'] = relationship(back_populates='item')
     order: Mapped[List[Order]] = relationship(back_populates='item')
+    favorites: Mapped['Favorites'] = relationship(back_populates='item')
 
 
 class Customer(User, Base):
@@ -38,6 +39,7 @@ class Customer(User, Base):
     id: Mapped[_id]
     name: Mapped[str]
     order: Mapped[List[Order]] = relationship(back_populates='customer')
+    favorites: Mapped['Favorites'] = relationship(back_populates='customer')
 
 
 class Seller(User, Base):
@@ -52,7 +54,16 @@ class Shop(User, Base):
     seller_id: Mapped[int] = mapped_column(sqlalchemy.ForeignKey('sellers.id'))
     item_id: Mapped[int] = mapped_column(sqlalchemy.ForeignKey('items.id'))
     seller: Mapped['Seller'] = relationship(back_populates='shop')
-    items: Mapped[List[Item]] = relationship(back_populates='shop')
+    item: Mapped[List[Item]] = relationship(back_populates='shop')
+
+
+class Favorites(Base):
+    __tablename__ = "favorites"
+    id: Mapped[_id]
+    customer_id: Mapped[int] = mapped_column(sqlalchemy.ForeignKey('customers.id'))
+    item_id: Mapped[int] = mapped_column(sqlalchemy.ForeignKey('items.id'))
+    customer: Mapped[List[Customer]] = relationship(back_populates='favorites')
+    item: Mapped[List[Item]] = relationship(back_populates='favorites')
 
 
 

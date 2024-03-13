@@ -51,6 +51,11 @@ class CreateShop(ShopBase):
     seller_id: int
 
 
+class CreateFav(BaseModel):
+    item_id: int
+    customer_id: int
+
+
 class CreateSeller(SellerBase):
     pass
 
@@ -87,5 +92,14 @@ class Order(OrderBase):
     customer: Customer
 
 
-ReturnType = Union[Order, Seller, Customer, Shop, Item]
+class Favorite(BaseModel):
+    id: int
+    customer: Customer
+    item: Item
+
+    class Config:
+        from_attributes = True
+
+
+ReturnType = Union[Order, Seller, Customer, Shop, Item, Favorite]
 

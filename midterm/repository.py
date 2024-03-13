@@ -88,3 +88,17 @@ class OrderRepository(AbcRepository):
     def get_by_id(self, id: int) -> Order:
         db_order = self._session.get(db.Order, id)
         return Order.model_validate(db_order)
+
+
+class FavRepository(AbcRepository):
+    def __init__(self, session: Session):
+        self._session = session
+
+    def get_all(self) -> List[Favorite]:
+        fav_db = self._session.execute(select(db.Favorites)).scalars().all()
+        favorites = [Favorite.model_validate(fav) for fav in fav_db]
+        return favorites
+
+    def get_by_id(self, id: int) -> Favorite:
+        fav_db = self._session.get(db.Favorite, id)
+        return Favorite.model_validate(fav_db)
