@@ -4,13 +4,12 @@ from fastapi import FastAPI, Depends, HTTPException
 from sqlalchemy import select, delete
 from sqlalchemy.orm import Session
 from database import session
-from schemas import CreateUser, User, GetFavorite, CreateCategory, CreatePost, Category, CreateLike
+from schemas import CreateUser, User, GetFavorite, CreateCategory, CreatePost, Category, CreateLike, GetPost
 
 '''
     User -> update
     Favorite -> update -> delete and add posts
     Post -> CreatePost, DeletePost, UpdatePost, GetPost, GetAllPost
-    Like -> Create, Delete
     Comment -> Create, Update, Delete, GetComment, GetAllComment
 '''
 
@@ -133,10 +132,14 @@ def delete_category(id: str, session: Session = Depends(get_db)):
         raise HTTPException(status_code=500, detail=str(e))
 
 
-@app.get("/post", tags=["Post"])
+@app.get("/post", tags=["Post"], response_model=list[GetPost])
 def get_posts():
-    post = session.query(db.Post).all()
-    return post
+    try:
+        post = session.query(db.Post).all()
+        response = [GetPost.model_validate(p) for p in post]
+        return response
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
 
 
 @app.post("/post", tags=["Post"], response_model=dict)

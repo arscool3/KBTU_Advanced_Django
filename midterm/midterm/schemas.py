@@ -45,6 +45,32 @@ class CreatePost(BaseModel):
     category_id: str
 
 
+class Comments(BaseModel):
+    pass
+
+
+class GetPost(BaseModel):
+    class Config:
+        from_attributes = True
+
+    id: str
+    title: str
+    content: str
+    comments: list[Comments]
+    like: list["Like"]
+    category_id: str
+    author_id: str
+
+
+class Like(BaseModel):
+    class Config:
+        from_attributes = True
+
+    id: str
+    owner_id: str
+    post_id: str
+
+
 class CreateLike(BaseModel):
     owner_id: str = Field(...)
     post_id: str = Field(...)
