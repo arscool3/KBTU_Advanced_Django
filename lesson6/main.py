@@ -23,7 +23,7 @@ class Dependency:
     def __init__(self, repo: AbsRepository):
         self.repo = repo
 
-    def __call__(self, id: int) -> schemas.ReturnType:
+    def __call__(self):
         return self.repo
 
     def get_list(self) -> List[schemas.ReturnType]:
@@ -42,45 +42,33 @@ def get_container(repository: type[AbsRepository]) -> punq.Container:
 
 @app.get('/users')
 def get_users(users: Annotated[List[schemas.User], Depends(get_container(UserRepository).resolve(Dependency).get_list)]):
-    if users is None:
-        return 'No users'
-    return users
+    return 'No comments' if users is None else users
 
 
 @app.post('/users')
-def add_users(user: Annotated[schemas.User, Depends(get_container(UserRepository).resolve(Dependency).add)]):
-    if user is None:
-        return 'Try again'
-    return user
+def add_users(user: schemas.CreateUser,
+              repo: UserRepository = Depends(get_container(UserRepository).resolve(Dependency))):
+    return 'Try again' if user is None else repo.add(data=user)
 
 
 @app.get('/posts')
-def get_users(posts: Annotated[List[schemas.Post], Depends(get_container(PostRepository).resolve(Dependency).get_list)]):
-    if posts is None:
-        return 'No posts'
-    return posts
+def get_posts(posts: Annotated[List[schemas.Post], Depends(get_container(PostRepository).resolve(Dependency).get_list)]):
+    return 'No comments' if posts is None else posts
 
 
 @app.post('/posts')
-def add_users(post: Annotated[schemas.Post, Depends(get_container(PostRepository).resolve(Dependency).add)]):
-    if post is None:
-        return 'Try again'
-    return post
+def add_post(post: schemas.CreatePost,
+             repo: PostRepository = Depends(get_container(PostRepository).resolve(Dependency))):
+    return 'Try again' if post is None else repo.add(data=post)
 
 
 @app.get('/comments')
-def get_users(comments: Annotated[List[schemas.Comment], Depends(get_container(CommentRepository).resolve(Dependency).get_list)]):
-    if comments is None:
-        return 'No comments'
-    return comments
+def get_comments(comments: Annotated[List[schemas.Comment], Depends(get_container(CommentRepository).resolve(Dependency).get_list)]):
+    return 'No comments' if comments is None else comments
 
 
 @app.post('/comments')
-def add_users(comment: Annotated[schemas.Comment, Depends(get_container(CommentRepository).resolve(Dependency).add)]):
-    if comment is None:
-        return 'Try again'
-    return comment
-
-
-# @app.get('posts')
+def add_comment(comment: schemas.CreateComment,
+                repo: CommentRepository = Depends(get_container(CommentRepository).resolve(Dependency))):
+    return 'Try again' if comment is None else repo.add(data=comment)
 

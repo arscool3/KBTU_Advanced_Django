@@ -59,7 +59,7 @@ class CommentRepository(AbsRepository):
         self.session = session
 
     def get_list(self) -> List[schemas.Comment]:
-        db_comments = self.session.execute(select(models.Post)).scalars().all()
+        db_comments = self.session.execute(select(models.Comment)).scalars().all()
         return [schemas.Comment.model_validate(db_comment) for db_comment in db_comments]
 
     def add(self, data: schemas.CreateComment):
