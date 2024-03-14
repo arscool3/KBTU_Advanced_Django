@@ -4,7 +4,7 @@ from product.schemas import Product
 
 class BaseFirm(BaseSchema):
     name: str
-    description = str
+    description: str
 
 
 class Firm(BaseFirm):

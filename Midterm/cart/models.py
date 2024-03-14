@@ -2,7 +2,6 @@ from typing import Annotated
 import sqlalchemy
 from sqlalchemy.orm import mapped_column, Mapped, relationship
 
-import product
 from cart_item.models import CartItem
 from database import Base
 
@@ -16,4 +15,4 @@ class Cart(Base):
     user_id: Mapped[int] = mapped_column(sqlalchemy.ForeignKey('user.id'))
 
     user = relationship('User', back_populates='cart')
-    cart_items = relationship(CartItem, back_populates="cart")
+    cart_items = relationship(CartItem, back_populates="cart", cascade="all, delete")

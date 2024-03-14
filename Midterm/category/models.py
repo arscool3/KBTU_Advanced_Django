@@ -13,6 +13,6 @@ class Category(Base):
     name: Mapped[str]
     description: Mapped[str] = mapped_column(nullable=True)
 
-    products = relationship("Product", back_populates="category")
+    products = relationship("Product", back_populates="category", cascade="all,delete")
 
 

@@ -1,3 +1,5 @@
+from typing import Optional
+
 from cart import schemas
 from helpers import BaseSchema
 
@@ -9,7 +11,7 @@ class BaseUser(BaseSchema):
 
 class User(BaseUser):
     id: int
-    cart: schemas.Cart
+    cart: Optional[schemas.Cart]
 
 
 class CreateUser(BaseUser):

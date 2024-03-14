@@ -13,4 +13,4 @@ class Firm(Base):
     name: Mapped[str]
     description: Mapped[str] = mapped_column(nullable=True)
 
-    products = relationship("Product", back_populates='firm')
+    products = relationship("Product", back_populates="firm", cascade="all,delete")

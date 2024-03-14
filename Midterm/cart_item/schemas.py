@@ -14,4 +14,4 @@ class CartItem(BaseCartItem):
 class CreateCartItem(BaseCartItem):
     cart_id: int
     product_id: int
-    amount: int
+    # amount: int
