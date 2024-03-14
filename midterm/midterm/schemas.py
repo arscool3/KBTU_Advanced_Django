@@ -45,8 +45,21 @@ class CreatePost(BaseModel):
     category_id: str
 
 
+class CreateComments(BaseModel):
+    body: str
+    owner_id: str
+    post_id: str
+
+
 class Comments(BaseModel):
-    pass
+
+    class Config:
+        from_attributes = True
+
+    id: str
+    body: str
+    owner_id: str
+    post_id: str
 
 
 class GetPost(BaseModel):

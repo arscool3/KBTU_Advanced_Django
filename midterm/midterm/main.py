@@ -4,14 +4,9 @@ from fastapi import FastAPI, Depends, HTTPException
 from sqlalchemy import select, delete
 from sqlalchemy.orm import Session
 from database import session
-from schemas import CreateUser, User, GetFavorite, CreateCategory, CreatePost, Category, CreateLike, GetPost
+from schemas import CreateUser, User, GetFavorite, CreateCategory, CreatePost, Category, CreateLike, GetPost, \
+    CreateComments, Comments
 
-'''
-    User -> update
-    Favorite -> update -> delete and add posts
-    Post -> CreatePost, DeletePost, UpdatePost, GetPost, GetAllPost
-    Comment -> Create, Update, Delete, GetComment, GetAllComment
-'''
 
 app = FastAPI()
 
@@ -179,3 +174,61 @@ def delete_like(id: str, session: Session = Depends(get_db)):
         return {"message": "like successfully deleted!"}
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
+
+
+# Comments handlers
+
+@app.get("/comments", status_code=200, tags=["Comments"])
+def read_comments(session: Session = Depends(get_db)):
+    response = session.query(db.Comment).all()
+    return response
+
+
+@app.post("/comments", status_code=http.HTTPStatus.CREATED, tags=["Comments"], response_model=CreateComments)
+def create_comment(comment: CreateComments, session: Session = Depends(get_db)):
+    try:
+        new_comment = db.Comment(**comment.dict())
+        session.add(new_comment)
+        return new_comment
+    except Exception as e:
+        raise HTTPException(status_code=http.HTTPStatus.INTERNAL_SERVER_ERROR, detail=str(e))
+
+
+@app.get("/comments/{comment_id}", status_code=http.HTTPStatus.OK, tags=["Comments"], response_model=Comments)
+def read_comment(comment_id: str, session: Session = Depends(get_db)):
+    try:
+        response = session.query(db.Comment).filter(db.Comment.id == comment_id).first()
+        return Comments.model_validate(response)
+    except Exception as e:
+        raise HTTPException(status_code=http.HTTPStatus.INTERNAL_SERVER_ERROR, detail=str(e))
+
+
+@app.delete("/comments/{comment_id}", status_code=http.HTTPStatus.OK, tags=["Comments"])
+def delete_comment(comment_id: str, session: Session = Depends(get_db)):
+    try:
+        row = session.execute(delete(db.Comment).filter(db.Comment.id == comment_id)).rowcount
+        if row == 0:
+            raise HTTPException(status_code=http.HTTPStatus.NOT_FOUND, detail=f"comment by id {comment_id} not found")
+        return "Comment deleted!"
+    except Exception as e:
+        raise HTTPException(status_code=http.HTTPStatus.INTERNAL_SERVER_ERROR, detail=str(e))
+
+
+@app.patch("/comments/{comment_id}", status_code=http.HTTPStatus.OK, tags=["Comments"])
+def update_comment(comment_id: str, body: str, session: Session = Depends(get_db)):
+    try:
+        response = session.query(db.Comment).where(db.Comment.id == comment_id).first()
+        response.body = body
+        session.commit()
+        return "Comment updated!"
+    except Exception as e:
+        raise HTTPException(status_code=http.HTTPStatus.OK, detail=str(e))
+
+
+@app.get("/comments/{post_id}")
+def get_post_comments(post_id: str, session: Session = Depends(get_db)):
+    try:
+        comments = session.query(db.Comment).where(db.Comment.post_id == post_id).all()
+        print(comments)
+    except Exception as e:
+        raise HTTPException(status_code=http.HTTPStatus.INTERNAL_SERVER_ERROR, detail=str(e))
