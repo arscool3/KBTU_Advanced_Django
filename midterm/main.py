@@ -7,13 +7,10 @@ from starlette import status
 import models as db
 from database import session
 from repository import AbcRepository, BookRepository, GenreRepository, PublisherRepository, OrderRepository, OrderItemRepository
-from services import create_access_token, get_current_user
+from services import create_access_token, get_current_user, pwd_context
 from schemas import UserCreate, ReturnType, BookCreate, GenreCreate, PublisherCreate, OrderCreate, OrderItemCreate
-from passlib.context import CryptContext
 
 app = FastAPI()
-
-pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
 
 def get_db():
@@ -31,7 +28,7 @@ class Dependency:
         self.repo = repo
 
     def __call__(self, id: int) -> ReturnType:
-        return self.repo.get_by_id(id)
+        return self.repo.get_by_id(1)
 
 
 class DependencyAll:
@@ -61,6 +58,7 @@ app.add_api_route("/all_genres", get_container(GenreRepository).resolve(Dependen
 app.add_api_route("/all_publishers", get_container(PublisherRepository).resolve(DependencyAll), methods=["GET"])
 app.add_api_route("/all_orders", get_container(OrderRepository).resolve(DependencyAll), methods=["GET"])
 app.add_api_route("/all_order_items", get_container(OrderItemRepository).resolve(DependencyAll), methods=["GET"])
+
 
 @app.get("/books_by_price")
 def get_books_by_price(session: Session = Depends(get_db)):
