@@ -5,7 +5,7 @@ from sqlalchemy.orm import Session
 
 #db, user,password, db_name
 
-url='postgresql://postgres:aru@localhost/fastapi'
+url='postgresql://postgres:aru@localhost/postgres'
 
 engine=create_engine(url)
 session=Session(engine)

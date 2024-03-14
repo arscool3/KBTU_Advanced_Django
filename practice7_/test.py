@@ -27,6 +27,7 @@ def get_test_db():
         raise
     finally:
         test_session.close()    
+
 app.dependency_orverrides[get_db]=get_test_db
 def test_get_genre(test_db):
     response = client.get("/genre")
@@ -38,3 +39,4 @@ def test_add_genre(test_db):
     assert response.status_code == 200
     response = client.get("/genre")
     assert response.json() == [{'id': 1, 'name': 'drama'}] 
+

@@ -1,6 +1,15 @@
 alembic init alembic
 py manage.py dbshell
 docker run --name fastapi -e POSTGRES_PASSWORD=aru -p 5432:5432 postgres
+alembic init alembic
 alembic revision -m 'initial_migration' --autogenerate
 alembic upgrade head
 uvicorn main:app --reload
+pip install punq
+
+create 3 views with dependency INJECTION
+2 with function dependency INJECTION
+1 with instance of class as callable DI
+# CREATE 3 VIEWS WITH DEPENDECY INJECTION
+# 2 WITH FUNCTION DEPENDENCY INJECTION
+# 1 WITH INSTANCE OF CLASS AS CALLABLE DI

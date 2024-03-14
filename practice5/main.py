@@ -1,3 +1,4 @@
+import punq
 from fastapi.params import Depends
 from pydantic import BaseModel
 from sqlalchemy import select, insert
@@ -6,7 +7,31 @@ from database import session
 
 import models as db
 from schemas import Citizen,CreateCitizen, CreateCountry,Country, CreatePresident, President
+from repository import CitizenRepository,AbstractRepository
 app=FastAPI()
+
+class Dependency:
+    def __init__(self,repo:AbstractRepository):
+        self.repo=repo
+    def __call__(self,id:int)->President|Country|Citizen:
+        return self.repo.get_by_id(id)
+    
+ # for registering dependencies(from the bottom to the top)
+def get_container(repository:type[AbstractRepository]) -> punq.Container:
+    container=punq.Container()
+    container.register(AbstractRepository,repository,instance=repository(session=session))
+    container.register(Dependency)
+    return container
+   
+#dependency_citizen=Dependency(repo=CitizenRepository(session=session))
+@app.get('/citizensDependency')
+def get_citizensDependency(dependency_func:BaseModel=Depends(get_container(CitizenRepository).resolve(Dependency))):
+    return dependency_func
+
+"""
+same as the above function with the decorator but shorter
+app.add_api_route("/citizensDependency",get_container(CitizenRepository).resolve(Dependency),methods=["GET"])
+"""
 
 @app.get('/citizens')
 def get_citizens(name:str=None):

@@ -1,19 +1,12 @@
 alembic init alembic
 py manage.py dbshell
-docker run --name fastapi -e POSTGRES_PASSWORD=aru -p 5432:5432 postgres
+docker run --name postgres -e POSTGRES_PASSWORD=aru -p 5432:5432 postgres
+for the test database
+docker run --name test_postgres -e POSTGRES_PASSWORD=aru -p 5433:5432 postgres
 alembic revision -m 'initial_migration' --autogenerate
 alembic upgrade head
 uvicorn main:app --reload
 
-
-# at least 8 endpoints 
-# at least 4 model   
-student(one to many relationship to faculty)
-teacher(one to many relationship to school)
-faculty(one to many relationship to school)
-school(one to many relationship to university)
-university
-# at least 3 relationships
-# at least 1 dependency injection as class and 2 as methods
-
-
+add 4 testsdock
+2 for films
+2 for directors
