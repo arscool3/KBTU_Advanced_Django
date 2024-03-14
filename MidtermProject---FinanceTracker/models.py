@@ -1,8 +1,7 @@
 from typing import Annotated
 import sqlalchemy
 from sqlalchemy.orm import mapped_column, Mapped, relationship
-from sqlalchemy import Column, ForeignKey, Integer, String, Float, DateTime
-from datetime import datetime
+from datetime import date
 
 from database import Base
 
@@ -18,66 +17,68 @@ class User(Base):
     password: Mapped[str]
 
     accounts: Mapped[list['Account']] = relationship("Account", back_populates="owner")
-    budgets = relationship("Budget", back_populates="user")
-    expenses = relationship("Expense", back_populates="user")
+    budgets: Mapped[list['Budget']] = relationship("Budget", back_populates="users")
+    expenses: Mapped[list['Expense']] = relationship("Expense", back_populates="users")
 
 
 class Account(Base):
     __tablename__ = 'accounts'
 
-    id = Mapped[_id]
-    user_id = Mapped[int] = mapped_column(sqlalchemy.ForeignKey('users.id'))
-    account_name = Mapped[str]
-    account_type = Mapped[str]
+    id: Mapped[_id]
+    user_id: Mapped[int] = mapped_column(sqlalchemy.ForeignKey('users.id'))
+    account_name: Mapped[str]
+    account_type: Mapped[str]
 
-    owner = relationship("User", back_populates="accounts")
-    transactions = relationship("Transaction", back_populates="account")
+    owner: Mapped[User] = relationship("User", back_populates="accounts")
+    transactions: Mapped[list['Transaction']] = relationship("Transaction", back_populates="account")
 
 
 class Transaction(Base):
     __tablename__ = 'transactions'
 
     id: Mapped[_id]
-    account_id: Mapped[int] = relationship(sqlalchemy.ForeignKey('accounts.id'))
-    category_id: Mapped[int] = relationship(sqlalchemy.ForeignKey('categories.id'))
+    account_id: Mapped[int] = mapped_column(sqlalchemy.ForeignKey('accounts.id'))
+    category_id: Mapped[int] = mapped_column(sqlalchemy.ForeignKey('categories.id'))
     amount: Mapped[float]
     description: Mapped[str]
-    transaction_date = Column(DateTime, default=datetime.now)
+    transaction_date: Mapped[date] = mapped_column(sqlalchemy.Date, default=date.today())
 
-    account = relationship("Account", back_populates="transactions")
-    category = relationship("Category", back_populates="transactions")
+    account: Mapped[Account] = relationship("Account", back_populates="transactions")
+    category: Mapped['Category'] = relationship("Category", back_populates="transactions")
 
 
 class Category(Base):
     __tablename__ = 'categories'
-    id = Column(Integer, primary_key=True, index=True)
-    category_name = Column(String)
 
-    transactions = relationship("Transaction", back_populates="category")
-    budgets = relationship("Budget", back_populates="category")
+    id: Mapped[_id]
+    category_name: Mapped[str]
+
+    transactions: Mapped[list[Transaction]] = relationship("Transaction", back_populates="category")
+    budgets: Mapped[list['Budget']] = relationship("Budget", back_populates="category")
 
 
 class Budget(Base):
     __tablename__ = 'budgets'
-    id = Column(Integer, primary_key=True, index=True)
-    user_id = Column(Integer, ForeignKey('users.id'))
-    category_id = Column(Integer, ForeignKey('categories.id'))
-    amount = Column(Float)
-    start_date = Column(DateTime)
-    end_date = Column(DateTime)
 
-    user = relationship("User", back_populates="budgets")
-    category = relationship("Category", back_populates="budgets")
+    id: Mapped[_id]
+    user_id: Mapped[int] = mapped_column(sqlalchemy.ForeignKey('users.id'))
+    category_id: Mapped[int] = mapped_column(sqlalchemy.ForeignKey('categories.id'))
+    amount: Mapped[float]
+    added_date: Mapped[date] = mapped_column(sqlalchemy.Date, default=date.today())
+
+    user: Mapped[User] = relationship("User", back_populates="budgets")
+    category: Mapped[Category] = relationship("Category", back_populates="budgets")
 
 
 class Expense(Base):
     __tablename__ = 'expenses'
-    id = Column(Integer, primary_key=True, index=True)
-    user_id = Column(Integer, ForeignKey('users.id'))
-    account_id = Column(Integer, ForeignKey('accounts.id'))
-    category_id = Column(Integer, ForeignKey('categories.id'))
-    amount = Column(Float)
-    description = Column(String, nullable=True)
-    expense_date = Column(DateTime, default=datetime.now)
 
-    user = relationship("User", back_populates="expenses")
+    id: Mapped[_id]
+    user_id: Mapped[int] = mapped_column(sqlalchemy.ForeignKey('users.id'))
+    account_id: Mapped[int] = mapped_column(sqlalchemy.ForeignKey('accounts.id'))
+    category_id: Mapped[int] = mapped_column(sqlalchemy.ForeignKey('categories.id'))
+    amount: Mapped[float]
+    description: Mapped[str]
+    expense_date: Mapped[date] = mapped_column(sqlalchemy.Date, default=date.today())
+
+    user: Mapped[User] = relationship("User", back_populates="expenses")
