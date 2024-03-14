@@ -1,7 +1,4 @@
 # Job site
-from typing import Annotated
-
-import punq
 # job -> title, salary, time, experience, employer(many to one)(1), skills (many to many)(2)
 # employer -> name, location, jobs (one to many)(1)
 # candidate -> name, age, applications(one to many)(3), resumes(one to many)(4)
@@ -18,12 +15,16 @@ import punq
 # 6 Models, 4 relationships // 6 models, 5 relationships
 # Write min 10 tests // 0
 
-
+from typing import Annotated
+import punq
 from fastapi import FastAPI, Depends
+from sqlalchemy.orm import Session
+
 import database as db
 import models
 import schemas
-from repository import BasicRepository, JobBasicRepository
+from repository import BasicRepository, JobBasicRepository, EmployerBasicRepository, SkillBasicRepository, \
+    CandidateBasicRepository, CandidateRepository, CandidateResumeRepository, CandidateApplicationRepository
 
 app = FastAPI()
 
@@ -32,7 +33,7 @@ class BasicDependency:
     def __init__(self, repo: BasicRepository):
         self.repo = repo
 
-    def __call__(self, id: int) -> schemas.ReturnType:
+    def __call__(self):
         return self.repo
 
     def get_all(self) -> list[schemas.ReturnType]:
@@ -42,6 +43,22 @@ class BasicDependency:
         return self.repo.add(data)
 
 
+def get_db():
+    try:
+        yield db.session
+        db.session.commit()
+    except:
+        raise NotImplementedError()
+    finally:
+        db.session.close()
+
+
+def get_candidate_repository(repo: type[BasicRepository]):
+    def _repo_dependency(session: Session = Depends(get_db)) -> BasicRepository:
+        return repo(session)
+    return _repo_dependency
+
+
 def get_basic_container(repository: type[BasicRepository]) -> punq.Container:
     container = punq.Container()
     container.register(BasicRepository, repository, instance=repository(session=db.session))
@@ -49,116 +66,76 @@ def get_basic_container(repository: type[BasicRepository]) -> punq.Container:
     return container
 
 
+def get_candidate_container(repository: type[CandidateRepository]) -> punq.Container:
+    container = punq.Container()
+    container.register(CandidateRepository, repository, instance=repository(session=db.session))
+    container.register(BasicDependency)
+    return container
+
+
 @app.get('/employers')
-def get_employers():
-    db_employers = db.session.execute().scalars().all()
-    employers = [schemas.Employer.model_validate(employer) for employer in db_employers]
-    return employers
+def get_employers(employers: Annotated[list[schemas.Employer], Depends(get_basic_container(EmployerBasicRepository).resolve(BasicDependency).get_all)]):
+    return 'No employers' if employers is None else employers
 
 
 @app.post('/employers')
-def add_employer(employer: schemas.CreateEmployer):
-    db.session.add(models.Employer(**employer.model_dump()))
-    db.session.commit()
-    db.session.close()
-    return f"{employer.name} was added"
+def add_employer(employer: schemas.CreateEmployer, repo: EmployerBasicRepository = Depends(get_basic_container(EmployerBasicRepository).resolve(BasicDependency))):
+    return 'Try again' if employer is None else repo.add(data=employer)
 
 
 @app.get('/jobs')
 def get_jobs(jobs: Annotated[list[schemas.Job], Depends(get_basic_container(JobBasicRepository).resolve(BasicDependency).get_all)]):
-    if jobs is None:
-        return 'No jobs'
-    return jobs
+    return 'No jobs' if jobs is None else jobs
 
 
 @app.post('/jobs')
-def add_job(job: Annotated[schemas.CreateJob, Depends(get_basic_container(JobBasicRepository).resolve(BasicDependency).add)]):
-    if job is None:
-        return 'Try again'
-    return job
+def add_employer(job: schemas.CreateJob, repo: JobBasicRepository = Depends(get_basic_container(JobBasicRepository).resolve(BasicDependency))):
+    return 'Try again' if job is None else repo.add(data=job)
 
 
 @app.post('/candidates')
-def add_candidate(candidate: schemas.CreateCandidate):
-    db.session.add(models.Candidate(**candidate.model_dump()))
-    db.session.commit()
-    db.session.close()
-    return f"{candidate.name} was added"
+def add_employer(candidate: schemas.CreateCandidate, repo: CandidateBasicRepository = Depends(get_basic_container(CandidateBasicRepository).resolve(BasicDependency))):
+    return 'Try again' if candidate is None else repo.add(data=candidate)
 
 
 @app.get('/candidates')
-def get_candidate_by_id(id: int):
-    db_candidate = db.session.get(models.Candidate, id)
-    candidate = schemas.Candidate.model_validate(db_candidate)
-    return candidate
-
-
-@app.post('/skills')
-def add_skill(skill: schemas.CreateSkill):
-    db.session.add(models.Skill(**skill.model_dump()))
-    db.session.commit()
-    db.session.close()
-    return f"{skill.title} was added"
+def get_candidate_by_id(id: int, repo: CandidateBasicRepository = Depends(get_basic_container(CandidateBasicRepository).resolve(BasicDependency))):
+    return 'Try again' if id is None else repo.get_by_id(id=id)
 
 
 @app.get('/skills')
-def get_skills():
-    db_skills = db.session.execute().scalars().all()
-    skills = [schemas.Skill.model_validate(skill) for skill in db_skills]
-    return skills
+def get_skills(skills: Annotated[list[schemas.Skill], Depends(get_basic_container(SkillBasicRepository).resolve(BasicDependency).get_all)]):
+    return 'No skills' if skills is None else skills
+
+
+@app.post('/skills')
+def add_skill(skill: schemas.CreateSkill, repo: SkillBasicRepository = Depends(get_basic_container(SkillBasicRepository).resolve(BasicDependency))):
+    return 'Try again' if skill is None else repo.add(data=skill)
 
 
 @app.get('/skills/{title}')
-def get_skill_by_title(title: str):
-    db_skill = db.session.query(models.Skill).filter(models.Skill.title == title).first()
-    skill = schemas.Skill.model_validate(db_skill)
-    return skill
+def get_skills(title: str, repo: SkillBasicRepository = Depends(get_basic_container(SkillBasicRepository).resolve(BasicDependency))):
+    return repo.get_by_title(title=title)
 
 
 @app.post('/candidates/resumes')
-def add_resume_to_candidate(resume: schemas.CreateResume):
-    db_candidate = db.session.get(models.Candidate, resume.candidate_id)
-    candidate = schemas.Candidate.model_validate(db_candidate)
-
-    db.session.add(models.Resume(**resume.model_dump()))
-    db.session.commit()
-    db.session.close()
-    return f"New resume was added to candidate: {candidate.name}"
+def add_resume_to_candidate(data: schemas.CreateResume, repo: CandidateResumeRepository = Depends(get_candidate_repository(CandidateResumeRepository))):
+    return repo.add(data=data)
 
 
 @app.get('/candidates/resumes')
-def get_candidate_resumes(candidate_id: int):
-    db_candidate = db.session.get(models.Candidate, candidate_id)
-    candidate = schemas.Candidate.model_validate(db_candidate)
-    db_resumes = db_candidate.resumes
-    resumes = [schemas.Resume.model_validate(resume) for resume in db_resumes]
-    return f"{candidate.name}'s resumes: {resumes}"
+def get_candidate_resumes(id: int, repo: CandidateResumeRepository = Depends(get_candidate_repository(CandidateResumeRepository))):
+    return repo.get_all(id=id)
 
 
 @app.post('/candidates/applications')
-def add_application_to_candidate(application: schemas.CreateApplication):
-    db.session.add(models.Application(**application.model_dump()))
-
-    db_candidate = db.session.get(models.Candidate, application.candidate_id)
-    db_job = db.session.get(models.Job, application.job_id)
-    db_resume = db.session.get(models.Resume, application.resume_id)
-
-    candidate = schemas.Candidate.model_validate(db_candidate)
-    job = schemas.Job.model_validate(db_job)
-    resume = schemas.Resume.model_validate(db_resume)
-
-    db.session.commit()
-    db.session.close()
-    return f"{candidate.name} applied to the job: {job.title} with resume {resume.title}"
+def add_application_to_candidate(data: schemas.CreateApplication, repo: CandidateApplicationRepository = Depends(get_candidate_repository(CandidateApplicationRepository))):
+    return repo.add(data=data)
 
 
 @app.get('/candidates/applications')
-def get_candidate_skills(candidate_id: int):
-    db_candidate = db.session.get(models.Candidate, candidate_id)
-    candidate = schemas.Candidate.model_validate(db_candidate)
-    db_applications = db_candidate.applications
-    applications = [schemas.Application.model_validate(application) for application in db_applications]
-    return f"Jobs that is {candidate.name} applied: {applications}"
+def get_candidate_resumes(id: int, repo: CandidateApplicationRepository = Depends(get_candidate_repository(CandidateApplicationRepository))):
+    return repo.get_all(id=id)
 
 
 @app.post('/jobs/skills')

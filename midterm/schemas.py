@@ -110,3 +110,4 @@ class CreateResume(BasicResume):
 
 ReturnType = Employer | Job | Candidate | Skill | Application | Resume
 CreateType = CreateEmployer | CreateJob | CreateCandidate | CreateSkill | CreateApplication | CreateResume
+

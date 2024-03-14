@@ -14,6 +14,7 @@ import database as db
 # application ->
 # resume ->
 
+
 class BasicRepository:
     @abstractmethod
     def __init__(self, session: Session):
@@ -24,7 +25,7 @@ class BasicRepository:
         raise NotImplementedError()
 
     @abstractmethod
-    def add(self, data: CreateType) -> str:
+    def add(self, data: CreateType) -> CreateType:
         raise NotImplementedError()
 
 
@@ -38,9 +39,132 @@ class JobBasicRepository(BasicRepository):
         return jobs
 
     # there's some error -> create type
-    def add(self, data: schemas.CreateJob) -> str:
+    def add(self, data: schemas.CreateJob) -> schemas.CreateJob:
         self.session.add(models.Job(**data.model_dump()))
         self.session.commit()
         self.session.close()
-        return f"{data.title} was added"
+        return data
 
+
+class EmployerBasicRepository(BasicRepository):
+    def __init__(self, session: Session):
+        self.session = session
+
+    def get_all(self) -> list[schemas.Employer]:
+        db_employers = self.session.execute(select(models.Employer)).scalars().all()
+        employers = [schemas.Employer.model_validate(employer) for employer in db_employers]
+        return employers
+
+    def add(self, data: schemas.CreateEmployer) -> schemas.CreateEmployer:
+        self.session.add(models.Employer(**data.model_dump()))
+        self.session.commit()
+        self.session.close()
+        return data
+
+
+class SkillBasicRepository(BasicRepository):
+    def __init__(self, session: Session):
+        self.session = session
+
+    def get_all(self) -> list[schemas.Skill]:
+        db_skills = self.session.execute(select(models.Skill)).scalars().all()
+        skills = [schemas.Skill.model_validate(skill) for skill in db_skills]
+        return skills
+
+    def add(self, data: schemas.CreateSkill) -> schemas.CreateSkill:
+        self.session.add(models.Skill(**data.model_dump()))
+        self.session.commit()
+        self.session.close()
+        return data
+
+    def get_by_title(self, title: str):
+        db_skill = db.session.query(models.Skill).filter(models.Skill.title == title).first()
+        if db_skill is None:
+            return None
+        skill = schemas.Skill.model_validate(db_skill)
+        return skill
+
+
+class CandidateBasicRepository(BasicRepository):
+    def __init__(self, session: Session):
+        self.session = session
+
+    def get_all(self) -> list[schemas.Skill]:
+        pass
+
+    def add(self, data: schemas.CreateCandidate) -> schemas.CreateCandidate:
+        self.session.add(models.Candidate(**data.model_dump()))
+        self.session.commit()
+        self.session.close()
+        return data
+
+    def get_by_id(self, id: int):
+        db_candidate = db.session.get(models.Candidate, id)
+        if db_candidate is None:
+            return None
+        candidate = schemas.Candidate.model_validate(db_candidate)
+        return candidate
+
+
+class CandidateRepository:
+    @abstractmethod
+    def __init__(self, session: Session):
+        pass
+
+    @abstractmethod
+    def get_all(self, id: int) -> list[ReturnType]:
+        raise NotImplementedError()
+
+    @abstractmethod
+    def add(self, data: CreateType) -> CreateType:
+        raise NotImplementedError()
+
+
+class CandidateResumeRepository(CandidateRepository):
+
+    def __init__(self, session: Session):
+        self.session = session
+
+    def get_all(self, id: int):
+        db_candidate = db.session.get(models.Candidate, id)
+        candidate = schemas.Candidate.model_validate(db_candidate)
+        db_resumes = db_candidate.resumes
+        resumes = [schemas.Resume.model_validate(resume) for resume in db_resumes]
+        return f"{candidate.name}'s resumes: {resumes}"
+
+    def add(self, data: schemas.CreateResume):
+        db_candidate = db.session.get(models.Candidate, data.candidate_id)
+        candidate = schemas.Candidate.model_validate(db_candidate)
+        db.session.add(models.Resume(**data.model_dump()))
+        db.session.commit()
+        db.session.close()
+        return f"New resume was added to candidate: {candidate.name}"
+
+
+class CandidateApplicationRepository(CandidateRepository):
+
+    def __init__(self, session: Session):
+        self.session = session
+
+    def get_all(self, id: int):
+        db_candidate = db.session.get(models.Candidate, id)
+        candidate = schemas.Candidate.model_validate(db_candidate)
+        db_applications = db_candidate.applications
+        applications = [schemas.Application.model_validate(application) for application in db_applications]
+        return f"Jobs that is {candidate.name} applied: {applications}"
+
+    def add(self, data: schemas.CreateApplication):
+        db_candidate = db.session.get(models.Candidate, data.candidate_id)
+        db_job = db.session.get(models.Job, data.job_id)
+        db_resume = db.session.get(models.Resume, data.resume_id)
+
+        candidate = schemas.Candidate.model_validate(db_candidate)
+        job = schemas.Job.model_validate(db_job)
+        resume = schemas.Resume.model_validate(db_resume)
+
+        if db_resume.candidate_id != data.candidate_id:
+            return "Such resume doesn't exists"
+        db.session.add(models.Application(**data.model_dump()))
+        db.session.commit()
+        db.session.close()
+        return f"{candidate.name} applied to the job: {job.title} with resume {resume.title}"
