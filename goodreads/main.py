@@ -2,9 +2,11 @@ from fastapi import FastAPI, Depends
 from sqlalchemy.orm.session import Session
 from sqlalchemy import select
 
-from database import session
-from schemas import CreateUser, User,Author,CreateAuthor,Book,CreateBook
+from database import session,engine
+
+from schemas import CreateUser, User,Author,CreateAuthor,Book,CreateBook,BookReview,CreateBookReview,Quote,CreateQuote,Genre,CreateGenre
 import models as db
+db.Base.metadata.create_all(bind=engine)
 
 app = FastAPI()
 
@@ -20,14 +22,14 @@ def get_db():
         session.close()
 
 @app.post("/users")
-def add_users(user: CreateUser) -> str:
+def add_users(user: CreateUser,session: Session = Depends(get_db)) -> str:
     session.add(db.User(**user.model_dump()))
     session.commit()
     session.close()
     return "User was added"
 
 @app.get("/users")
-def get_users():
+def get_users(session: Session = Depends(get_db)):
     db_users = session.execute(select(db.User)).scalars().all()
     users = []
     for db_user in db_users:
@@ -35,14 +37,14 @@ def get_users():
     return users
 
 @app.post("/authors")
-def add_authors(author: CreateAuthor) -> str:
+def add_authors(author: CreateAuthor,session: Session = Depends(get_db)) -> str:
     session.add(db.Author(**author.model_dump()))
     session.commit()
     session.close()
     return "Author"
 
 @app.get("/authors")
-def get_authors():
+def get_authors(session: Session = Depends(get_db)):
     db_authors = session.execute(select(db.Author)).scalars().all()
     authors = []
     for db_author in db_authors:
@@ -51,16 +53,63 @@ def get_authors():
 
 
 @app.post("/books")
-def add_books(book: CreateBook) -> str:
+def add_books(book: CreateBook,session: Session = Depends(get_db)) -> str:
     session.add(db.Book(**book.model_dump()))
     session.commit()
     session.close()
     return "Book"
 
 @app.get("/books")
-def get_books():
+def get_books(session: Session = Depends(get_db)):
     db_books = session.execute(select(db.Book)).scalars().all()
     books = []
     for db_book in db_books:
         books.append(Book.model_validate(db_book))
     return books
+
+
+@app.post("/quotes")
+def add_quotes(quote: CreateQuote,session: Session = Depends(get_db)) -> str:
+    session.add(db.Quote(**quote.model_dump()))
+    session.commit()
+    session.close()
+    return "Quote"
+
+@app.get("/quotes")
+def get_quotes(session: Session = Depends(get_db)):
+    db_quotes = session.execute(select(db.Quote)).scalars().all()
+    quotes= []
+    for db_quote in db_quotes:
+        quotes.append(Quote.model_validate(db_quote))
+    return quotes
+
+
+@app.post("/bookreviews")
+def add_bookreviews(bookreview:CreateBookReview,session: Session = Depends(get_db)) -> str:
+    session.add(db.BookReview(**bookreview.model_dump()))
+    session.commit()
+    session.close()
+    return "BookReview"
+
+@app.get("/bookreviews")
+def get_bookreviews(session: Session = Depends(get_db)):
+    db_bookreviews= session.execute(select(db.BookReview)).scalars().all()
+    bookreviews = []
+    for db_bookreview in db_bookreviews:
+        bookreviews.append(BookReview.model_validate(db_bookreview))
+    return bookreviews
+
+@app.post("/genres")
+def add_genres(genre:CreateGenre,session: Session = Depends(get_db)) -> str:
+    session.add(db.Genre(**genre.model_dump()))
+    session.commit()
+    session.close()
+    return "Genre"
+
+@app.get("/genres")
+def get_genres(session: Session = Depends(get_db)):
+    db_genres= session.execute(select(db.Genre)).scalars().all()
+    genres = []
+    for db_genre in db_genres:
+        genres.append(Genre.model_validate(db_genre))
+    return genres

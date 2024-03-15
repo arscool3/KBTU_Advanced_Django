@@ -35,30 +35,12 @@ class Book(Base):
 class CreateBook(Base):
     author_id:int
 
-class BaseBookReview(BaseModel):
-    review:str
-    rating:int
 
-    class Config:
-        from_attributes = True  
 
-class BookReview(BaseBookReview):
-    id:int
-    user:User
 
-class CreateBookReview(BaseBookReview):
-    book_id: int
-    user_id: int
 
-class BaseQuote(BaseModel):
-    description:str
 
-    class Config:
-        from_attributes = True  
 
-class Quote(BaseQuote):
-    id:int
-    author:Author
 
-class CreateQuote(BaseQuote):
-    author_id:int
+
+
