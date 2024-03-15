@@ -62,7 +62,6 @@ def test_create_and_get_territory():
 
 
 def test_create_and_get_business():
-    # Create a business
     response = client.post("/business", json={"name": "Business A", "profit": 10000})
     assert response.status_code == 200
     data = response.json()
