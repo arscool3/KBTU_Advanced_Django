@@ -15,3 +15,7 @@ class Budget(BaseBudget):
 class CreateBudget(BaseBudget):
     user_id: int
     category_id: int
+
+
+class BudgetResponse(BaseBudget):
+    id: int

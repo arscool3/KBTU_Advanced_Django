@@ -4,6 +4,7 @@ from accounts.routers import router as account_router
 from transactions.routers import router as transaction_router
 from categories.routers import router as category_router
 from budgets.routers import router as budget_router
+from expenses.routers import router as expense_router
 
 
 app = FastAPI()
@@ -18,5 +19,6 @@ app.include_router(category_router)
 
 app.include_router(budget_router)
 
+app.include_router(expense_router)
 
 

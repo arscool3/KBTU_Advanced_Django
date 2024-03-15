@@ -1,4 +1,6 @@
 from accounts.schemas import AccountResponse
+from budgets.schemas import BudgetResponse
+from expenses.schemas import ExpenseResponse
 from utils.config_schema import ConfigSchema
 
 
@@ -15,7 +17,7 @@ class CreateUser(BaseUser):
 class User(BaseUser):
     id: int
     accounts: list[AccountResponse]
-    # budgets: list[Budget]
-    # expenses: list[Expense]
+    budgets: list[BudgetResponse]
+    expenses: list[ExpenseResponse]
 
 

@@ -7,6 +7,7 @@ from utils.dependencies import GetListDependency, RetrieveDependency, DeleteDepe
 from users.dependencies import UserCreateDependency
 from budgets.dependencies import BudgetCreateDependency
 from categories.dependencies import CategoryCreateDependency
+from expenses.dependencies import ExpenseCreateDependency
 
 
 def get_container(repository: type[AbcRepository]) -> punq.Container:
@@ -27,5 +28,7 @@ def get_container(repository: type[AbcRepository]) -> punq.Container:
     container.register(CategoryCreateDependency)
 
     container.register(BudgetCreateDependency)
+
+    container.register(ExpenseCreateDependency)
 
     return container

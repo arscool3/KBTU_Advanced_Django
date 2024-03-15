@@ -1,3 +1,4 @@
+from transactions.schemas import TransactionResponse
 from utils.config_schema import ConfigSchema
 
 
@@ -8,7 +9,7 @@ class BaseAccount(ConfigSchema):
 
 class Account(BaseAccount):
     id: int
-    # transactions: list[Transaction]
+    transactions: list[TransactionResponse]
 
 
 class CreateAccount(BaseAccount):

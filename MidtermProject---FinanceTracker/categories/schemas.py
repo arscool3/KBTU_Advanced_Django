@@ -1,3 +1,4 @@
+from budgets.schemas import BudgetResponse
 from transactions.schemas import TransactionResponse
 from utils.config_schema import ConfigSchema
 
@@ -9,7 +10,7 @@ class BaseCategory(ConfigSchema):
 class Category(BaseCategory):
     id: int
     transactions: list[TransactionResponse]
-    # budgets: list[BudgetResponse]
+    budgets: list[BudgetResponse]
 
 
 class CreateCategory(BaseCategory):
