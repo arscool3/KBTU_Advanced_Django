@@ -23,7 +23,7 @@ def add_category(category: sch.Category, session: Session = Depends(get_db)) -> 
     session.add(mdl.Category(**category.model_dump()))
     return "Category was added"
 
-@app.get("/categories")
+@app.get("/categories/add")
 def get_category_list(session: Session = Depends(get_db)):
     db_categories = session.query(mdl.Category).all()
     return [sch.Category.model_validate(category) for category in db_categories]
@@ -89,6 +89,48 @@ def get_cartitems_for_customer(customer_id: int, session: Session = Depends(get_
     validated_cartitems = [sch.CartItem.model_validate(cartitem) for cartitem in cartitems]
     return validated_cartitems  
 
-@app.post("/comment")
-def add_comment(session: Session = Depends(get_db)):
-    pass
+@app.post("/store")
+def create_store(store: sch.Store, session: Session = Depends(get_db)):
+    session.add(mdl.Store(**store.model_dump()))
+    return "Store created succesfull"
+
+@app.get("/stores")
+def get_store_list(session: Session = Depends(get_db)):
+    db_stores = session.query(mdl.Store).all()
+    return [sch.Store.model_validate(store) for store in db_stores]
+
+
+
+@app.get("/stores/{store_id}")
+def get_store_details(store_id: int, session: Session = Depends(get_db)):
+    db_store = session.query(mdl.Store).filter(mdl.Store.id == store_id).first()
+
+    if not db_store:
+        raise HTTPException(status_code=404, detail="Store not found")
+
+    return sch.Store.model_validate(db_store)
+
+@app.post("/store/{store_id}/add")
+def add_product_to_store(store_id: int, product_id: int, session: Session = Depends(get_db)):
+    store = session.query(mdl.Store).filter(mdl.Store.id == store_id).first()
+    if not store:
+        raise HTTPException(status_code=404, detail="Store not found")
+    product = session.query(mdl.Product).filter(mdl.Product.id == product_id).first()
+    if not product:
+        raise HTTPException(status_code=404, detail="Product not found")
+
+    existing_item = session.query(mdl.StoreItem).filter(
+        mdl.StoreItem.store_id == store_id, mdl.StoreItem.product_id == product_id
+    ).first()
+
+    if existing_item:
+        return {"message": "Product already exists in the store."}
+    else:
+        new_item = mdl.StoreItem(store_id=store_id, product_id=product_id)
+        session.add(new_item)
+        return {"message": "Product successfully added to the store"}
+    
+@app.get("/store/{store_id}/products")
+def get_store_products(store_id: int, session: Session = Depends(get_db)):
+    store_items = session.query(mdl.StoreItem).filter(mdl.StoreItem.store_id == store_id).all()
+    return [sch.StoreItem.model_validate(items) for items in store_items]

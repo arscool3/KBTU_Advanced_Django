@@ -3,7 +3,6 @@ from datetime import datetime
 
 
 class Base(BaseModel):
-   
 
     class Config:
         from_attributes = True
