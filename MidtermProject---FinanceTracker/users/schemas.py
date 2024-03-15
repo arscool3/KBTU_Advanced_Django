@@ -1,4 +1,4 @@
-from models import Account, Budget, Expense
+from accounts.schemas import AccountResponse
 from utils.config_schema import ConfigSchema
 
 
@@ -8,12 +8,14 @@ class BaseUser(ConfigSchema):
     password: str
 
 
-class User(BaseUser):
-    id: int
-    accounts: list[Account]
-    budgets: list[Budget]
-    expenses: list[Expense]
-
-
 class CreateUser(BaseUser):
     pass
+
+
+class User(BaseUser):
+    id: int
+    accounts: list[AccountResponse]
+    # budgets: list[Budget]
+    # expenses: list[Expense]
+
+

@@ -17,8 +17,8 @@ class User(Base):
     password: Mapped[str]
 
     accounts: Mapped[list['Account']] = relationship("Account", back_populates="owner")
-    budgets: Mapped[list['Budget']] = relationship("Budget", back_populates="users")
-    expenses: Mapped[list['Expense']] = relationship("Expense", back_populates="users")
+    budgets: Mapped[list['Budget']] = relationship("Budget", back_populates="user")
+    expenses: Mapped[list['Expense']] = relationship("Expense", back_populates="user")
 
 
 class Account(Base):
