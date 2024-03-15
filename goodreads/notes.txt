@@ -1,7 +1,6 @@
 # Use all topics in syllabus
-# Minimum 15 api handlters (post, get)
+
 # Use DI as class, as function
-# 6 Models, 4 relationships(user, book, bookreview, Author, bookshelf,)
 
 # Write min 10 tests
 
@@ -9,7 +8,7 @@ goodreads:"https://www.goodreads.com/quotes/list?ref=nav_profile_quotes"
 
 alembic init alembic
 
-docker run --name database -e POSTGRES_PASSWORD=aru -p 5432:5432 postgres
+docker run --name test -e POSTGRES_PASSWORD=aru -p 5432:5432 postgres
 alembic revision -m 'initial_migration' --autogenerate
 alembic upgrade head
 uvicorn main:app --reload

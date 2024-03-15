@@ -1,9 +1,9 @@
-from fastapi import FastAPI, Depends
+from fastapi import FastAPI, Depends, HTTPException
 from sqlalchemy.orm.session import Session
 from sqlalchemy import select
 
 from database import session,engine
-
+from typing import List
 from schemas import CreateUser, User,Author,CreateAuthor,Book,CreateBook,BookReview,CreateBookReview,Quote,CreateQuote,Genre,CreateGenre
 import models as db
 db.Base.metadata.create_all(bind=engine)
@@ -113,3 +113,24 @@ def get_genres(session: Session = Depends(get_db)):
     for db_genre in db_genres:
         genres.append(Genre.model_validate(db_genre))
     return genres
+
+@app.get("/books/{author_id}", response_model=List[Book])
+def get_books_by_author(author_id: int, session: Session = Depends(get_db)):
+    author = session.query(Author).filter(Author.id == author_id).first()
+    if author is None:
+        raise HTTPException(status_code=404, detail="Author not found")
+    return author.books
+
+@app.get("/bookreviews/{user_id}", response_model=List[BookReview])
+def get_bookreviews_by_user(user_id: int, session: Session = Depends(get_db)):
+    user = session.query(User).filter(User.id == user_id).first()
+    if user is None:
+        raise HTTPException(status_code=404, detail="User not found")
+    return user.bookreviews
+
+@app.get("/quotes/{author_id}", response_model=List[Quote])
+def get_quotes_by_author(author_id: int, session: Session = Depends(get_db)):
+    author = session.query(Author).filter(Author.id == author_id).first()
+    if author is None:
+        raise HTTPException(status_code=404, detail="Author not found")
+    return author.quotes
