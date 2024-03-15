@@ -11,7 +11,7 @@
 # Requirements:
 # Use all topics in syllabus
 # Minimum 15 api handlers (post, get) // 17
-# Use DI as class, as function // 0 - callable and with methods
+# Use DI as class, as function //  1 class, 2 function
 # 6 Models, 4 relationships // 6 models, 5 relationships
 # Write min 10 tests // 0
 
@@ -24,7 +24,8 @@ import database as db
 import models
 import schemas
 from repository import BasicRepository, JobBasicRepository, EmployerBasicRepository, SkillBasicRepository, \
-    CandidateBasicRepository, CandidateRepository, CandidateResumeRepository, CandidateApplicationRepository
+    CandidateBasicRepository, CandidateRepository, CandidateResumeRepository, CandidateApplicationRepository, \
+    JobSkillRepository, JobApplicationRepository, JobRepository
 
 app = FastAPI()
 
@@ -53,8 +54,14 @@ def get_db():
         db.session.close()
 
 
-def get_candidate_repository(repo: type[BasicRepository]):
-    def _repo_dependency(session: Session = Depends(get_db)) -> BasicRepository:
+def get_candidate_repository(repo: type[CandidateRepository]):
+    def _repo_dependency(session: Session = Depends(get_db)) -> CandidateRepository:
+        return repo(session)
+    return _repo_dependency
+
+
+def get_job_repository(repo: type[JobRepository]):
+    def _repo_dependency(session: Session = Depends(get_db)) -> JobRepository:
         return repo(session)
     return _repo_dependency
 
@@ -62,13 +69,6 @@ def get_candidate_repository(repo: type[BasicRepository]):
 def get_basic_container(repository: type[BasicRepository]) -> punq.Container:
     container = punq.Container()
     container.register(BasicRepository, repository, instance=repository(session=db.session))
-    container.register(BasicDependency)
-    return container
-
-
-def get_candidate_container(repository: type[CandidateRepository]) -> punq.Container:
-    container = punq.Container()
-    container.register(CandidateRepository, repository, instance=repository(session=db.session))
     container.register(BasicDependency)
     return container
 
@@ -138,40 +138,22 @@ def get_candidate_resumes(id: int, repo: CandidateApplicationRepository = Depend
     return repo.get_all(id=id)
 
 
-@app.post('/jobs/skills')
-def add_skill_to_job(job_id: int, skill_title: str):
-    db_job = db.session.get(models.Job, job_id)
-    db_skill = db.session.query(models.Skill).filter(models.Skill.title == skill_title).first()
-    db_skill.jobs.append(db_job)
-    db_job.skills.append(db_skill)
-    job = schemas.Job.model_validate(db_job)
-    db.session.commit()
-    db.session.close()
-    return f"{skill_title} was added to candidate: {job.title}"
-
-
 @app.get('/jobs/skills')
-def get_job_skills(job_id: int):
-    db_job = db.session.get(models.Job, job_id)
-    job = schemas.Job.model_validate(db_job)
-    db_skills = db_job.skills
-    skills = [schemas.Skill.model_validate(skill) for skill in db_skills]
-    return f"Skills that is {job.title} required: {skills}"
+def get_job_skills(id: int, repo: JobSkillRepository = Depends(get_job_repository(JobSkillRepository))):
+    return repo.get_all(id=id)
+
+
+@app.post('/jobs/skills')
+def add_job_skills(id: int, title: str, repo: JobSkillRepository = Depends(get_job_repository(JobSkillRepository))):
+    return repo.add(id=id, title=title)
 
 
 @app.get('/jobs/applications')
-def get_job_applications(job_id: int):
-    db_job = db.session.get(models.Job, job_id)
-    db_applications = db_job.applications
-    applications = [schemas.Application.model_validate(application) for application in db_applications]
-    return applications
+def get_job_applications(id: int, repo: JobApplicationRepository = Depends(get_job_repository(JobApplicationRepository))):
+    return repo.get_all(id=id)
 
 
-@app.put('/applications')
-def get_job_applications(application_id: int, status: str):
-    db_applications = db.session.get(models.Application, application_id)
-    setattr(db_applications, 'status', status)
-    application = schemas.Application.model_validate(db_applications)
-    db.session.commit()
-    db.session.close()
-    return application
+@app.put('/applications/status')
+def get_job_applications(id: int, title: str, repo: JobApplicationRepository = Depends(get_job_repository(JobApplicationRepository))):
+    return repo.update(id=id, title=title)
+
