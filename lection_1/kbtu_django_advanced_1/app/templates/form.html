@@ -1,0 +1,14 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <title>Add Student Form</title>
+</head>
+<body>
+    <h2> Add student </h2>
+    <form action="{%url 'add'%}" method="POST">
+        {% csrf_token %}
+        {{form}}
+        <input type=submit>
+    </form>
+</body>
+</html>
