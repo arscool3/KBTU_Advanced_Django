@@ -1,19 +1,9 @@
-# Job site
-# job -> title, salary, time, experience, employer(many to one)(1), skills (many to many)(2)
-# employer -> name, location, jobs (one to many)(1)
-# candidate -> name, age, applications(one to many)(3), resumes(one to many)(4)
-# skill -> title, jobs(2), applications(many to many)(5)
-# application -> candidate_id, job_id, date, status, candidate(many to one)(3)
-# resume -> candidates_id, skills(many to many)(5), candidate(many to one)(4), experience, education
-
-# try yield finally
-
 # Requirements:
 # Use all topics in syllabus
 # Minimum 15 api handlers (post, get) // 17
 # Use DI as class, as function //  1 class, 2 function
 # 6 Models, 4 relationships // 6 models, 5 relationships
-# Write min 10 tests // 0
+# Write min 10 tests // 11 tests
 
 from typing import Annotated
 import punq

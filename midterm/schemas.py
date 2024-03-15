@@ -7,7 +7,7 @@ class BasicEmployer(BaseModel):
     name: str
     location: str
 
-    class Config:
+    class ConfigDict:
         from_attributes = True
 
 
@@ -23,7 +23,7 @@ class BasicCandidate(BaseModel):
     name: str
     age: int
 
-    class Config:
+    class ConfigDict:
         from_attributes = True
 
 
@@ -43,7 +43,7 @@ class BasicJob(BaseModel):
     years_of_experience: int
     employer_id: int
 
-    class Config:
+    class ConfigDict:
         from_attributes = True
 
 
@@ -58,7 +58,7 @@ class CreateJob(BasicJob):
 class BasicSkill(BaseModel):
     title: str
 
-    class Config:
+    class ConfigDict:
         from_attributes = True
 
 
@@ -77,7 +77,7 @@ class BasicApplication(BaseModel):
     date: datetime
     status: str
 
-    class Config:
+    class ConfigDict:
         from_attributes = True
 
 
@@ -96,7 +96,7 @@ class BasicResume(BaseModel):
     education: str
     years_of_experience: int
 
-    class Config:
+    class ConfigDict:
         from_attributes = True
 
 
