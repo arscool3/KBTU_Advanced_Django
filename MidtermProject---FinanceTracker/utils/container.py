@@ -5,6 +5,7 @@ from transactions.dependencies import TransactionCreateDependency
 from utils.repository import AbcRepository
 from utils.dependencies import GetListDependency, RetrieveDependency, DeleteDependency
 from users.dependencies import UserCreateDependency
+from budgets.dependencies import BudgetCreateDependency
 from categories.dependencies import CategoryCreateDependency
 
 
@@ -24,5 +25,7 @@ def get_container(repository: type[AbcRepository]) -> punq.Container:
     container.register(TransactionCreateDependency)
 
     container.register(CategoryCreateDependency)
+
+    container.register(BudgetCreateDependency)
 
     return container
