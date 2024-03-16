@@ -2,7 +2,6 @@ import asyncio
 import dependencies
 import models
 import schemas
-
 from requests import JSONDecodeError
 from fastapi import APIRouter, HTTPException, Depends
 from sqlalchemy.orm import Session

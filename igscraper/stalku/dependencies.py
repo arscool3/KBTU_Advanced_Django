@@ -1,7 +1,6 @@
-from decouple import config
-from ensta import Host
-
 import database
+from decouple import config
+from ensta import Web
 
 
 def get_db():
@@ -13,5 +12,5 @@ def get_db():
 
 
 def get_bot():
-    bot = Host(config('LOGIN'), config('PASSWORD'))
+    bot = Web(config('LOGIN'), config('PASSWORD'))
     return bot

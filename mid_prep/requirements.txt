@@ -3,3 +3,4 @@ uvicorn
 psycopg2-binary
 sqlalchemy
 pydantic
+instagrapi

@@ -1,0 +1,9 @@
+fastapi
+uvicorn
+psycopg2-binary
+alembic
+sqlalchemy
+pydantic
+ensta
+python-decouple
+httpx
