@@ -51,3 +51,6 @@ class SecurityCreate(Base):
     username: str
     password: str
     user_id: int
+
+
+ReturnType = UserCreate | AccountCreate | TransactionCreate | LoanCreate | PaymentCreate | SecurityCreate
