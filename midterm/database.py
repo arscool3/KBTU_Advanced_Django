@@ -15,7 +15,6 @@ film_actor_association = Table('film_actor_association', Base.metadata,
                                Column('actor_id', Integer, ForeignKey('actors.id'))
                                )
 
-
 class User(Base):
     __tablename__ = 'users'
 
