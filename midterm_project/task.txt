@@ -1,0 +1,14 @@
+#Midterm requirements
+
+# Use all topics in syllabus
+# Minimum 15 api handlers (post, get)
+# Use DI as class, as function
+# 6 Models, 4 relationships
+# Write min 10 tests
+
+
+# DONE
+
+# Models(6): User, Account, Transactions, Payment, Loan, Security
+# Relationships(5): U1:*A, U1:*L, U1:1S, A1:*T, L1:*P
+#
