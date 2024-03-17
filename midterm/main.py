@@ -4,16 +4,17 @@ import jwt
 from fastapi import FastAPI, Depends, HTTPException
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm, HTTPBearer, HTTPAuthorizationCredentials
 from sqlalchemy import select
-from sqlalchemy.orm import Session
+from sqlalchemy.orm import Session, joinedload
 from starlette import status
 
 from posts.repository import PostRepository
 from users.repository import UserRepository
 from utils import models as db
 from utils.database import session, get_db
-from utils.dependencies import get_container, RetrieveDependency
+from utils.dependencies import get_container, RetrieveDependency, ListDependency
 from utils.repository import AbcRepository
-from utils.schemes import CreateUser, User, CreatePost, PrevCreatePost
+from utils.schemes import CreateUser, User, CreatePost, PrevCreatePost, CreateComment, PrevCreateComment, CreateLike, \
+    CreateComplaint, PrevCreateComplaint
 
 app = FastAPI()
 auth_scheme = HTTPBearer()
@@ -103,5 +104,52 @@ def create_post(post: PrevCreatePost,
                 repository: PostRepository = Depends(get_post_repository)):
     post_ = CreatePost(user_id=user_id, **post.dict())
     return repository.create(post_)
+
+
+@app.get("/posts")
+def get_posts(repository: PostRepository = Depends(get_post_repository),
+              user_id: int = Depends(get_user_id_from_token)):
+    posts = repository.list()
+    return posts
+
+
+@app.get("/posts/{post_id}")
+def get_posts(post_id: int, repository: PostRepository = Depends(get_post_repository),
+              user_id: int = Depends(get_user_id_from_token)):
+    post = repository.retrieve(post_id)
+    return post
+
+@app.get("/posts/{post_id}/comments")
+def get_comments(post_id: int, repository: PostRepository = Depends(get_post_repository),
+                 user_id: int = Depends(get_user_id_from_token)):
+    return repository.get_comments(post_id=post_id)
+
+@app.post("/posts/{post_id}/comments")
+def leave_comment(post_id: int, comment_: PrevCreateComment, repository: UserRepository = Depends(get_user_repository),
+                 user_id: int = Depends(get_user_id_from_token)):
+    comment = CreateComment(post_id=post_id, user_id=user_id, **comment_.dict())
+    return repository.leave_comment(comment=comment)
+
+@app.get("/posts/{post_id}/likes")
+def get_likes(post_id: int, repository: PostRepository = Depends(get_post_repository),
+                 user_id: int = Depends(get_user_id_from_token)):
+    return repository.get_likes(post_id=post_id)
+
+@app.post("/posts/{post_id}/likes")
+def put_like(post_id: int, repository: UserRepository = Depends(get_user_repository),
+                 user_id: int = Depends(get_user_id_from_token)):
+    like = CreateLike(post_id=post_id, user_id=user_id)
+    return repository.put_like(like=like)
+
+@app.get("/posts/{post_id}/complaints")
+def get_complaints(post_id: int, repository: PostRepository = Depends(get_post_repository),
+                 user_id: int = Depends(get_user_id_from_token)):
+    return repository.get_complaints(post_id=post_id)
+
+@app.post("/posts/{post_id}/complaints")
+def leave_complaint(post_id: int, complaint_: PrevCreateComplaint, repository: UserRepository = Depends(get_user_repository),
+                 user_id: int = Depends(get_user_id_from_token)):
+    complaint = CreateComplaint(post_id=post_id, user_id=user_id, **complaint_.dict())
+    return repository.leave_complaint(complaint=complaint)
 
 

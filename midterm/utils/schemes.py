@@ -15,10 +15,10 @@ class BasePerson(BaseModel):
 
 
 class User(BasePerson):
-    posts: List['Post']
-    comments: List['Comment']
-    complaints: List['Complaint']
-    likes: List['Like']
+    posts: list['Post']
+    comments: list['Comment']
+    complaints: list['Complaint']
+    likes: list['Like']
 
 
 class CreateUser(BaseModel):
@@ -48,11 +48,11 @@ class Post(BaseCart):
     id: int
     title: str
     description: str
-    user: User
+    # user: User
     user_id: int
-    comments: List['Comment']
-    complaints: List['Complaint']
-    likes: List['Like']
+    # comments: list['Comment']
+    # complaints: list['Complaint']
+    # likes: list['Like']
 
 
 class PrevCreatePost(BaseModel):
@@ -68,32 +68,42 @@ class CreatePost(PrevCreatePost):
 
 class Comment(BaseCart):
     description: str
-    user: User
-    post: Post
+    # user: User
+    # post: Post
+    user_id: int
+    post_id: int
 
 
-class CreateComment(BaseModel):
+class PrevCreateComment(BaseModel):
     description: str
+
+
+class CreateComment(PrevCreateComment):
     user_id: int
     post_id: int
 
 
 class Complaint(BaseCart):
     description: str
-    user: User
-    post: Post
+    # user: User
+    # post: Post
+    user_id: int
+    post_id: int
 
-
-class CreateComplaint(BaseModel):
+class PrevCreateComplaint(BaseModel):
+    description: str
+class CreateComplaint(PrevCreateComplaint):
     description: str
     user_id: int
     post_id: int
 
 
 class Like(BaseCart):
-    user: User
-    post: Post
-
+    pass
+    # user: User
+    # post: Post
+    user_id: int
+    post_id: int
 
 class CreateLike(BaseModel):
     user_id: int

@@ -17,10 +17,10 @@ class User(Base):
     surname: Mapped[str]
     username: Mapped[str]
     password: Mapped[str]
-    posts: Mapped[List['Post']] = relationship("Post", back_populates="user")
-    comments: Mapped[List['Comment']] = relationship("Comment", back_populates="user")
-    complaints: Mapped[List['Complaint']] = relationship("Complaint", back_populates="user")
-    likes: Mapped[List['Like']] = relationship("Like", back_populates="user")
+    posts: Mapped['Post'] = relationship("Post", back_populates="user")
+    comments: Mapped['Comment'] = relationship("Comment", back_populates="user")
+    complaints: Mapped['Complaint'] = relationship("Complaint", back_populates="user")
+    likes: Mapped['Like'] = relationship("Like", back_populates="user")
 
     def generate_token(self) -> dict:
         payload = {
@@ -40,9 +40,9 @@ class Post(Base):
     description: Mapped[str]
     user_id: Mapped[int] = mapped_column(sqlalchemy.ForeignKey('users.id'))
     user: Mapped[User] = relationship(User, back_populates="posts")
-    comments: Mapped[list('Comment')] = relationship("Comment", back_populates="post")
-    complaints: Mapped[list('Complaint')] = relationship("Complaint", back_populates="post")
-    likes: Mapped[list('Like')] = relationship("Like", back_populates="post")
+    comments: Mapped['Comment'] = relationship("Comment", back_populates="post")
+    complaints: Mapped['Complaint'] = relationship("Complaint", back_populates="post")
+    likes: Mapped['Like'] = relationship("Like", back_populates="post")
 
 
 class Comment(Base):
@@ -81,3 +81,6 @@ class Admin(Base):
     surname: Mapped[str]
     username: Mapped[str]
     password: Mapped[str]
+
+
+
