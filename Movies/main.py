@@ -3,7 +3,7 @@ from sqlalchemy.orm.session import Session
 from sqlalchemy import select
 
 from database import session
-from schemas import CreateGenre, Genre
+from schemas import CreateGenre, Genre, Director, CreateDirector, CreateFilm, Film
 import models as db
 
 app = FastAPI()
@@ -40,3 +40,29 @@ def get_genres(session: Session = Depends(get_db)) -> list[Genre]:
     db_genres = session.execute(select(db.Genre)).scalars().all()
     genres = [Genre.model_validate(db_genre) for db_genre in db_genres]
     return genres
+
+
+@app.post("/director")
+def add_director(director: CreateDirector, session: Session = Depends(get_db)) -> str:
+    session.add(db.Director(**director.model_dump()))
+    return director.name
+
+
+@app.get("/director")
+def get_directors(session: Session = Depends(get_db)) -> list[Director]:
+    db_directors = session.execute(select(db.Director)).scalars().all()
+    directors = [Director.model_validate(db_director) for db_director in db_directors]
+    return directors
+
+
+@app.post("/film")
+def add_film(film: CreateFilm, session: Session = Depends(get_db)) -> str:
+    session.add(db.Film(**film.model_dump()))
+    return "Film is added"
+
+
+@app.get("/film")
+def get_films(session: Session = Depends(get_db)):
+    db_films = session.execute(select(db.Film)).scalars().all()
+    films = [Film.model_validate(db_film) for db_film in db_films]
+    return films

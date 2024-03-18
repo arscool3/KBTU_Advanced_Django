@@ -21,12 +21,19 @@ class Director(Base):
     pass
 
 
-class Movie(Base):
-    description: str
-    rating: float
-    duration: int
-    director: Director
-    genre: Genre
+class CreateDirector(BaseModel):
+    name: str
+
+
+class Film(Base):
+    directors: Director
+    genres: Genre
+
+
+class CreateFilm(BaseModel):
+    director_id: int
+    genre_id: int
+    name: str
 
 # Movie <-> Genre Many to One
 # Movie <-> Director Many to One
