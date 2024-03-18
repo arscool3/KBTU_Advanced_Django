@@ -7,6 +7,7 @@ from sqlalchemy import select
 from sqlalchemy.orm import Session, joinedload
 from starlette import status
 
+from admins.repository import AdminRepository
 from posts.repository import PostRepository
 from users.repository import UserRepository
 from utils import models as db
@@ -98,6 +99,10 @@ def get_user_repository(session: Session = Depends(get_db)) -> UserRepository:
     return UserRepository(session=session)
 
 
+def get_admin_repository(session: Session = Depends(get_db)) -> AdminRepository:
+    return AdminRepository(session=session)
+
+
 @app.post("/posts")
 def create_post(post: PrevCreatePost,
                 user_id: int = Depends(get_user_id_from_token),
@@ -119,37 +124,56 @@ def get_posts(post_id: int, repository: PostRepository = Depends(get_post_reposi
     post = repository.retrieve(post_id)
     return post
 
+
 @app.get("/posts/{post_id}/comments")
 def get_comments(post_id: int, repository: PostRepository = Depends(get_post_repository),
                  user_id: int = Depends(get_user_id_from_token)):
     return repository.get_comments(post_id=post_id)
 
+
 @app.post("/posts/{post_id}/comments")
 def leave_comment(post_id: int, comment_: PrevCreateComment, repository: UserRepository = Depends(get_user_repository),
-                 user_id: int = Depends(get_user_id_from_token)):
+                  user_id: int = Depends(get_user_id_from_token)):
     comment = CreateComment(post_id=post_id, user_id=user_id, **comment_.dict())
     return repository.leave_comment(comment=comment)
 
+
 @app.get("/posts/{post_id}/likes")
 def get_likes(post_id: int, repository: PostRepository = Depends(get_post_repository),
-                 user_id: int = Depends(get_user_id_from_token)):
+              user_id: int = Depends(get_user_id_from_token)):
     return repository.get_likes(post_id=post_id)
+
 
 @app.post("/posts/{post_id}/likes")
 def put_like(post_id: int, repository: UserRepository = Depends(get_user_repository),
-                 user_id: int = Depends(get_user_id_from_token)):
+             user_id: int = Depends(get_user_id_from_token)):
     like = CreateLike(post_id=post_id, user_id=user_id)
     return repository.put_like(like=like)
 
+
 @app.get("/posts/{post_id}/complaints")
 def get_complaints(post_id: int, repository: PostRepository = Depends(get_post_repository),
-                 user_id: int = Depends(get_user_id_from_token)):
+                   user_id: int = Depends(get_user_id_from_token)):
     return repository.get_complaints(post_id=post_id)
 
+
 @app.post("/posts/{post_id}/complaints")
-def leave_complaint(post_id: int, complaint_: PrevCreateComplaint, repository: UserRepository = Depends(get_user_repository),
-                 user_id: int = Depends(get_user_id_from_token)):
+def leave_complaint(post_id: int, complaint_: PrevCreateComplaint,
+                    repository: UserRepository = Depends(get_user_repository),
+                    user_id: int = Depends(get_user_id_from_token)):
     complaint = CreateComplaint(post_id=post_id, user_id=user_id, **complaint_.dict())
     return repository.leave_complaint(complaint=complaint)
+
+
+@app.post("/profile/comments")
+def get_user_comments(repository: UserRepository = Depends(get_user_repository),
+                      user_id: int = Depends(get_user_id_from_token)):
+    return repository.get_user_comments(user_id=user_id)
+
+@app.post("/profile/complaints")
+def get_user_complaints(repository: UserRepository = Depends(get_user_repository),
+                      user_id: int = Depends(get_user_id_from_token)):
+    return repository.get_user_complaints(user_id=user_id)
+
 
 

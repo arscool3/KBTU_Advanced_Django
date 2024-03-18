@@ -38,3 +38,12 @@ class UserRepository(AbcRepository):
         self.session.add(db.Complaint(**complaint.model_dump()))
         self.session.commit()
         return "complaint successfully published"
+
+    def get_user_comments(self, user_id: int):
+        comments = self.session.query(db.Comment).where(db.Comment.user_id == user_id).all()
+        return comments
+
+    def get_user_complaints(self, user_id: int):
+        complaints = self.session.query(db.Complaint).where(db.Complaint.user_id == user_id).all()
+        return complaints
+

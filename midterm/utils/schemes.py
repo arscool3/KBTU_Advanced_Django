@@ -15,10 +15,11 @@ class BasePerson(BaseModel):
 
 
 class User(BasePerson):
-    posts: list['Post']
-    comments: list['Comment']
-    complaints: list['Complaint']
-    likes: list['Like']
+    pass
+    # posts: list['Post']
+    # comments: list['Comment']
+    # complaints: list['Complaint']
+    # likes: list['Like']
 
 
 class CreateUser(BaseModel):
