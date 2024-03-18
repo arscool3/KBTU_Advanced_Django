@@ -6,11 +6,10 @@ from fastapi.testclient import TestClient
 from main import app
 
 from database import Base, engine
-from schemas import CreateGenre
 
 client = TestClient(app)
 
-url = 'postgresql://postgres:postgres@localhost:5433/postgres'
+url = 'postgresql://postgres:password@localhost:5435/postgres'
 engine = sqlalchemy.create_engine(url)
 session = Session(engine)
 
