@@ -1,7 +1,6 @@
 from datetime import date
 
 from app.config import ConfigSchema
-from pydantic import BaseModel
 
 
 class Department(ConfigSchema):
@@ -19,17 +18,17 @@ class Employee(ConfigSchema):
     schedules: list['Schedule']
 
 
-class CreateEmployee(BaseModel):
-    name: str
+class CreateEmployee(ConfigSchema):
     department_id: int
 
 
 class Task(ConfigSchema):
     id: int
+    todo: str
+    added_time: date
 
 
-class CreateTask(BaseModel):
-    name: str
+class CreateTask(ConfigSchema):
     todo: str
     added_time: date
     employee_id: int
@@ -37,9 +36,9 @@ class CreateTask(BaseModel):
 
 class Schedule(ConfigSchema):
     id: int
+    description: str
 
 
-class CreateSchedule(BaseModel):
-    name: str
+class CreateSchedule(ConfigSchema):
     description: str
     employee_id: int

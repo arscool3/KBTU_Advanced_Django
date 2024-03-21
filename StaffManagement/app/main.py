@@ -1,35 +1,49 @@
-from fastapi import FastAPI, Depends
-from sqlalchemy.orm.session import Session
-import app.models as db
-from app.database import get_db
-from app.schemas import CreateDepartment, Department,\
-    CreateTask, Task, CreateEmployee, Employee, CreateSchedule, Schedule
-from sqlalchemy import select
+from fastapi import FastAPI, APIRouter
+from app.container import get_container
+from app.repository import DepartmentRepository, \
+    EmployeeRepository, TaskRepository, ScheduleRepository
+from app.dependencies import GetListDependency, DepartmentCreateDependency, \
+    EmployeeCreateDependency, TaskCreateDependency, ScheduleCreateDependency
 
+# App
 app = FastAPI()
 
+# Department
+router_department = APIRouter(prefix="/department", tags=["Departments"])
 
-@app.get("/get_departments")
-def get_departments(session: Session = Depends(get_db)) -> list[Department]:
-    db_departments = session.execute(select(db.Department)).scalars().all()
-    departments = [Department.model_validate(db_department) for db_department in db_departments]
-    return departments
+router_department.add_api_route("/get_departments", get_container(DepartmentRepository).resolve(GetListDependency),
+                                methods=["GET"])
+router_department.add_api_route("/add_department",
+                                get_container(DepartmentRepository).resolve(DepartmentCreateDependency),
+                                methods=["POST"])
+app.include_router(router_department)
 
+# Employee
+router_employee = APIRouter(prefix="/employee", tags=["Employees"])
 
-@app.post('/add_department')
-def add_department(department: CreateDepartment, session: Session = Depends(get_db)) -> str:
-    session.add(db.Department(**department.model_dump()))
-    return department.name
+router_employee.add_api_route("/get_employees", get_container(EmployeeRepository).resolve(GetListDependency),
+                              methods=["GET"])
+router_employee.add_api_route("/add_employee",
+                              get_container(EmployeeRepository).resolve(EmployeeCreateDependency),
+                              methods=["POST"])
+app.include_router(router_employee)
 
+# Task
+router_task = APIRouter(prefix="/task", tags=["Tasks"])
 
-@app.get("/get_employees")
-def get_employees(session: Session = Depends(get_db)):
-    db_employees = session.execute(select(db.Employee)).scalars().all()
-    employees = [Employee.model_validate(db_employee) for db_employee in db_employees]
-    return employees
+router_task.add_api_route("/get_tasks", get_container(TaskRepository).resolve(GetListDependency),
+                          methods=["GET"])
+router_task.add_api_route("/add_task",
+                          get_container(TaskRepository).resolve(TaskCreateDependency),
+                          methods=["POST"])
+app.include_router(router_task)
 
+# Schedule
+router_schedule = APIRouter(prefix="/schedule", tags=["Schedules"])
 
-@app.post("/add_employee")
-def add_employee(employee: CreateEmployee, session: Session = Depends(get_db)):
-    session.add(db.Employee(**employee.model_dump()))
-    return employee.name
+router_schedule.add_api_route("/get_schedules", get_container(ScheduleRepository).resolve(GetListDependency),
+                              methods=["GET"])
+router_schedule.add_api_route("/add_schedule",
+                              get_container(ScheduleRepository).resolve(ScheduleCreateDependency),
+                              methods=["POST"])
+app.include_router(router_schedule)
