@@ -7,11 +7,11 @@ import sqlalchemy
 
 class ConfigModel:
     id: Mapped[Annotated[int, mapped_column(sqlalchemy.Integer, primary_key=True)]]
-    name: str
+    name: Mapped[str]
 
 
 class ConfigSchema(BaseModel):
-    id: int
+    name: str
 
     class Config:
         from_attributes = True

@@ -5,14 +5,16 @@ from pydantic import BaseModel
 
 
 class Department(ConfigSchema):
+    id: int
     employees: list['Employee']
 
 
-class CreateDepartment(BaseModel):
-    name: str
+class CreateDepartment(ConfigSchema):
+    pass
 
 
 class Employee(ConfigSchema):
+    id: int
     tasks: list['Task']
     schedules: list['Schedule']
 
@@ -23,7 +25,7 @@ class CreateEmployee(BaseModel):
 
 
 class Task(ConfigSchema):
-    pass
+    id: int
 
 
 class CreateTask(BaseModel):
@@ -34,7 +36,7 @@ class CreateTask(BaseModel):
 
 
 class Schedule(ConfigSchema):
-    pass
+    id: int
 
 
 class CreateSchedule(BaseModel):
