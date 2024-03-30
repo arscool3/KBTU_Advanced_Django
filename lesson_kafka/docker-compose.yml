@@ -23,3 +23,11 @@ services:
     container_name: zookeeper
     ports:
       - "2181:2181"
+
+  postgres:
+    image: postgres
+    container_name: postgres
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_PASSWORD: postgres
