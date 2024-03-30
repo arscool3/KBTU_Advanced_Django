@@ -101,29 +101,29 @@ def get_all_users(users: list[User] = Depends(get_all_users_dependency)):
     return users
 
 
-# @app.get("/users/{user_id}/courses")
-# def get_user_courses(user_id: int):
-#     user = session.get(db.User, user_id)
-#     if user:
-#         return user.courses
-#     return "No such user!"
-#
-# @app.get("/courses/{course_id}/users")
-# def get_course_users(course_id: int):
-#     course = session.get(db.Course, course_id)
-#     if course:
-#         return [BaseUser(name=user.name, email=user.email) for user in course.users]
-#     return "No such course!"
-#
-# @app.get("/all_courses")
-# def get_all_courses():
-#     courses = session.query(db.Course).all()
-#     return courses
-#
-# @app.get("/all_users")
-# def get_all_users():
-#     users = session.query(db.User).all()
-#     return users
+@app.get("/users/{user_id}/courses")
+def get_user_courses(user_id: int):
+    user = session.get(db.User, user_id)
+    if user:
+        return user.courses
+    return "No such user!"
+
+@app.get("/courses/{course_id}/users")
+def get_course_users(course_id: int):
+    course = session.get(db.Course, course_id)
+    if course:
+        return [BaseUser(name=user.name, email=user.email) for user in course.users]
+    return "No such course!"
+
+@app.get("/all_courses")
+def get_all_courses():
+    courses = session.query(db.Course).all()
+    return courses
+
+@app.get("/all_users")
+def get_all_users():
+    users = session.query(db.User).all()
+    return users
 
 app.add_api_route("/users", get_container(UserRepository).resolve(Dependency), methods=["GET"])
 app.add_api_route("/courses", get_container(CourseRepository).resolve(Dependency), methods=["GET"])
