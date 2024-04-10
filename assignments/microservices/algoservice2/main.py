@@ -1,13 +1,24 @@
 from fastapi import FastAPI
+from database import session
 
 app = FastAPI()
 
 
+def get_db():
+    try:
+        yield session
+        session.commit()
+    except Exception:
+        raise
+    finally:
+        session.close()
+
+
 @app.get("/")
-async def root():
+def root():
     return {"message": "Hello World"}
 
 
-@app.get("/hello/{name}")
-async def say_hello(name: str):
-    return {"message": f"Hello {name}"}
+@app.get("/health_check")
+def health_check() -> dict:
+    return {"message": 'I am alive'}
