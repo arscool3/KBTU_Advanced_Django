@@ -16,3 +16,9 @@ class Binance(BaseModel):
     start_date: str
     end_date: str
     pair: Pair
+
+
+class CreateData(BaseModel):
+    time: str
+    name: str
+    correlation_coefficient: float
