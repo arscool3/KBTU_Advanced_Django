@@ -24,7 +24,7 @@ def consume(db: Session = Depends(get_db)):
             for message in messages:
                 binance = Binance.model_validate(json.loads(message.value().decode("utf-8")))
                 data = CreateData(
-                    time=datetime.datetime.now(),
+                    time=datetime.datetime.now().__str__(),
                     name=f'{binance.pair.at_coin}_to_{binance.pair.from_coin}',
                     correlation_coefficient=11.16  # in here algo function
                 )

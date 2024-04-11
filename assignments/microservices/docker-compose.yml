@@ -6,6 +6,11 @@ services:
     container_name: zookeeper
     ports:
       - "2181:2181"
+    ulimits:
+      nofile:
+        soft: 65536
+        hard: 65536
+
   kafka:
     image: wurstmeister/kafka:latest
     container_name: kafka
@@ -53,7 +58,7 @@ services:
       - "8001:8001"
     depends_on:
       - binance-api
-  
+
   algoservice2:
     build:
       context: ./algoservice2
@@ -63,7 +68,7 @@ services:
       - "8002:8002"
     depends_on:
       - binance-api
-  
+
   heatmap-api:
     build:
       context: ./heatmap_api

@@ -1,5 +1,7 @@
 from fastapi import FastAPI
 from database import session
+import uvicorn
+from consumer import consume
 
 app = FastAPI()
 
@@ -22,3 +24,8 @@ def root():
 @app.get("/health_check")
 def health_check() -> dict:
     return {"message": 'I am alive'}
+
+
+if __name__ == "__main__":
+    consume()
+    uvicorn.run(app, host="0.0.0.0", port=8002)

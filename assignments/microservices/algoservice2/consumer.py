@@ -1,7 +1,6 @@
 import datetime
 import json
 import time
-
 import confluent_kafka
 import httpx
 from fastapi import Depends
@@ -42,9 +41,9 @@ def start_proccesing(db: Session = Depends(get_db)):
     finally:
         consumer.close()
 
+
 # 8002
 def consume():
-    pass
     while True:
         time.sleep(60)
         try:
@@ -55,3 +54,4 @@ def consume():
 
 if __name__ == '__main__':
     consume()
+
