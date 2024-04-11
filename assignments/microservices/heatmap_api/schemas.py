@@ -18,6 +18,16 @@ class Binance(BaseModel):
     pair: Pair
 
 
+class Data(BaseModel):
+    class Config:
+        from_attributes = True
+
+    id: int
+    time: str
+    name: str
+    correlation_coefficient: float
+
+
 class CreateData(BaseModel):
     time: str
     name: str
