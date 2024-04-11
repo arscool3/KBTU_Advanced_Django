@@ -33,3 +33,41 @@ services:
     environment:
       - KAFKA_CLUSTERS_0_NAME=local
       - KAFKA_CLUSTERS_0_BOOTSTRAP_SERVERS=kafka:9093
+
+  binance-api:
+    build:
+      context: ./binance
+    restart: always
+    container_name: binance-api
+    ports:
+       - "8000:8000"
+    depends_on:
+      - kafka-ui
+
+  algoservice1:
+    build:
+      context: ./algoservice1
+    restart: always
+    container_name: algoservice1
+    ports:
+      - "8001:8001"
+    depends_on:
+      - binance-api
+  
+  algoservice2:
+    build:
+      context: ./algoservice2
+    restart: always
+    container_name: algoservice2
+    ports:
+      - "8002:8002"
+    depends_on:
+      - binance-api
+  
+  heatmap-api:
+    build:
+      context: ./heatmap_api
+    restart: always
+    container_name: heatmap-api
+    ports:
+      - "8003:8003"

@@ -42,7 +42,7 @@ def start_proccesing(db: Session = Depends(get_db)):
     finally:
         consumer.close()
 
-
+# 8002
 def consume():
     pass
     while True:
