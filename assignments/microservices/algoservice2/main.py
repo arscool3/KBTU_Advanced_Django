@@ -1,7 +1,7 @@
 from fastapi import FastAPI
 from database import session
 import uvicorn
-from consumer import consume
+from .consumer import consume
 
 app = FastAPI()
 

@@ -39,6 +39,28 @@ services:
       - KAFKA_CLUSTERS_0_NAME=local
       - KAFKA_CLUSTERS_0_BOOTSTRAP_SERVERS=kafka:9093
 
+  db:
+    image: postgres:14
+    restart: always
+    environment:
+      POSTGRES_DB: algo_service_fastapi
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: 191203
+    volumes:
+      - ./postgres-data:/var/lib/postgresql
+    ports:
+      - "5433:5432"
+
+  pgadmin:
+    image: chorss/docker-pgadmin4
+    restart: always
+    volumes:
+      - ./pgadmin:/data
+    ports:
+      - "5050:5050"
+    depends_on:
+      - db
+
   binance-api:
     build:
       context: ./binance
@@ -57,7 +79,7 @@ services:
     ports:
       - "8001:8001"
     depends_on:
-      - binance-api
+      - db
 
   algoservice2:
     build:
@@ -67,7 +89,7 @@ services:
     ports:
       - "8002:8002"
     depends_on:
-      - binance-api
+      - db
 
   heatmap-api:
     build:
@@ -76,3 +98,5 @@ services:
     container_name: heatmap-api
     ports:
       - "8003:8003"
+    depends_on:
+      - db

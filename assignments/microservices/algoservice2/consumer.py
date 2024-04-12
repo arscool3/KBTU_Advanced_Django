@@ -4,7 +4,6 @@ import time
 import confluent_kafka
 import httpx
 from fastapi import Depends
-from httpx import request
 from sqlalchemy.orm import Session
 import models
 from schemas import CreateData
@@ -42,7 +41,6 @@ def start_proccesing(db: Session = Depends(get_db)):
         consumer.close()
 
 
-# 8002
 def consume():
     while True:
         time.sleep(60)
