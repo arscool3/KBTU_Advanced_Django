@@ -1,4 +1,4 @@
-from fastapi import FastAPI, Depends
+from fastapi import FastAPI, Depends, APIRouter
 from sqlalchemy.orm.session import Session
 from sqlalchemy import select
 
@@ -7,6 +7,13 @@ from schemas import CreateGenre, Genre
 import models as db
 
 app = FastAPI()
+movie_router = APIRouter(prefix='movies/')
+director_router = APIRouter(prefix='directors/')
+
+app.include_router(movie_router)
+app.include_router(director_router)
+
+
 
 movies = [
     'Citizen Kane'
@@ -27,6 +34,7 @@ def get_db():
         raise
     finally:
         session.close()
+
 
 
 @app.post('/genre')
