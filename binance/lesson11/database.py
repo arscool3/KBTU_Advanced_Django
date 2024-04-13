@@ -1,24 +1,22 @@
-from typing import Annotated
-import sqlalchemy
-from sqlalchemy import create_engine, Column, Integer, String, Float, func, DateTime
-from sqlalchemy.orm import declarative_base, Session, mapped_column, Mapped
+from fastapi import FastAPI
+from database import session
+from consumer import consume
 
-url = 'postgresql://postgres:postgres@localhost:5439/postgres'
-engine = create_engine(url)
-session = Session(engine)
-Base = declarative_base()
+app = FastAPI()
 
 
-_id = Annotated[int, mapped_column(sqlalchemy.Integer, primary_key=True)]
+@app.get("/")
+def root():
+    return "OK"
 
 
-class Data(Base):
-    __tablename__ = 'data'
-
-    id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
-    time: Mapped[str] = Column(DateTime, default=func.utcnow)
-    name: Mapped[str] = mapped_column(nullable=False)
-    k_to_usd: Mapped[float] = mapped_column(nullable=False)
+@app.get("/heath_check")
+def health_check() -> str:
+    return "I'm alive"
 
 
-# Docker: 1ed6fa6ef3ee8fb1bd91524b38857389b32ba397b01e4bf92476ac8f270eb42a
+if __name__ == "__main__":
+    consume()
+
+
+# Address: localhost/8002
