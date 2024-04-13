@@ -1,4 +1,5 @@
 from datetime import datetime
+from typing import Optional
 
 from pydantic import BaseModel
 
@@ -12,8 +13,7 @@ class CreateData(BaseModel):
 class Currency(BaseModel):
     cur_name: str
     k: str
-    amount: float
-
+    amount: Optional[float] = None
 
 class CurrencyPair(BaseModel):
     send_coin: Currency
