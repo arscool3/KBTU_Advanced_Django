@@ -1,11 +1,16 @@
 import confluent_kafka
-from schemas import Binance
+from schemas import Binance, Currency, CurrencyPair
 
 producer = confluent_kafka.Producer(
     {"bootstrap.servers": "localhost:9092"}
 )
 
 topic = 'main_topic'
+
+send_coin = Currency(cur_name="BTC", k="Bitcoin", amount=30.0)
+get_coin = Currency(cur_name="ETH", k="Ethereum", amount=30.0)
+
+currency_pair = CurrencyPair(send_coin=send_coin, get_coin=get_coin)
 
 
 def produce(binance: Binance):
@@ -19,4 +24,10 @@ def produce(binance: Binance):
 
 
 if __name__ == "__main__":
-    produce()
+    binance_instance = Binance(
+        start_date='2018-01-01',
+        end_date='2022-02-02',
+        interval='1d',
+        pair=currency_pair
+    )
+    produce(binance_instance)
