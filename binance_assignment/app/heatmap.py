@@ -23,3 +23,17 @@ def get_from_db(start_date: datetime, end_date: datetime):
 
 if __name__ == '__main__':
     get_heatmap(start_date=datetime(2024, 4, 12), end_date=datetime(2024, 5, 2))
+
+
+#output
+# BTC-USD 69439.0 816.929
+# BTC-USD 70113.0 1460.688
+# BTC-USD 70284.0 1434.367
+# BTC-USD 69849.0 712.745
+# BTC-USD 69674.0 839.446
+# BTC-USD 71635.0 1432.7
+# BTC-USD 71235.0 1047.574
+# BTC-USD 69505.0 1782.179
+# BTC-USD 70619.0 3530.95
+# BTC-USD 70495.0 1409.9
+# BTC-USD 71234.0 989.361
