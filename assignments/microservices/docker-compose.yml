@@ -51,52 +51,42 @@ services:
     ports:
       - "5433:5432"
 
-  pgadmin:
-    image: chorss/docker-pgadmin4
-    restart: always
-    volumes:
-      - ./pgadmin:/data
-    ports:
-      - "5050:5050"
-    depends_on:
-      - db
-
-  binance-api:
-    build:
-      context: ./binance
-    restart: always
-    container_name: binance-api
-    ports:
-       - "8000:8000"
-    depends_on:
-      - kafka-ui
-
-  algoservice1:
-    build:
-      context: ./algoservice1
-    restart: always
-    container_name: algoservice1
-    ports:
-      - "8001:8001"
-    depends_on:
-      - db
-
-  algoservice2:
-    build:
-      context: ./algoservice2
-    restart: always
-    container_name: algoservice2
-    ports:
-      - "8002:8002"
-    depends_on:
-      - db
-
-  heatmap-api:
-    build:
-      context: ./heatmap_api
-    restart: always
-    container_name: heatmap-api
-    ports:
-      - "8003:8003"
-    depends_on:
-      - db
+#  binance-api:
+#    build:
+#      context: ./binance
+#    restart: always
+#    container_name: binance-api
+#    ports:
+#       - "8000:8000"
+#    depends_on:
+#      - kafka-ui
+#
+#  algoservice1:
+#    build:
+#      context: ./algoservice1
+#    restart: always
+#    container_name: algoservice1
+#    ports:
+#      - "8001:8001"
+#    depends_on:
+#      - db
+#
+#  algoservice2:
+#    build:
+#      context: ./algoservice2
+#    restart: always
+#    container_name: algoservice2
+#    ports:
+#      - "8002:8002"
+#    depends_on:
+#      - db
+#
+#  heatmap-api:
+#    build:
+#      context: ./heatmap_api
+#    restart: always
+#    container_name: heatmap-api
+#    ports:
+#      - "8003:8003"
+#    depends_on:
+#      - db

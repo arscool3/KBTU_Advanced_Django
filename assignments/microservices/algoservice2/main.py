@@ -1,19 +1,11 @@
 from fastapi import FastAPI
-from database import session
 import uvicorn
-from .consumer import consume
+from consumer import consume
 
 app = FastAPI()
 
 
-def get_db():
-    try:
-        yield session
-        session.commit()
-    except Exception:
-        raise
-    finally:
-        session.close()
+
 
 
 @app.get("/")

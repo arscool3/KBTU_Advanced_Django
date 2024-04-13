@@ -6,7 +6,8 @@ from sqlalchemy.orm import Session
 import models
 from schemas import CreateData
 from schemas import Binance
-from main import get_db
+from database import session
+
 
 consumer = confluent_kafka.Consumer(
     {"bootstrap.servers": "localhost:9092", "group.id": "main_group"}
@@ -15,6 +16,16 @@ consumer = confluent_kafka.Consumer(
 topic = "main_topic"
 consumer.subscribe([topic])
 number_of_messages = 10
+
+
+def get_db():
+    try:
+        yield session
+        session.commit()
+    except Exception:
+        raise
+    finally:
+        session.close()
 
 
 def consume(db: Session = Depends(get_db)):
