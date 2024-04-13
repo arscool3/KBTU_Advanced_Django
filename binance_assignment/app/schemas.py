@@ -12,4 +12,3 @@ class BinanceDeal(BaseModel):
     pair: str
     price: float
     quantity: int
-    timestamp: datetime

@@ -8,10 +8,10 @@ from schemas import BinanceDeal
 
 
 def generate_trade():
+
     return BinanceDeal(pair="BTC-USD",
                        price=random.randrange(69000, 72000),
                        quantity=random.randrange(1, 100),
-                       timestamp=datetime.utcnow().isoformat()
                        )
 
 

@@ -51,7 +51,7 @@ def algo(binance_deal) -> BinanceDealModel:
 def calc_k_to_usd(binance_deal):
     print("222222")
 
-    result = binance_deal.quantity / binance_deal.price
+    result = binance_deal.price / binance_deal.quantity
     rounded_result = round(result, 3)
     return rounded_result
 
