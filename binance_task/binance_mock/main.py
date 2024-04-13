@@ -1,3 +1,4 @@
+import random
 from datetime import datetime
 
 from fastapi import FastAPI
@@ -17,11 +18,15 @@ class Trade(BaseModel):
 
 
 def _get_mock_data() -> dict:
+    currency_choices = ["btc", "etherium"]
+
+    index = random.randint(0, 1)
+
     data = {
         "start_date": datetime.now(),
         "end_date": datetime.now(),
-        "sold_currency": Trade(currency="etherium", amount=1).model_dump(),
-        "purchase_currency": Trade(currency="usdt", amount=70000).model_dump(),
+        "sold_currency": Trade(currency=currency_choices[index], amount=1).model_dump(),
+        "purchase_currency": Trade(currency=currency_choices[(index + 1) // 2], amount=70000).model_dump(),
     }
 
     return data

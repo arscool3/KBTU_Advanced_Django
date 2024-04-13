@@ -5,8 +5,7 @@ from pydantic import BaseModel
 
 class CreateCryptoTrade(BaseModel):
     timestamp: datetime = datetime.now()
-    sold_currency: str
-    purchase_currency: str
+    currency: str
     k_to_usd: float = 0.0
 
     class Config:

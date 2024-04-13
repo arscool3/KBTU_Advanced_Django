@@ -3,11 +3,13 @@ version: '3'
 services:
   zookeeper:
     image: wurstmeister/zookeeper:latest
+    restart: always
     container_name: zookeeper
     ports:
       - "2181:2181"
   kafka:
     image: wurstmeister/kafka:latest
+    restart: always
     container_name: kafka
     ports:
       - "9092:9092"
@@ -24,6 +26,7 @@ services:
 
   kafka-ui:
     image: "provectuslabs/kafka-ui:latest"
+    restart: always
     container_name: kafka-ui
     ports:
       - "8080:8080"

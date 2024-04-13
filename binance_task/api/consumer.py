@@ -19,9 +19,12 @@ topic = "binance_topic"
 consumer.subscribe([topic])
 
 
-def _insert_db(res: CreateCryptoTrade):
+def _insert_db(trades: list[CreateCryptoTrade]):
     db_session = session()
-    db_session.add(CryptoTrade(**res.model_dump()))
+
+    trade_instances = [CryptoTrade(**trade.model_dump()) for trade in trades]
+
+    db_session.bulk_save_objects(trade_instances)
     db_session.commit()
 
 

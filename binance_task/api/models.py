@@ -16,7 +16,6 @@ class CryptoTrade(Base):
     id: Mapped[_id]
 
     timestamp: Mapped[datetime]
-    sold_currency: Mapped[str]
-    purchase_currency: Mapped[str]
+    currency: Mapped[str]
     k_to_usd: Mapped[float]
 
