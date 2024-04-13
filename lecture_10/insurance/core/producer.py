@@ -3,7 +3,7 @@ import pickle
 import time
 from datetime import datetime
 
-from dotenv import load_dotenv
+# from dotenv import load_dotenv
 import confluent_kafka
 import httpx
 
@@ -14,17 +14,17 @@ from database import WorkTime, session
 
 sys.path.append("../../")
 
-dotenv_path = os.path.join(os.path.dirname(__file__), '.env')
-
-if os.path.exists(dotenv_path):
-    load_dotenv(dotenv_path)
-else:
-    print("Error: .env file")
+# dotenv_path = os.path.join(os.path.dirname(__file__), '.env')
+#
+# if os.path.exists(dotenv_path):
+#     load_dotenv(dotenv_path)
+# else:
+#     print("Error: .env file")
 
 KAFKA_BOOTSTRAP = os.environ.get("KAFKA_BOOTSTRAP", "localhost: 9092")
-binance_host = os.environ.get("INTERNAL_BINACE_HOST", "localhost:8022")
+binance_host = os.environ.get("INTERNAL_BINACE_HOST", "localhost:8002")
 topic = os.environ.get("DEFAULT_TOPIC", "main_topic")
-producer_host = os.environ.get("DEFAULT_PRODUCER_HOST", "127.0.0.1:8000")
+producer_host = os.environ.get("DEFAULT_PRODUCER_HOST", "127.0.0.1:8003")
 timeout = int(os.environ.get("DEFAULT_TIMEOUT", 10))
 producer = confluent_kafka.Producer({"bootstrap.servers": KAFKA_BOOTSTRAP})
 

@@ -1,19 +1,19 @@
 import os
 import pickle
 import time
-from dotenv import load_dotenv
+# from dotenv import load_dotenv
 import confluent_kafka
 import httpx
 
-dotenv_path = os.path.join(os.path.dirname(__file__), '.env')
+# dotenv_path = os.path.join(os.path.dirname(__file__), '.env')
 
-if os.path.exists(dotenv_path):
-    load_dotenv(dotenv_path)
-else:
-    print("Error: .env file")
+# if os.path.exists(dotenv_path):
+#     load_dotenv(dotenv_path)
+# else:
+#     print("Error: .env file")
 
 KAFKA_BOOTSTRAP = os.environ.get("KAFKA_BOOTSTRAP", "localhost: 9092")
-binance_host = os.environ.get("INTERNAL_BINACE_HOST", "localhost:8022")
+binance_host = os.environ.get("INTERNAL_BINACE_HOST", "localhost:8002")
 topic = os.environ.get("DEFAULT_TOPIC", "main_topic")
 
 producer = confluent_kafka.Producer({"bootstrap.servers": KAFKA_BOOTSTRAP})

@@ -4,6 +4,7 @@ from typing import List
 from fastapi import FastAPI, Depends
 from datetime import datetime
 
+from sqlalchemy import select, and_
 from sqlalchemy.orm import Session
 
 import database as models
@@ -41,8 +42,15 @@ def post_currency_query(
         .filter(models.Currency.timestamp <= query_params.end_date)
         .all()
     )
-    print(query_params.name, query_params.start_date, query_params.end_date)
-    if not currency_data:
-        print("No currencies found")
+    query = select(models.Currency).where(
+        and_(
+            models.Currency.name == query_params.name,
+            models.Currency.timestamp >= query_params.start_date,
+            models.Currency.timestamp <= query_params.end_date
+        )
+    )
+    print(query)
+    db_obj = db.execute(query)
+    instance = db_obj.scalars().all()
+    return instance
 
-    return currency_data

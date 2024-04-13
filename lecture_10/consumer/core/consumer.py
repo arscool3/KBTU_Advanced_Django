@@ -11,7 +11,7 @@ MESSAGE_NUM = os.environ.get("MESSAGE_NUM", 20)
 
 consumer = confluent_kafka.Consumer({"bootstrap.servers": KAFKA_BOOTSTRAP, "group.id": GROUP_ID})
 
-topic = os.environ.get("DEFAULT_TOPIC", "producer_topic")
+topic = os.environ.get("DEFAULT_TOPIC", "main_topic")
 
 consumer.subscribe([topic])
 
