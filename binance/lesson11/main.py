@@ -1,18 +1,8 @@
 from fastapi import FastAPI
 from database import session
-from lesson11.core.consumer import consume
+from consumer import consume
 
 app = FastAPI()
-
-
-def get_db():
-    try:
-        yield session
-        session.commit()
-    except Exception:
-        raise
-    finally:
-        session.close()
 
 
 @app.get("/")
@@ -27,5 +17,6 @@ def health_check() -> str:
 
 if __name__ == "__main__":
     consume()
+
 
 # Address: localhost/8002
