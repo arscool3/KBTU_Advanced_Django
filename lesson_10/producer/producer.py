@@ -18,7 +18,7 @@ print("\n\n\n\n\nCONNECTED\n\n\n\n")
 
 
 def request_to_binance():
-    time.sleep(10)  # to not DOS a server
+    time.sleep(1)  # to not DOS a server
     url = f"http://{binance_host}/fake/binance/data/"
     print(url)
     response = httpx.get(url)

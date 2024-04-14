@@ -1,10 +1,6 @@
 from database import session, HeatMapData
 from sqlalchemy import select
 from datetime import datetime
-import matplotlib.pyplot as plt
-import seaborn as sns
-from PIL import Image, ImageDraw
-import io
 import plotly.graph_objects as go
 import numpy as np
 
