@@ -10,7 +10,7 @@ from database import session
 
 
 consumer = confluent_kafka.Consumer(
-    {"bootstrap.servers": "localhost:9092", "group.id": "main_group"}
+    {"bootstrap.servers": "kafka:9092", "group.id": "main_group"}
 )
 
 topic = "main_topic"
@@ -30,6 +30,7 @@ def get_db():
 
 def consume(db: Session = Depends(get_db)):
     try:
+        print("start consuming!")
         while True:
             messages = consumer.consume(num_messages=number_of_messages, timeout=1.5)
             for message in messages:
@@ -39,6 +40,7 @@ def consume(db: Session = Depends(get_db)):
                     name=f'{binance.pair.at_coin}_to_{binance.pair.from_coin}',
                     correlation_coefficient=11.16  # in here algo function
                 )
+                print(data)
                 db.add(models.Data(**data.model_dump()))
                 print("Data added to table!")
                 print(f'data: {data.model_dump_json()}')

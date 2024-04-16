@@ -2,7 +2,7 @@ import confluent_kafka
 from schemas import Binance
 
 producer = confluent_kafka.Producer(
-    {"bootstrap.servers": "localhost:9092"}
+    {"bootstrap.servers": "kafka:9092"}
 )
 
 topic = 'main_topic'

@@ -1,4 +1,4 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, BackgroundTasks
 import uvicorn
 from consumer import consume
 
@@ -19,5 +19,6 @@ def health_check() -> dict:
 
 
 if __name__ == "__main__":
-    consume()
+    background_task = BackgroundTasks()
+    background_task.add_task(consume)
     uvicorn.run(app, host="0.0.0.0", port=8002)
