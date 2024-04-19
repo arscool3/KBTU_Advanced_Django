@@ -1,5 +1,13 @@
-from pydantic import BaseModel
 from datetime import datetime
+
+from pydantic import BaseModel
+
+
+class Binance(BaseModel):
+    symbol: str
+    interval: str
+    start: str
+    end: str
 
 
 class Price(BaseModel):

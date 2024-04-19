@@ -5,13 +5,6 @@ import json
 
 
 def fetch_binance_price_history(symbol, interval, start_str, end_str=None):
-    """
-    Parameters:
-    - symbol: The symbol pair to fetch (e.g., 'BTCUSDT').
-    - interval: The interval of the candlesticks (e.g., '1h' for one hour).
-    - start_str: Start time as a string in "YYYY-MM-DD" format.
-    - end_str: (Optional) End time as a string in "YYYY-MM-DD" format. Defaults to None.
-    """
     start_time = int(datetime.strptime(start_str, "%Y-%m-%d").timestamp() * 1000)
     end_time = int(datetime.strptime(end_str, "%Y-%m-%d").timestamp() * 1000) if end_str else None
 
@@ -40,17 +33,17 @@ def fetch_binance_price_history(symbol, interval, start_str, end_str=None):
     return json_data
 
 
-"""
+
 
 # Example usage
-symbol = 'BTCUSDT'
-interval = '1h'  # 1 hour interval
-start_str = '2023-12-26'
-end_str = '2024-01-10'
+# symbol = 'BTCUSDT'
+# interval = '1h'  # 1 hour interval
+# start_str = '2023-01-9'
+# end_str = '2024-01-10'
+#
+# # Fetch the price history
+# price_history = fetch_binance_price_history(symbol, interval, start_str, end_str)
+# formatted_json = json.dumps(json.loads(price_history), indent=4)
+# print(formatted_json)
 
-# Fetch the price history
-price_history = fetch_binance_price_history(symbol, interval, start_str, end_str)
-formatted_json = json.dumps(json.loads(price_history), indent=4)
-print(formatted_json)
 
-"""
