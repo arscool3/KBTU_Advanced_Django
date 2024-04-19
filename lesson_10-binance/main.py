@@ -1,8 +1,51 @@
-from fastapi import FastAPI
+import time
+from fastapi import HTTPException, Depends
+from datetime import datetime
+from fastapi import FastAPI, BackgroundTasks
+from sqlalchemy.orm import Session
+
 from producer import produce
 from consumer import consume
+from services import *
 
 app = FastAPI()
 
-# produce()
-consume()
+
+def get_db():
+    try:
+        yield session
+        session.commit()
+    except:
+        raise
+    finally:
+        session.close()
+
+
+@app.get("/bitcoin/run")
+def run_server(background_tasks: BackgroundTasks):
+    background_tasks.add_task(produce)
+    background_tasks.add_task(consume)
+    return "Producer and consumer started"
+
+
+@app.get("/heatmap/")
+def get_heatmap(coin1: str, coin2: str, start_date: str, db: Session = Depends(get_db)):
+    start_datetime = datetime.strptime(start_date, '%Y-%m-%d %H:%M:%S')
+
+    latest_date_coin1 = get_latest_date_for_symbol(db, coin1) or datetime.now()
+    latest_date_coin2 = get_latest_date_for_symbol(db, coin2) or datetime.now()
+
+    end_datetime = min(latest_date_coin1, latest_date_coin2)
+
+    prices_coin1 = get_prices_from_db(db, coin1, start_datetime, end_datetime)
+    prices_coin2 = get_prices_from_db(db, coin2, start_datetime, end_datetime)
+
+    if not prices_coin1 or not prices_coin2:
+        raise HTTPException(status_code=404, detail="No price data found for the specified symbols or date range.")
+
+    prices_coin1 = [price[0] for price in prices_coin1]
+    prices_coin2 = [price[0] for price in prices_coin2]
+
+    correlation = calculate_correlation(prices_coin1, prices_coin2)
+
+    return {"correlation": correlation}

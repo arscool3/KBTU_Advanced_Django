@@ -4,12 +4,12 @@ from schemas import BitcoinCreate
 import json
 
 consumer = confluent_kafka.Consumer(
-    {'bootstrap.servers': 'localhost:9092', 'group.id': 'binance_group'}
+    {'bootstrap.servers': 'localhost:9092', 'group.id': 'group6'}
 )
 
-topic = 'topic1'
+topic = 'topic6'
 consumer.subscribe([topic])
-number_of_messages = 10
+number_of_messages = 30
 
 
 def consume():
@@ -19,7 +19,7 @@ def consume():
             if messages is None:
                 continue
             for message in messages:
-                print("------")
+                print(message.value().decode("utf-8"))
                 bitcoin = BitcoinCreate(**json.loads(message.value().decode("utf-8")))
                 print(bitcoin)
                 insert_data_to_db(bitcoin)
@@ -27,7 +27,6 @@ def consume():
         print(f"Error: {e}")
     finally:
         consumer.close()
-        print("Consumer closed")
 
 
 if __name__ == '__main__':

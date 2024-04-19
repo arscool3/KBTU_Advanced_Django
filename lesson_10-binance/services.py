@@ -2,6 +2,33 @@ import requests
 from datetime import datetime
 from schemas import Bitcoin
 from db import session
+import numpy as np
+
+
+def get_latest_date_for_symbol(db: session, symbol: str):
+    latest_record = db.query(Bitcoin).filter(Bitcoin.name == symbol).order_by(Bitcoin.end_date.desc()).first()
+    return latest_record.end_date if latest_record else None
+
+
+def get_prices_from_db(db: session, symbol: str, start_date: datetime, end_date: datetime):
+    return db.query(Bitcoin.price).filter(
+        Bitcoin.name == symbol,
+        Bitcoin.start_date >= start_date,
+        Bitcoin.end_date <= end_date
+    ).all()
+
+
+def calculate_correlation(prices1, prices2):
+    if len(prices1) != len(prices2):
+        raise ValueError("Lists of prices must have the same length")
+
+    prices1 = np.array(prices1)
+    prices2 = np.array(prices2)
+
+    correlation_matrix = np.corrcoef(prices1, prices2)
+    correlation_coefficient = correlation_matrix[0, 1]
+    return correlation_coefficient
+
 
 def fetch_binance_data(symbol, interval, start_str, end_str):
     url = 'https://api.binance.com/api/v3/klines'
