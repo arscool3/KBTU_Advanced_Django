@@ -1,0 +1,24 @@
+# Use Gradle image as base for building the application
+FROM gradle:latest AS builder
+
+# Copy the source code into the container
+COPY . /home/gradle/project
+
+# Set the working directory
+WORKDIR /home/gradle/project
+
+
+RUN gradle build -x test
+
+FROM openjdk:23-ea-18-jdk-oraclelinux9
+# Copy the built jar file from the builder stage
+COPY --from=builder /home/gradle/project/build/libs/binance_server-all.jar /app/binance_server-all.jar
+
+# Set the working directory inside the container
+WORKDIR /app
+
+# Expose port 8080 to the outside world
+EXPOSE 8080
+
+# Command to run the application
+CMD ["java", "-jar", "binance_server-all.jar"]

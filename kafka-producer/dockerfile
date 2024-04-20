@@ -1,0 +1,23 @@
+# Use Gradle image as base for building the application
+FROM gradle:latest AS builder
+
+# Copy the source code into the container
+COPY . /home/gradle/project
+
+# Set the working directory
+WORKDIR /home/gradle/project
+
+# Build the application
+RUN gradle build -x test
+
+
+FROM openjdk:23-ea-18-jdk-oraclelinux9
+
+# Copy the built jar file from the builder stage
+COPY --from=builder /home/gradle/project/app/build/libs/app.jar /app/app.jar
+
+# Set the working directory inside the container
+WORKDIR /app
+
+# Command to run the application
+CMD ["java", "-jar", "app.jar"]

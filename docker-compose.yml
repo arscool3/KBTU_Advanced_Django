@@ -1,0 +1,42 @@
+version: '3.8'
+
+services:
+  webserver:
+    build:
+      context: ./binance_server
+    ports:
+      - "8080:8080"
+    depends_on:
+      - kafka
+
+  producer:
+    build:
+      context: ./kafka-producer
+    depends_on:
+      - kafka
+      - webserver
+
+  consumer:
+    build:
+      context: ./kafka-consumer
+    depends_on:
+      - kafka
+
+  kafka:
+    image: wurstmeister/kafka:latest
+    container_name: kafka
+    ports:
+      - "9092:9092"
+    depends_on:
+      - zookeeper
+    environment:
+      KAFKA_ADVERTISED_HOST_NAME: localhost
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+      KAFKA_ADVERTISED_PORT: 9092
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+  
+  zookeeper:
+    image: wurstmeister/zookeeper:latest
+    container_name: zookeeper
+    ports:
+      - "2181:2181"
