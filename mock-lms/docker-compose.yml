@@ -2,21 +2,24 @@ version: '3.8'
 services:
   web:
     build: .
+    command: uvicorn app.main:app --host 0.0.0.0 --port 8000
+    volumes:
+      - .:/app
     env_file:
-      - ../mock-lms/.env
+      - .env
     ports:
-      - "8081:8081"
+      - "8081:8000"
     depends_on:
       - db
 
   db:
     image: postgres:13
     environment:
-      POSTGRES_USER: iguser
-      POSTGRES_PASSWORD: igpass
-      POSTGRES_DB: targetdb
+      POSTGRES_USER: lms_user
+      POSTGRES_PASSWORD: 123
+      POSTGRES_DB: lms_db
     ports:
-      - "5435:5435"
+      - "5435:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
 

@@ -160,7 +160,7 @@ cython_debug/
 .idea/
 
 
-igscraper/.env
+mock-lms/.env
 igscraper/.alembic.ini
 igscraper/.docker-compose.yml
 #DELETE ENSTA SESSION
