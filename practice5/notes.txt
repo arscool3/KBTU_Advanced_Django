@@ -1,6 +1,6 @@
 alembic init alembic
 py manage.py dbshell
-docker run --name fastapi -e POSTGRES_PASSWORD=aru -p 5432:5432 postgres
+docker run --name postgres -e POSTGRES_PASSWORD=postgres -p 5432:5432 postgres
 alembic init alembic
 alembic revision -m 'initial_migration' --autogenerate
 alembic upgrade head

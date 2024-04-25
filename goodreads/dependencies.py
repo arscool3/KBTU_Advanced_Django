@@ -34,7 +34,7 @@ class GenreDependencyClass:
         return db_genre
 
 class BookDependencyClass:
-    def __call__(self, db_book: models.Book = Depends(get_book_model)) -> models.Book | None:
+    def __call__(self, db_briook: models.Book = Depends(get_book_model)) -> models.Book | None:
         return db_book
 
 class QuoteDependencyClass:
