@@ -6,6 +6,7 @@ services:
     container_name: kafka_service
     ports:
       - "9092:9092"
+      - "9093"
     environment:
       KAFKA_ADVERTISED_LISTENERS: INSIDE://kafka_service:9093, OUTSIDE://localhost:9092
       KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: INSIDE:PLAINTEXT,OUTSIDE:PLAINTEXT
@@ -13,10 +14,22 @@ services:
       KAFKA_INTER_BROKER_LISTENER_NAME: INSIDE
       KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
       KAFKA_NUM_PARTITIONS: 3
+    hostname: kafka_service
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
     depends_on:
       - zookeeper
+
+  kafka-ui:
+    image: "provectuslabs/kafka-ui:latest"
+    container_name: kafka-ui
+    ports:
+      - "8080:8080"
+    depends_on:
+      - zookeeper
+    environment:
+      - KAFKA_CLUSTERS_0_NAME=local
+      - KAFKA_CLUSTERS_0_BOOTSTRAP_SERVERS=kafka_service:9093
 
   zookeeper:
     restart: on-failure
@@ -78,17 +91,17 @@ services:
       - redis_data:/data
     command: redis-server --appendonly yes
 
-  producer:
-    restart: on-failure
-    build:
-      context: ./producer
-      dockerfile: Dockerfile
-    container_name: producer
-    environment:
-      DEFAULT_TOPIC: "traffic_data"
-      KAFKA_BOOTSTRAP: "kafka_service:9093"
-    depends_on:
-      - kafka_service
+#  producer:
+#    restart: always
+#    build:
+#      context: ./producer
+#      dockerfile: Dockerfile
+#    container_name: producer
+#    environment:
+#      DEFAULT_TOPIC: "traffic_data"
+#      KAFKA_BOOTSTRAP: "kafka_service:9093"
+#    depends_on:
+#      - zookeeper
 
 volumes:
   postgres_data:
