@@ -4,6 +4,9 @@ psycopg2-binary
 alembic
 sqlalchemy
 pydantic
-celery
 python-decouple
 bcrypt
+aiokafka==0.7.0
+dramatiq[aiokafka]==1.10.0
+dramatiq_kafka
+psycopg2-binary==2.8.6
