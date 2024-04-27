@@ -1,5 +1,5 @@
 import confluent_kafka
-from schemas import Bitcoin
+from schemas import Bitcoin, BitcoinCreate
 import time
 from datetime import datetime
 
@@ -11,13 +11,14 @@ topic = 'binance_topic'
 
 
 def produce():
-    while True:
-        bitcoin1 = Bitcoin(
+    counter = 0
+    while counter < 20:
+        bitcoin1 = BitcoinCreate(
             time=datetime.now().isoformat(),
             price=100 + time.time() % 50,
             coin="BTC"
         )
-        bitcoin2 = Bitcoin(
+        bitcoin2 = BitcoinCreate(
             time=datetime.now().isoformat(),
             price=100 + time.time() % 40,
             coin="ETH"
@@ -26,8 +27,8 @@ def produce():
         print(bitcoin2.model_dump_json())
         producer.produce(topic=topic, value=bitcoin1.model_dump_json())
         producer.produce(topic=topic, value=bitcoin2.model_dump_json())
-        producer.flush()
-        time.sleep(5)
+        counter += 1
+        time.sleep(2)
 
 
 if __name__ == '__main__':

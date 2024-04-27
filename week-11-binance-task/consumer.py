@@ -1,6 +1,6 @@
 import confluent_kafka
-from database import insert_to_db
-from schemas import Bitcoin
+import schemas
+from reposiroty import insert_to_db
 import json
 
 consumer = confluent_kafka.Consumer(
@@ -12,16 +12,21 @@ consumer.subscribe([topic])
 number_of_messages = 30
 
 
-def consume_data():
+def consume():
     try:
+        message_count = 0
         while True:
-            messages = consumer.consume(num_messages=number_of_messages, timeout=1.5)
+            messages = consumer.consume(num_messages=number_of_messages, timeout=2)
             if messages is None:
-                continue
+                break
             for message in messages:
-                bitcoin = Bitcoin.model_validate(json.loads(message.value().decode("utf-8")))
+                bitcoin = schemas.BitcoinCreate(**json.loads(message.value().decode("utf-8")))
                 print(bitcoin)
                 insert_to_db(bitcoin)
+                message_count += 1
+                if message_count >= 20:
+                    print("All messages consumed")
+                    continue
     except Exception as e:
         print(f"Error: {e}")
     finally:
@@ -30,4 +35,4 @@ def consume_data():
 
 
 if __name__ == '__main__':
-    consume_data()
+    consume()
