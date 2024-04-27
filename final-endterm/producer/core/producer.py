@@ -4,7 +4,7 @@ import time
 
 import confluent_kafka
 from .get_traffic_data import get_person_traffic_data
-from ..settings import KAFKA_BOOTSTRAP, TOPIC
+from settings import KAFKA_BOOTSTRAP, TOPIC
 
 logger = logging.getLogger(__name__)
 
