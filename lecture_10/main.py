@@ -35,13 +35,6 @@ def post_currency_query(
         query_params: CurrencyQueryRequest,
         db: Session = Depends(get_db)
 ):
-    currency_data = (
-        db.query(models.Currency)
-        .filter(models.Currency.name == query_params.name)
-        .filter(models.Currency.timestamp >= query_params.start_date)
-        .filter(models.Currency.timestamp <= query_params.end_date)
-        .all()
-    )
     query = select(models.Currency).where(
         and_(
             models.Currency.name == query_params.name,

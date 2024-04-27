@@ -22,7 +22,7 @@ def consume():
             messages = consumer.consume(num_messages=MESSAGE_NUM, timeout=0.1)
             for message in messages:
                 data = pickle.loads(message.value())
-                currencies = data["data"]
+                currencies = data["price"]
                 timestamp = data["timestamp"]
                 for currency in currencies:
                     print(f'{timestamp} - {currency}: {currencies.get(currency)} OK!')

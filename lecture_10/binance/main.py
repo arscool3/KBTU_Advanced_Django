@@ -1,6 +1,8 @@
+import json
 from datetime import datetime
+import asyncio
 
-from fastapi import FastAPI
+from fastapi import FastAPI, WebSocket
 
 # 127.0.0.1:8002
 binance_app = FastAPI(title="BinanceAPI")
@@ -30,9 +32,23 @@ def main():
     return random_currency_values
 
 
-@binance_app.get("/currencies/", tags=["currency"])
-def fake_get():
-    data = main()
-    now = datetime.now()
-    print(now)
-    return {"timestamp": now, "data": data}
+# @binance_app.get("/currencies/", tags=["currency"])
+# def fake_get():
+#     data = main()
+#     now = datetime.now()
+#     print(now)
+#     return {"timestamp": now, "data": data}
+
+@binance_app.websocket('/currencies/')
+async def stock_market(web_socket: WebSocket):
+    await web_socket.accept()
+    try:
+        while True:
+            data = main()
+            now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+            await web_socket.send_json({'timestamp': now, 'price': data})
+            await asyncio.sleep(2)
+    except Exception as e:
+        print(f"Error {e}")
+    finally:
+        await web_socket.close()
