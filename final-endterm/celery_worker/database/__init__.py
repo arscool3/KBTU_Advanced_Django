@@ -1,5 +1,5 @@
 from .connection import session, engine
-from .models import Base, History, Location, Person, Position, Region, Road
+from .models import Base, History, Location, Person, Position, Region, Road, TrafficHistory
 
 __all__ = [
     "session",
@@ -11,4 +11,5 @@ __all__ = [
     "Position",
     "Region",
     "Road",
+    "TrafficHistory"
 ]

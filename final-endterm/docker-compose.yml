@@ -59,6 +59,8 @@ services:
       - ./celery_worker:/celery
     environment:
       CELERY_BROKER: "redis://redis:6379/0"
+      POSTGRES_URL: "postgresql://postgres:postgres@postgres:5432/postgres"
+      REDIS_HOST: "redis"
     depends_on:
       - postgres
       - redis

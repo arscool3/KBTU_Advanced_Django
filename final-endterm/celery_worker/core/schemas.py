@@ -9,12 +9,18 @@ __all__ = [
 ]
 
 
+class Person(BaseModel):
+    id: int
+    current_speed: int
+
+
 class Road(BaseModel):
     name: str
     region: int
     traffic_rate: float
     start_position: int
     end_position: int
+    people: list
 
     class Config:
         from_attributes = True
