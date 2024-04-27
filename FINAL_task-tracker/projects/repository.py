@@ -10,3 +10,6 @@ class ProjectRepo(BaseRepository):
         "retrieve": schemas.Project,
         "create": schemas.CreateProjectResponse,
     }
+
+    def add_user_to_project(self, user_project_association: schemas.):
+

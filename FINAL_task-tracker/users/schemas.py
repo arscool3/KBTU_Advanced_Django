@@ -11,7 +11,7 @@ class BaseUser(BaseSchema):
 
 
 class CreateUser(BaseUser):
-    project_id: int
+    pass
 
 
 class CreateUserResponse(BaseUser):

@@ -20,3 +20,8 @@ class CreateProjectResponse(BaseProject):
 class Project(BaseProject):
     id: int
     users: List[User]
+
+
+class AddUserToProject(BaseSchema):
+    user_id: int
+    project_id: int

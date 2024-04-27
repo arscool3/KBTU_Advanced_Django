@@ -1,15 +1,24 @@
+import asyncio
 import random
 from datetime import datetime
 
-from fastapi import FastAPI
+from fastapi import FastAPI, WebSocket
 from pydantic import BaseModel
 
 app = FastAPI()
 
 
-@app.get("/binance")
-async def binance_data():
-    return _get_mock_data()
+@app.websocket("/binance")
+async def binance_data(websocket: WebSocket):
+    await websocket.accept()
+    try:
+        while True:
+            await websocket.send_json(_get_mock_data())
+            await asyncio.sleep(2)
+    except Exception as e:
+        print(e)
+    finally:
+        await websocket.close()
 
 
 class Trade(BaseModel):

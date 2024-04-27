@@ -1,7 +1,7 @@
 from datetime import datetime
 
 import numpy as np
-from fastapi import FastAPI, Depends
+from fastapi import FastAPI, Depends, WebSocket
 from sqlalchemy import select, cast, String
 from sqlalchemy.orm import Session
 
@@ -11,7 +11,7 @@ from models import CryptoTrade
 app = FastAPI()
 
 
-@app.get("/heatmap")
+@app.websocket("/heatmap")
 async def get_heatmap(
         coin1: str,
         coin2: str,

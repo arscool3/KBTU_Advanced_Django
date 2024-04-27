@@ -3,6 +3,7 @@ from sqlalchemy.orm import Mapped, relationship, mapped_column
 
 from database import Base
 from notifications.models import Notification
+from projects.models import project_user_association
 from utils.model_constants import default_id
 
 
@@ -14,9 +15,7 @@ class User(Base):
     last_name: Mapped[str]
     email: Mapped[str]
 
-    project_id: Mapped[int] = mapped_column(sqlalchemy.ForeignKey("project.id"))
-
     tasks = relationship("Task", back_populates="user")
-    project = relationship("Project", back_populates="users")
+    projects = relationship("Project", secondary=project_user_association, back_populates="users")
     comments = relationship("TaskComment", back_populates="user")
     notifications = relationship(Notification, back_populates="user")
