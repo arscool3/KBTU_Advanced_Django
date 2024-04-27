@@ -1,12 +1,12 @@
+from typing import List
 from fastapi import FastAPI, Depends, HTTPException
 from sqlalchemy.orm.session import Session
 from sqlalchemy import select
 
 from database import session,engine
-from typing import List
-from schemas import CreateUser, User,Author,CreateAuthor,Book,CreateBook,BookReview,CreateBookReview,Quote,CreateQuote,Genre,CreateGenre
+
+from schemas import CreateUser, User,Author,CreateAuthor,Book,CreateBook,BookReview,CreateBookReview,Genre,CreateGenre,Quote,CreateQuote
 import models as db
-from dependencies import *
 db.Base.metadata.create_all(bind=engine)
 
 app = FastAPI()
@@ -22,16 +22,15 @@ def get_db():
     finally:
         session.close()
 
-
 @app.post("/users")
-def add_users(user: CreateUser,session: Session = Depends(get_db)) -> str:
+def add_users(user: CreateUser) -> str:
     session.add(db.User(**user.model_dump()))
     session.commit()
     session.close()
     return "User was added"
 
 @app.get("/users")
-def get_users(session: Session = Depends(get_db)):
+def get_users():
     db_users = session.execute(select(db.User)).scalars().all()
     users = []
     for db_user in db_users:
@@ -39,14 +38,14 @@ def get_users(session: Session = Depends(get_db)):
     return users
 
 @app.post("/authors")
-def add_authors(author: CreateAuthor,session: Session = Depends(get_db)) -> str:
+def add_authors(author: CreateAuthor) -> str:
     session.add(db.Author(**author.model_dump()))
     session.commit()
     session.close()
     return "Author"
 
 @app.get("/authors")
-def get_authors(session: Session = Depends(get_db)):
+def get_authors():
     db_authors = session.execute(select(db.Author)).scalars().all()
     authors = []
     for db_author in db_authors:
@@ -55,14 +54,14 @@ def get_authors(session: Session = Depends(get_db)):
 
 
 @app.post("/books")
-def add_books(book: CreateBook,session: Session = Depends(get_db)) -> str:
+def add_books(book: CreateBook) -> str:
     session.add(db.Book(**book.model_dump()))
     session.commit()
     session.close()
     return "Book"
 
 @app.get("/books")
-def get_books(session: Session = Depends(get_db)):
+def get_books():
     db_books = session.execute(select(db.Book)).scalars().all()
     books = []
     for db_book in db_books:
@@ -70,20 +69,20 @@ def get_books(session: Session = Depends(get_db)):
     return books
 
 
-#@app.post("/quotes")
-#def add_quotes(quote: CreateQuote,session: Session = Depends(get_db)) -> str:
-#    session.add(db.Quote(**quote.model_dump()))
-#    session.commit()
-#    session.close()
- #   return "Quote"
+@app.post("/quotes")
+def add_quotes(quote: CreateQuote,session: Session = Depends(get_db)) -> str:
+    session.add(db.Quote(**quote.model_dump()))
+    session.commit()
+    session.close()
+    return "Quote"
 
-#@app.get("/quotes")
-#def get_quotes(session: Session = Depends(get_db)):
-#    db_quotes = session.execute(select(db.Quote)).scalars().all()
-#    quotes= []
-#    for db_quote in db_quotes:
-#        quotes.append(Quote.model_validate(db_quote))
-#    return quotes
+@app.get("/quotes")
+def get_quotes(session: Session = Depends(get_db)):
+    db_quotes = session.execute(select(db.Quote)).scalars().all()
+    quotes= []
+    for db_quote in db_quotes:
+        quotes.append(Quote.model_validate(db_quote))
+    return quotes
 
 
 @app.post("/bookreviews")
@@ -123,35 +122,25 @@ def get_books_by_author(author_id: int, session: Session = Depends(get_db)):
         raise HTTPException(status_code=404, detail="Author not found")
     return author.books
 
-@app.get("/bookreviews/{user_id}", response_model=List[BookReview])
-def get_bookreviews_by_user(user_id: int, session: Session = Depends(get_db)):
-    user = session.query(User).filter(User.id == user_id).first()
-    if user is None:
-        raise HTTPException(status_code=404, detail="User not found")
-    return user.bookreviews
+# @app.get("/bookreviews/{user_id}", response_model=List[BookReview])
+# def get_bookreviews_by_user(user_id: int, session: Session = Depends(get_db)):
+#     user = session.query(User).filter(User.id == user_id).first()
+#     if user is None:
+#         raise HTTPException(status_code=404, detail="User not found")
+#     return user.bookreviews
 
-# Using Dependencies:
-def get_quote_model(quote_id: int, db: Session = Depends(get_db)) -> db.Quote | None:
-    return db.get_quote(quote_id, db)
+# @app.post("/quotes")
+# def add_quotes(quote:CreateQuote,session: Session = Depends(get_db)) -> str:
+#     session.add(db.Quote(**quote.model_dump()))
+#     session.commit()
+#     session.close()
+#     return "Quote"
 
-@app.post("/quotes")
-def add_quotes(quote: CreateQuote, db: Session = Depends(get_db)) -> str:
-    db.add_quote(quote, db)
-    return "Quote was added"
+# @app.get("/quotes/{author_id}", response_model=List[db.Quote])
+# def get_quotes_by_author(author_id: int, session: Session = Depends(get_db)):
+#     author = session.query(db.Author).filter(db.Author.id == author_id).first()
+#     if author is None:
+#         raise HTTPException(status_code=404, detail="Author not found")
 
-@app.get("/quotes")
-def get_quotes(db: Session = Depends(get_db)):
-    return db.get_quotes(db)
-
-@app.get("/quotes/{author_id}", response_model=List[Quote])
-def get_quotes_by_author(author_id: int, db: Session = Depends(get_db)):
-    return db.get_quotes_by_author(author_id, db)
-
-
-#@app.get("/quotes/{author_id}", response_model=List[Quote])
-#def get_quotes_by_author(author_id: int, session: Session = Depends(get_db)):
-#    author = session.query(Author).filter(Author.id == author_id).first()
-#    if author is None:
-#        raise HTTPException(status_code=404, detail="Author not found")
-#    return author.quotes
-
+#     quotes = session.query(db.Quote).filter(db.Quote.author_id == author_id).all()
+#     return quotes

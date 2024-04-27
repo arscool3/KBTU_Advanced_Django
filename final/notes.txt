@@ -9,7 +9,7 @@ goodreads:"https://www.goodreads.com/quotes/list?ref=nav_profile_quotes"
 
 alembic init alembic
 
-docker run --name database -e POSTGRES_PASSWORD=aru -p 5432:5432 postgres
+docker run --name postgres -e POSTGRES_PASSWORD=postgres -p 5432:5432 postgres
 alembic revision -m 'initial_migration' --autogenerate
 alembic upgrade head
 uvicorn main:app --reload

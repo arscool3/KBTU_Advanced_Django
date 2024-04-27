@@ -1,64 +1,38 @@
+from typing import Optional, List
 from pydantic import BaseModel
 
-class Base(BaseModel):
+class Goodreads(BaseModel):
+    id: Optional[int]
+    name: Optional[str]
+    description: Optional[str]
 
-    name: str
-    description:str
+class User(BaseModel, Goodreads):
+    reviews: Optional[List['BookReview']]
 
-    class Config:
-        from_attributes = True
+class Genre(BaseModel, Goodreads):
+    book: Optional['Book']
 
-class User(Base):
-    id:int
+class Book(BaseModel, Goodreads):
+    author_id: Optional[int]
+    author: Optional['Author']
+    genre_id: Optional[int]
+    genres: Optional[List[Genre]]
+    reviews: Optional[List['BookReview']]
 
-class CreateUser(Base):
-    pass
+class Quote(BaseModel):
+    id: Optional[int]
+    description: Optional[str]
+    author_id: Optional[int]
+    author: Optional['Author']
 
+class Author(BaseModel, Goodreads):
+    books: Optional[List[Book]]
+    quotes: Optional[List[Quote]]
 
-class Author(Base):
-    id:int
-
-class CreateAuthor(Base):
-    pass
-
-class Genre(Base):
-    id:int
-
-class CreateGenre(Base):
-    pass
-
-class Book(Base):
-    id:int
-    author:Author
-    genre:Genre
-
-class CreateBook(Base):
-    author_id:int
-
-class BaseBookReview(BaseModel):
-    review:str
-    rating:int
-
-    class Config:
-        from_attributes = True  
-
-class BookReview(BaseBookReview):
-    id:int
-    user:User
-
-class CreateBookReview(BaseBookReview):
-    book_id: int
-    user_id: int
-
-class BaseQuote(BaseModel):
-    description:str
-
-    class Config:
-        from_attributes = True  
-
-class Quote(BaseQuote):
-    id:int
-    author:Author
-
-class CreateQuote(BaseQuote):
-    author_id:int
+class BookReview(BaseModel):
+    id: Optional[int]
+    review: Optional[str]
+    rating: Optional[int]
+    user_id: Optional[int]
+    user: Optional[User]
+    book_id: O
