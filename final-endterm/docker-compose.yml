@@ -6,7 +6,6 @@ services:
     container_name: kafka_service
     ports:
       - "9092:9092"
-      - "9093"
     environment:
       KAFKA_ADVERTISED_LISTENERS: INSIDE://kafka_service:9093, OUTSIDE://localhost:9092
       KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: INSIDE:PLAINTEXT,OUTSIDE:PLAINTEXT
@@ -20,16 +19,16 @@ services:
     depends_on:
       - zookeeper
 
-  kafka-ui:
-    image: "provectuslabs/kafka-ui:latest"
-    container_name: kafka-ui
-    ports:
-      - "8080:8080"
-    depends_on:
-      - zookeeper
-    environment:
-      - KAFKA_CLUSTERS_0_NAME=local
-      - KAFKA_CLUSTERS_0_BOOTSTRAP_SERVERS=kafka_service:9093
+#  kafka-ui:
+#    image: "provectuslabs/kafka-ui:latest"
+#    container_name: kafka-ui
+#    ports:
+#      - "8080:8080"
+#    depends_on:
+#      - zookeeper
+#    environment:
+#      - KAFKA_CLUSTERS_0_NAME=local
+#      - KAFKA_CLUSTERS_0_BOOTSTRAP_SERVERS=kafka_service:9093
 
   zookeeper:
     restart: on-failure
@@ -55,7 +54,7 @@ services:
       context: ./celery_worker
       dockerfile: Dockerfile
     container_name: celery
-    command: celery -A celery_app worker --loglevel=info
+    command: celery -A settings worker --loglevel=info
     volumes:
       - ./celery_worker:/celery
     environment:

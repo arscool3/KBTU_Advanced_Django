@@ -15,6 +15,6 @@ COPY . /celery
 
 WORKDIR /celery
 
-CMD uvicorn celery_app:celery_app --host=${HOST} --port=${PORT} --reload
+CMD uvicorn main:celery_fastapi --host=${HOST} --port=${PORT} --reload
 
 EXPOSE $PORT
