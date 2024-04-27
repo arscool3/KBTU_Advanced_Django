@@ -100,16 +100,16 @@ services:
     ports:
       - "8543:8543"
 
-#  kafka-ui:
-#    image: "provectuslabs/kafka-ui:latest"
-#    container_name: kafka-ui
-#    ports:
-#      - "8080:8080"
-#    depends_on:
-#      - zookeeper
-#    environment:
-#      - KAFKA_CLUSTERS_0_NAME=local
-#      - KAFKA_CLUSTERS_0_BOOTSTRAP_SERVERS=kafka_service:9093
+  kafka-ui:
+    image: "provectuslabs/kafka-ui:latest"
+    container_name: kafka-ui
+    ports:
+      - "8080:8080"
+    depends_on:
+      - zookeeper
+    environment:
+      - KAFKA_CLUSTERS_0_NAME=local
+      - KAFKA_CLUSTERS_0_BOOTSTRAP_SERVERS=kafka_service:9093
 
 
 volumes:

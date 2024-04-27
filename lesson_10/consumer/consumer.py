@@ -2,6 +2,7 @@ import os
 import pickle
 
 from database import session, HeatMapData
+from datetime import datetime
 
 import confluent_kafka
 
@@ -34,7 +35,7 @@ def consume_message(consumer):
     for message in messages:
         data = pickle.loads(message.value())
         db_heatmap = HeatMapData(
-            timestamp=data.get("timestamp"),
+            timestamp=datetime.strptime(data.get("timestamp"), "%Y-%m-%d %H:%M:%S"),
             data=data.get("data")
         )
         print(data)

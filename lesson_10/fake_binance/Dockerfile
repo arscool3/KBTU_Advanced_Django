@@ -1,6 +1,6 @@
 FROM python as builder
 
-RUN pip install fastapi uvicorn
+RUN pip install fastapi uvicorn websockets
 
 COPY . /project
 
