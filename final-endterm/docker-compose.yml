@@ -54,7 +54,7 @@ services:
       context: ./celery_worker
       dockerfile: Dockerfile
     container_name: celery
-    command: celery -A settings worker --loglevel=info
+    command: celery -A core.tasks worker --loglevel=info
     volumes:
       - ./celery_worker:/celery
     environment:
