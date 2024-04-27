@@ -18,4 +18,4 @@ class BinanceDealModel(Base):
     price: Mapped[float]
     quantity: Mapped[int]
     k_to_usd: Mapped[float]
-    timestamp: Mapped[date] = mapped_column(sqlalchemy.DATE, default=date.today())
+    timestamp: Mapped[date] = mapped_column(sqlalchemy.TIMESTAMP, default=datetime.now())

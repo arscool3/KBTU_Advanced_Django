@@ -18,7 +18,6 @@ number_of_messages = 20
 def consume():
     try:
         while True:
-            print("CONSUMER HERE")
             messages = consumer.consume(num_messages=number_of_messages, timeout=1.5)
             messages_to_create = []
             for message in messages:
@@ -28,7 +27,6 @@ def consume():
                 result = algo(binance_deal)
 
                 messages_to_create.append(result)
-            print("OUT LOop")
             insert_db(messages_to_create)
     except Exception as e:
         print(f"Raised {e}")
@@ -44,12 +42,10 @@ def algo(binance_deal) -> BinanceDealModel:
         quantity=binance_deal.quantity,
         k_to_usd=calc_k_to_usd(binance_deal)
     )
-    print("111111")
     return binance_deal_model
 
 
 def calc_k_to_usd(binance_deal):
-    print("222222")
 
     result = binance_deal.price / binance_deal.quantity
     rounded_result = round(result, 3)
@@ -57,10 +53,8 @@ def calc_k_to_usd(binance_deal):
 
 
 def insert_db(binance_deals: list[BinanceDealModel]):
-    print("DB HERE!!!")
     db_session = session()
     for deals in binance_deals:
-        print("3333")
 
         db_session.add(deals)
     db_session.commit()

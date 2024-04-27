@@ -1,28 +1,29 @@
 # from core.producer import produce
+import asyncio
 import time
 from datetime import datetime
 import random
+from fastapi import FastAPI, Depends, HTTPException, WebSocket, Response
 
-from producer import produce
-from schemas import BinanceDeal
+app = FastAPI()
 
+trade_pairs = [
+    'BTC-USD', 'USD-BTC', 'ETH-USD', 'ETH-BTC', 'LTC-USD', 'LTC-BTC',
+]
 
-def generate_trade():
+@app.websocket('/data')
+async def generate_trade(web_socket: WebSocket):
+    await web_socket.accept()
 
-    return BinanceDeal(pair="BTC-USD",
-                       price=random.randrange(69000, 72000),
-                       quantity=random.randrange(1, 100),
-                       )
+    try:
+        while True:
+            price = random.randint(69000, 72000)
+            trade_unit = random.choice(trade_pairs)
+            quantity=random.randint(1, 100)
+            await web_socket.send_json({'pair': trade_unit, 'price': price, 'quantity': quantity})
+            await asyncio.sleep(2)
+    except Exception as e:
+        print(e)
+    finally:
+        await web_socket.close()
 
-
-def main():
-    while True:
-        trade = generate_trade()
-        produce(trade=trade)
-
-        time.sleep(2)
-        print(f"trade {trade} created!")
-
-
-if __name__ == '__main__':
-    main()

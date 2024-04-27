@@ -3,12 +3,28 @@ from datetime import datetime
 from models import BinanceDealModel
 from schemas import BinanceDeal
 from database import session
-
+import matplotlib.pyplot as plt
+import numpy as np
 
 def get_heatmap(start_date: datetime, end_date: datetime):
     response = get_from_db(start_date, end_date)
-    for row in response:
-        print(row.symbol, row.price, row.k_to_usd)
+    timestamps = [deal.timestamp for deal in response]
+    prices = [deal.price for deal in response]
+    k_to_usd = [deal.k_to_usd for deal in response]
+
+    timestamps_ord = [timestamp.toordinal() for timestamp in timestamps]
+
+
+    # Plot heatmap
+    plt.figure(figsize=(10, 6))
+    plt.hexbin(timestamps_ord, prices, gridsize=20, cmap='hot')
+    plt.colorbar(label='count in bin')
+    plt.xlabel('Timestamp')
+    plt.ylabel('Price')
+    plt.title('Heatmap of Prices over Time')
+    plt.savefig('heatmap.png')
+
+    plt.show()
     return response
 
 
@@ -21,7 +37,7 @@ def get_from_db(start_date: datetime, end_date: datetime):
     db_session.close()
     return binance_deals
 
-if __name__ == '__main__':
+if __name__ == 'main':
     get_heatmap(start_date=datetime(2024, 4, 12), end_date=datetime(2024, 5, 2))
 
 

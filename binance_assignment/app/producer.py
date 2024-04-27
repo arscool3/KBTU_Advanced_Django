@@ -1,6 +1,8 @@
+import asyncio
 import time
 
 import confluent_kafka
+import websockets
 
 from schemas import BinanceDeal
 
@@ -11,8 +13,17 @@ producer = confluent_kafka.Producer(
 topic = "main_topic"
 
 
-def produce(trade: BinanceDeal) -> None:
-    time.sleep(1)
-    producer.produce(topic=topic, value=trade.model_dump_json())
-    print(f"trade in producer")
-    producer.flush()
+async def produce_message():
+    url = 'ws://127.0.0.1:8000/data'
+    try:
+        async with websockets.connect(url) as websocket:
+            while True:
+                data = await websocket.recv()
+                producer.produce(topic, data)
+    except websockets.exceptions.ConnectionClosedOK as e:
+        print('Connection closed')
+
+
+asyncio.run(produce_message())
+
+
