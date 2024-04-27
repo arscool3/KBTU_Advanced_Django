@@ -103,19 +103,19 @@ services:
 #    depends_on:
 #      - kafka_service
 
-  consumer:
-    restart: always
-    build:
-      context: ./consumer
-      dockerfile: Dockerfile
-    container_name: consumer
-    environment:
-      DEFAULT_TOPIC: "traffic_data"
-      KAFKA_BOOTSTRAP: "kafka_service:9093"
-      CELERY_SERVER: "http://celery_server:8888"
-    depends_on:
-      - kafka_service
-      - celery_server
+#  consumer:
+#    restart: always
+#    build:
+#      context: ./consumer
+#      dockerfile: Dockerfile
+#    container_name: consumer
+#    environment:
+#      DEFAULT_TOPIC: "traffic_data"
+#      KAFKA_BOOTSTRAP: "kafka_service:9093"
+#      CELERY_SERVER: "http://celery_server:8888"
+#    depends_on:
+#      - kafka_service
+#      - celery_server
 
 volumes:
   postgres_data:
