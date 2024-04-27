@@ -1,9 +1,9 @@
 import time
 from fastapi import HTTPException, Depends
 from datetime import datetime
-from fastapi import FastAPI, BackgroundTasks
+from fastapi import FastAPI, BackgroundTasks, WebSocket
 from sqlalchemy.orm import Session
-
+from database import session
 from producer import produce
 from consumer import consume
 from services import *
@@ -21,10 +21,26 @@ def get_db():
         session.close()
 
 
+@app.websocket('/data')
+async def stock_market(web_socket: WebSocket):
+    await web_socket.accept()
+    try:
+        while True:
+            price = random.randint(660, 670)
+            if price == 666:
+                raise Exception('devil here')
+            stock_unit = random.choice(stock_units)
+            await web_socket.send_json({'stock': stock_unit, 'price': price})
+            await asyncio.sleep(2)
+    except Exception as e:
+        print(f"Error {e}")
+    finally:
+        await web_socket.close()
+
 @app.get("/bitcoin/run")
 def run_server(background_tasks: BackgroundTasks):
     background_tasks.add_task(produce)
-    background_tasks.add_task(consume)
+    # background_tasks.add_task(consume)
     return "Producer and consumer started"
 
 
