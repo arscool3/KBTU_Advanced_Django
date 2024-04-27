@@ -1,7 +1,7 @@
 import requests
 from datetime import datetime
-from schemas import Bitcoin
-from db import session
+from schemas import Bitcoin, BaseBitcoin
+from database import session
 import numpy as np
 
 
@@ -56,9 +56,9 @@ def fetch_binance_data(symbol, interval, start_str, end_str):
     return transformed_data
 
 
-def insert_data_to_db(name, price, start_date, end_date):
-    bitcoin = Bitcoin(name=name, price=price, start_date=start_date, end_date=end_date)
-    session.add(bitcoin)
+def insert_data_to_db(bitcoin_create):
+    print(bitcoin_create)
+    session.add(BaseBitcoin(**bitcoin_create.dict()))
     try:
         session.commit()
     except Exception as e:
