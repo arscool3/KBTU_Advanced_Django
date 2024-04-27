@@ -3,6 +3,8 @@ __pycache__/
 *.py[cod]
 *$py.class
 
+lecture_2/venv
+
 # C extensions
 *.so
 
