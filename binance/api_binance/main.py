@@ -1,3 +1,5 @@
+import asyncio
+
 from fastapi import FastAPI
 from producer import produce
 from schemas import Binance
@@ -12,7 +14,7 @@ def root():
 
 @app.post("/binance")
 def produce_binance(binance: Binance):
-    produce(binance)
+    asyncio.run(produce(binance))
     return "Binance works"
 
 
