@@ -6,6 +6,6 @@ RUN pip install --no-cache-dir -r /requirements.txt
 
 FROM builder as runner
 
-COPY producer.py /producer.py
+COPY . /app
 
-CMD ["python", "/producer.py"]
+CMD ["python", "/app/main.py"]

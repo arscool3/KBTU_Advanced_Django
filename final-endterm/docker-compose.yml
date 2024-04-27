@@ -101,7 +101,7 @@ services:
 #      DEFAULT_TOPIC: "traffic_data"
 #      KAFKA_BOOTSTRAP: "kafka_service:9093"
 #    depends_on:
-#      - zookeeper
+#      - kafka_service
 
 volumes:
   postgres_data:
