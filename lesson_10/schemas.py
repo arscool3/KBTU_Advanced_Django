@@ -1,4 +1,5 @@
 from pydantic import BaseModel
+from database import Base
 
 
 class BaseBitcoin(BaseModel):
@@ -13,7 +14,3 @@ class BaseBitcoin(BaseModel):
 
 class Bitcoin(BaseBitcoin):
     id: int
-
-
-class BitcoinCreate(BaseBitcoin):
-    pass

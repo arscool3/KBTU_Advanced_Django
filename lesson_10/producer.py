@@ -15,15 +15,12 @@ start_date = '2022-01-01 00:00:00'
 end_date = '2022-01-02 00:00:00'
 
 
-def produce():
-    for symbol in symbols:
-        data = fetch_binance_data(symbol, interval, start_date, end_date)
-        for entry in data:
-            producer.produce(topic=topic, value=json.dumps(entry))
-            producer.flush()
-            # print(entry)
-            print("producer is done")
-        time.sleep(10)
+def produce(entry):
+    producer.produce(topic=topic, value=entry)
+    producer.flush()
+
+    print("producer is done")
+    time.sleep(5)
 
 
 if __name__ == '__main__':
