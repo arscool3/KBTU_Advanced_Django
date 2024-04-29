@@ -14,9 +14,10 @@ logging.basicConfig(level=logging.INFO)
 def _calculate_traffic_for_road(road: Road) -> int:
     calculated_rate = round(
         ((len(road.people) / road.max_num_of_cars)
-         + ((road.max_speed - road.average_speed) / road.max_speed)) / 2
-        * 10
-    )
+         + ((road.max_speed - road.average_speed) * (
+                            len(road.people) / (road.max_speed * max(1, (len(road.people))))) / 2
+            * 10
+            )))
     calculated_rate = max(0, calculated_rate)
     return calculated_rate
 
@@ -58,13 +59,7 @@ def calculate_traffic_function(traffic_schema: dict):
 
             person = session.get(Person, traffic_data.person_id)
             if person is None:
-                person = Person(
-                    id=traffic_data.person_id,
-                    current_road_id=approximate_road_location.id,
-                    current_speed=traffic_data.traffic_data.speed,
-                    current_location_id=person_location.id
-                )
-                session.add(person)
+                raise Exception("Person not found")
             else:
                 person.current_road_id = approximate_road_location.id
                 person.current_speed = traffic_data.traffic_data.speed

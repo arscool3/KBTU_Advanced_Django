@@ -19,16 +19,16 @@ services:
     depends_on:
       - zookeeper
 
-#  kafka-ui:
-#    image: "provectuslabs/kafka-ui:latest"
-#    container_name: kafka-ui
-#    ports:
-#      - "8080:8080"
-#    depends_on:
-#      - zookeeper
-#    environment:
-#      - KAFKA_CLUSTERS_0_NAME=local
-#      - KAFKA_CLUSTERS_0_BOOTSTRAP_SERVERS=kafka_service:9093
+  #  kafka-ui:
+  #    image: "provectuslabs/kafka-ui:latest"
+  #    container_name: kafka-ui
+  #    ports:
+  #      - "8080:8080"
+  #    depends_on:
+  #      - zookeeper
+  #    environment:
+  #      - KAFKA_CLUSTERS_0_NAME=local
+  #      - KAFKA_CLUSTERS_0_BOOTSTRAP_SERVERS=kafka_service:9093
 
   zookeeper:
     restart: on-failure
@@ -91,6 +91,21 @@ services:
     volumes:
       - redis_data:/data
     command: redis-server --appendonly yes
+
+  api_server:
+    restart: always
+    build:
+      context: ./api
+      dockerfile: Dockerfile
+    container_name: api_server
+    ports:
+      - "80:8000"
+    env_file:
+      - ./api/.env
+    depends_on:
+      - postgres
+    volumes:
+      - ./api:/app
 
 #  producer:
 #    restart: always

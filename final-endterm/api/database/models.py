@@ -5,6 +5,8 @@ from typing import Annotated
 
 Base = declarative_base()
 
+__all__ = ["History", "Person", "Position", "Location", "TrafficHistory", "Road", "Region"]
+
 _id = Annotated[int, mapped_column(sqlalchemy.Integer, primary_key=True, autoincrement=True)]
 
 
@@ -15,11 +17,12 @@ class History(Base):
     person_id: Mapped[int] = mapped_column(sqlalchemy.ForeignKey("people.id"))
     person = relationship("Person", back_populates="history")
     location_id: Mapped[int] = mapped_column(sqlalchemy.ForeignKey("locations.id"))
+    location = relationship("Location")
 
 
 class Person(Base):
     __tablename__ = "people"
-    login: Mapped[str] = mapped_column(sqlalchemy.String, nullable=False, unique=True)
+    login: Mapped[str] = mapped_column(sqlalchemy.String, nullable=False, unique=True, primary_key=True)
     password: Mapped[str] = mapped_column(sqlalchemy.String, nullable=False)  # hashed
     id: Mapped[_id]
     current_location_id: Mapped[int] = mapped_column(sqlalchemy.ForeignKey("locations.id"), nullable=True)
@@ -27,7 +30,7 @@ class Person(Base):
     current_road_id: Mapped[int] = mapped_column(sqlalchemy.ForeignKey("roads.id"), nullable=True)
     current_road = relationship("Road", back_populates="people")
     history = relationship("History", back_populates="person")
-    current_speed: Mapped[int] = mapped_column(sqlalchemy.Integer, default=0, insert_default=True, nullable=True)
+    current_speed: Mapped[int] = mapped_column(sqlalchemy.Integer, default=0, nullable=True)
 
 
 class Position(Base):

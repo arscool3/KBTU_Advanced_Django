@@ -9,7 +9,7 @@ celery_fastapi = FastAPI(title="Celery Worker", version="0.1.0")
 
 
 @celery_fastapi.post("/calculate/")
-def calculate_traffic(traffic_data: TrafficData):
+async def calculate_traffic(traffic_data: TrafficData):
     result = calculate_traffic_task.delay(
         traffic_schema=traffic_data.dict()
     )
