@@ -29,7 +29,7 @@ class Person(Base):
     current_location = relationship("Location", back_populates="people")
     current_road_id: Mapped[int] = mapped_column(sqlalchemy.ForeignKey("roads.id"), nullable=True)
     current_road = relationship("Road", back_populates="people")
-    history = relationship("History", back_populates="person")
+    history = relationship("History", back_populates="person", order_by=History.timestamps.desc())
     current_speed: Mapped[int] = mapped_column(sqlalchemy.Integer, default=0, nullable=True)
 
 
@@ -70,10 +70,12 @@ class Road(Base):
     # must be a rectangle
     start_position: Mapped[int] = mapped_column(sqlalchemy.ForeignKey("positions.id"))
     end_position: Mapped[int] = mapped_column(sqlalchemy.ForeignKey("positions.id"))
+    start_point = relationship("Position", foreign_keys=[start_position])
+    end_point = relationship("Position", foreign_keys=[end_position])
     max_speed: Mapped[int] = mapped_column(sqlalchemy.Integer, default=60, insert_default=True)
     average_speed: Mapped[int] = mapped_column(sqlalchemy.Integer, default=0, insert_default=True)
     max_num_of_cars: Mapped[int] = mapped_column(sqlalchemy.Integer, default=50, insert_default=True)
-    history = relationship("TrafficHistory", back_populates="road")
+    history = relationship("TrafficHistory", back_populates="road", order_by=TrafficHistory.timestamp.desc())
     people = relationship("Person", back_populates="current_road")
 
 
