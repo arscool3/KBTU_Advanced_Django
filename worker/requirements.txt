@@ -1,0 +1,2 @@
+confluent-kafka==2.3.0
+psycopg2==2.9.9
