@@ -1,5 +1,4 @@
 from typing import Annotated
-
 from sqlalchemy.orm import Session
 from starlette import status
 from fastapi import FastAPI, Depends, HTTPException
@@ -29,7 +28,7 @@ db_dependency = Annotated[Session, Depends(get_db)]
 
 
 @app.get("/health_check")
-async def health_check(entity: entity_dependency, db: db_dependency) -> dict:
+async def health_check() -> dict:
     return {"message": "I'm alive"}
 
 

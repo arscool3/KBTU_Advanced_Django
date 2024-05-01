@@ -21,7 +21,7 @@ SECRET_KEY = SECRET_KEY
 ALGORITHM = 'HS256'
 
 bcrypt_context = CryptContext(schemes=['bcrypt'], deprecated='auto')
-oauth2_bearer = OAuth2PasswordBearer(tokenUrl='auth/token')
+oauth2_bearer = OAuth2PasswordBearer(tokenUrl='auth/login')
 
 
 def get_db():
@@ -38,7 +38,7 @@ def get_db():
 db_dependency = Annotated[Session, Depends(get_db)]
 
 
-@router.post("/", status_code=status.HTTP_201_CREATED)
+@router.post("/register", status_code=status.HTTP_201_CREATED)
 async def create_customer(dp: db_dependency, customer_request: CreateCustomerRequest) -> dict:
     try:
         customer = Customer(
@@ -54,9 +54,41 @@ async def create_customer(dp: db_dependency, customer_request: CreateCustomerReq
         raise HTTPException(status_code=500, detail=str(e))
 
 
-@router.post("/token", response_model=Token)
-async def login_for_access_token(form_data: Annotated[OAuth2PasswordRequestForm, Depends()], dp: db_dependency):
-    entity = authenticate_customer(form_data.username, form_data.password, dp)
+@router.post("/register_restaurant", status_code=status.HTTP_201_CREATED)
+async def create_restaurant(dp: db_dependency, customer_request: CreateCustomerRequest) -> dict:
+    try:
+        customer = Customer(
+            email=customer_request.email,
+            phone_number=customer_request.phone_number,
+            address=customer_request.address,
+            hashed_password=bcrypt_context.hash(customer_request.hashed_password.get_secret_value()),
+        )
+        dp.add(customer)
+        return {"message": "user successfully created!"}
+    except Exception as e:
+        dp.rollback()
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@router.post("/register_courier", status_code=status.HTTP_201_CREATED)
+async def create_restaurant(dp: db_dependency, customer_request: CreateCustomerRequest) -> dict:
+    try:
+        customer = Customer(
+            email=customer_request.email,
+            phone_number=customer_request.phone_number,
+            address=customer_request.address,
+            hashed_password=bcrypt_context.hash(customer_request.hashed_password.get_secret_value()),
+        )
+        dp.add(customer)
+        return {"message": "user successfully created!"}
+    except Exception as e:
+        dp.rollback()
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@router.post("/login", response_model=Token)
+async def login(form_data: Annotated[OAuth2PasswordRequestForm, Depends()], dp: db_dependency):
+    entity = authenticate_entity(form_data.username, form_data.password, dp)
 
     if not entity:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail='Could not validate user.')
@@ -64,7 +96,7 @@ async def login_for_access_token(form_data: Annotated[OAuth2PasswordRequestForm,
     return {'access_token': token, 'token_type': 'bearer'}
 
 
-def authenticate_customer(email: str, password: str, dp: db_dependency):
+def authenticate_entity(email: str, password: str, dp: db_dependency):
     entity = dp.query(Customer).filter(Customer.email == email).first()
 
     if not entity:
