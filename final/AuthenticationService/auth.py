@@ -92,4 +92,3 @@ async def get_current_entity(token: Annotated[str, Depends(oauth2_bearer)]):
         return {"email": email, 'id': entity_id}
     except JWTError:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Could not validate user.")
-
