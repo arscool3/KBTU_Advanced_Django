@@ -3,13 +3,10 @@ from sqlalchemy.orm import Session
 from starlette import status
 from fastapi import FastAPI, Depends, HTTPException
 import auth
-from models import Base
 import database as db
 
 app = FastAPI()
 app.include_router(auth.router)
-
-Base.metadata.create_all(db.engine)
 
 
 def get_db():

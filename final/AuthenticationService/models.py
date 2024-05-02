@@ -3,10 +3,16 @@ from typing import List
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from database import Base
 from sqlalchemy import Column, Text, ForeignKey
+from sqlalchemy_utils import ChoiceType
 
 
 class Restaurant(Base):
     __tablename__ = 'restaurants'
+
+    RESTAURANT_STATUSES = (
+        ('OPEN', 'open'),
+        ('CLOSE', 'close')
+    )
 
     id: Mapped[str] = mapped_column(primary_key=True, default=str(uuid.uuid4()))
     email: Mapped[str] = mapped_column(nullable=False, unique=True)
@@ -15,7 +21,7 @@ class Restaurant(Base):
     hashed_password: Mapped[str] = mapped_column(nullable=False)
     menu: Mapped[List["RestaurantMenuItem"]] = relationship("RestaurantMenuItem", back_populates="restaurant")
     orders: Mapped[List["Order"]] = relationship("Order", back_populates="restaurant")
-    status: Mapped[str]
+    status = Column(ChoiceType(RESTAURANT_STATUSES), default="CLOSE")
 
 
 class RestaurantMenuItem(Base):
@@ -35,10 +41,16 @@ class RestaurantMenuItem(Base):
 class Order(Base):
     __tablename__ = 'orders'
 
+    ORDER_STATUSES = (
+        ('PENDING', 'pending'),
+        ('IN-TRANSIT', 'in-transit'),
+        ('DELIVERED', 'delivered'),
+    )
+
     id: Mapped[str] = mapped_column(primary_key=True, default=str(uuid.uuid4()))
     items: Mapped[List["OrderItem"]] = relationship("OrderItem", back_populates="order")
-    total: Mapped[int]
-    status: Mapped[str]
+    total: Mapped[int] = mapped_column(nullable=False)
+    status = Column(ChoiceType(ORDER_STATUSES), default="PENDING")
     customer_id: Mapped[str] = mapped_column(ForeignKey("users.id"))
     customer: Mapped["Customer"] = relationship("Customer", back_populates="orders")
     restaurant_id: Mapped[str] = mapped_column(ForeignKey("restaurants.id"))
@@ -64,7 +76,7 @@ class Customer(Base):
     id: Mapped[str] = mapped_column(primary_key=True, default=str(uuid.uuid4()))
     email: Mapped[str] = mapped_column(nullable=False, unique=True)
     phone_number: Mapped[str] = mapped_column(nullable=False)
-    address: Mapped[str]
+    address: Mapped[str] = mapped_column(nullable=False)
     hashed_password: Mapped[str] = mapped_column(nullable=False)
     orders: Mapped[List["Order"]] = relationship("Order", back_populates="customer")
 
@@ -72,9 +84,14 @@ class Customer(Base):
 class Courier(Base):
     __tablename__ = 'couriers'
 
+    COURIER_STATUSES = (
+        ('OPEN', 'open'),
+        ('CLOSE', 'close')
+    )
+
     id: Mapped[str] = mapped_column(primary_key=True, default=str(uuid.uuid4()))
     email: Mapped[str] = mapped_column(nullable=False, unique=True)
     phone_number: Mapped[str] = mapped_column(nullable=False)
     hashed_password: Mapped[str] = mapped_column(nullable=False)
     orders: Mapped[List["Order"]] = relationship("Order", back_populates="courier")
-    status: Mapped[str]
+    status = Column(ChoiceType(COURIER_STATUSES), default="CLOSE")
