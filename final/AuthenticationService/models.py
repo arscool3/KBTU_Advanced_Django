@@ -1,9 +1,7 @@
 import uuid
-from enum import Enum
 from typing import List
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from database import Base
-from sqlalchemy.dialects.postgresql import ENUM as PgEnum
 from sqlalchemy import Column, Text, ForeignKey
 
 
