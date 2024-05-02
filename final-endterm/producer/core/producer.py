@@ -4,7 +4,7 @@ import time
 
 import confluent_kafka
 from .get_traffic_data import get_person_traffic_data
-from settings import KAFKA_BOOTSTRAP, TOPIC
+from settings import KAFKA_BOOTSTRAP, TOPIC, SLEEP_TIME
 
 logger = logging.getLogger(__name__)
 
@@ -26,7 +26,7 @@ def producer_loop():
 
     while True:
         try:
-            time.sleep(1)
+            time.sleep(SLEEP_TIME)
             traffic_data = get_person_traffic_data()
             produce(traffic_data, producer=producer)
             logger.info(f"{time.time()}-PRODUCED")

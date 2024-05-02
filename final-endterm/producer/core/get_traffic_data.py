@@ -6,7 +6,7 @@ __all__ = ["get_person_traffic_data"]
 
 def get_person_traffic_data() -> dict:
     return {
-        "person_id": random.randint(1, 1),
+        "person_id": random.randint(1, 11),
         "traffic_data": {
             "timestamp": time.time(),
             "location": {

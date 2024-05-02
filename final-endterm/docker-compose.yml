@@ -48,12 +48,12 @@ services:
     environment:
       POSTGRES_PASSWORD: postgres
 
-  celery_1:
+  celery:
     restart: always
     build:
       context: ./celery_worker
       dockerfile: Dockerfile
-    container_name: celery1
+    container_name: celery
     command: celery -A core.tasks worker --loglevel=info -Q calculations --concurrency=5
     volumes:
       - ./celery_worker:/celery
@@ -136,6 +136,7 @@ services:
     environment:
       DEFAULT_TOPIC: "traffic_data"
       KAFKA_BOOTSTRAP: "kafka_service:9093"
+      SLEEP_TIME: 0.1
     depends_on:
       - kafka_service
 
@@ -153,7 +154,39 @@ services:
       CELERY_RESULT_BACKEND: "redis://redis:6379/3"
     depends_on:
       - kafka_service
-      - celery_1
+      - celery
+
+  consumer2:
+    restart: always
+    build:
+      context: ./consumer
+      dockerfile: Dockerfile
+    container_name: consumer2
+    environment:
+      DEFAULT_TOPIC: "traffic_data"
+      KAFKA_BOOTSTRAP: "kafka_service:9093"
+      #      CELERY_SERVER: "http://celery_server:8888"
+      CELERY_BROKER: "redis://redis:6379/3"
+      CELERY_RESULT_BACKEND: "redis://redis:6379/3"
+    depends_on:
+      - kafka_service
+      - celery
+
+  consumer3:
+    restart: always
+    build:
+      context: ./consumer
+      dockerfile: Dockerfile
+    container_name: consumer3
+    environment:
+      DEFAULT_TOPIC: "traffic_data"
+      KAFKA_BOOTSTRAP: "kafka_service:9093"
+      #      CELERY_SERVER: "http://celery_server:8888"
+      CELERY_BROKER: "redis://redis:6379/3"
+      CELERY_RESULT_BACKEND: "redis://redis:6379/3"
+    depends_on:
+      - kafka_service
+      - celery
 
 volumes:
   postgres_data:
