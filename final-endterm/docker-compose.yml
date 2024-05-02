@@ -48,12 +48,30 @@ services:
     environment:
       POSTGRES_PASSWORD: postgres
 
-  celery:
+  celery_1:
     restart: always
     build:
       context: ./celery_worker
       dockerfile: Dockerfile
-    container_name: celery
+    container_name: celery1
+    command: celery -A core.tasks worker --loglevel=info -Q calculations --concurrency=5
+    volumes:
+      - ./celery_worker:/celery
+    environment:
+      CELERY_BROKER: "redis://redis:6379/3"
+      CELERY_RESULT_BACKEND: "redis://redis:6379/3"
+      POSTGRES_URL: "postgresql://postgres:postgres@postgres:5432/postgres"
+      REDIS_HOST: "redis"
+    depends_on:
+      - postgres
+      - redis
+
+  celery_2:
+    restart: always
+    build:
+      context: ./celery_worker
+      dockerfile: Dockerfile
+    container_name: celery2
     command: celery -A core.tasks worker --loglevel=info -Q calculations --concurrency=5
     volumes:
       - ./celery_worker:/celery
@@ -135,7 +153,7 @@ services:
       CELERY_RESULT_BACKEND: "redis://redis:6379/3"
     depends_on:
       - kafka_service
-      - celery
+      - celery_1
 
 volumes:
   postgres_data:
