@@ -1,9 +1,9 @@
 import confluent_kafka
-import httpx
 import pickle
 import logging
 
 from settings import KAFKA_BOOTSTRAP, GROUP_ID, TOPIC, MESSAGE_NUM, CELERY_SERVER
+from .celery_broker import celery_app
 
 __all__ = ["consumer_loop"]
 
@@ -32,15 +32,21 @@ def consumer_loop():
 
 
 def consume_message(consumer):
-    messages = consumer.consume(num_messages=MESSAGE_NUM, timeout=0.1)
+    messages = consumer.consume(num_messages=MESSAGE_NUM)
+    logger.info(f"consumed messages {messages}")
     for message in messages:
         try:
             data = pickle.loads(message.value())
-            response = httpx.post(f"{CELERY_SERVER}/calculate/", json=data)
+            # response = httpx.post(f"{CELERY_SERVER}/calculate/", json=data)
+            result = celery_app.send_task("calculate_traffic_task", args=[data], queue="calculations")
         except Exception as e:
-            logger.warning(f"Failed to process message: {e}, data {message.value().decode('UTF-8')}")
+            try:
+                logger.warning(f"Failed to process message: {e}, data {message.value().decode('UTF-8')}")
+            except:
+                logger.warning(f"Failed to process message: {e}")
         else:
             try:
-                response.raise_for_status()
+                logger.info(f"Sent message to Celery: {result.id}")
+                # response.raise_for_status()
             except Exception as e:
                 logger.warning(f"Failed to process message: {e}")

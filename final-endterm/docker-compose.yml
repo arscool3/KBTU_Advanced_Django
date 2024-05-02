@@ -54,33 +54,35 @@ services:
       context: ./celery_worker
       dockerfile: Dockerfile
     container_name: celery
-    command: celery -A core.tasks worker --loglevel=info
+    command: celery -A core.tasks worker --loglevel=info -Q calculations --concurrency=5
     volumes:
       - ./celery_worker:/celery
     environment:
-      CELERY_BROKER: "redis://redis:6379/0"
+      CELERY_BROKER: "redis://redis:6379/3"
+      CELERY_RESULT_BACKEND: "redis://redis:6379/3"
       POSTGRES_URL: "postgresql://postgres:postgres@postgres:5432/postgres"
       REDIS_HOST: "redis"
     depends_on:
       - postgres
       - redis
 
-  celery_server:
-    restart: on-failure
-    build:
-      context: ./celery_worker
-      dockerfile: Dockerfile
-    container_name: celery_server
-    environment:
-      HOST: "0.0.0.0"
-      PORT: "8888"
-      CELERY_BROKER: "redis://redis:6379/0"
-    volumes:
-      - ./celery_worker:/celery
-    ports:
-      - "8888:8888"
-    depends_on:
-      - celery
+  # DO NOT NEED ANY MORE
+  #  celery_server:
+  #    restart: on-failure
+  #    build:
+  #      context: ./celery_worker
+  #      dockerfile: Dockerfile
+  #    container_name: celery_server
+  #    environment:
+  #      HOST: "0.0.0.0"
+  #      PORT: "8888"
+  #      CELERY_BROKER: "redis://redis:6379/0"
+  #    volumes:
+  #      - ./celery_worker:/celery
+  #    ports:
+  #      - "8888:8888"
+  #    depends_on:
+  #      - celery
 
   redis:
     restart: always
@@ -128,10 +130,12 @@ services:
     environment:
       DEFAULT_TOPIC: "traffic_data"
       KAFKA_BOOTSTRAP: "kafka_service:9093"
-      CELERY_SERVER: "http://celery_server:8888"
+      #      CELERY_SERVER: "http://celery_server:8888"
+      CELERY_BROKER: "redis://redis:6379/3"
+      CELERY_RESULT_BACKEND: "redis://redis:6379/3"
     depends_on:
       - kafka_service
-      - celery_server
+      - celery
 
 volumes:
   postgres_data:

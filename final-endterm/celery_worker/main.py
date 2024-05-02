@@ -1,1 +1,1 @@
-from core import celery_fastapi
+# from core import celery_fastapi
