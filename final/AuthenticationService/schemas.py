@@ -11,3 +11,18 @@ class CreateCustomerRequest(BaseModel):
 class Token(BaseModel):
     token_type: str
     access_token: str
+
+
+class CreateCourierRequest(BaseModel):
+    email: str
+    phone_number: str
+    hashed_password: SecretStr
+    status: str
+
+
+class CreateRestaurantRequest(BaseModel):
+    email: str
+    phone_number: str
+    hashed_password: SecretStr
+    status: str
+    address: str
