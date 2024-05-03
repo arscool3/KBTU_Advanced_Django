@@ -1,24 +1,48 @@
 version: "3"
 
-services:  
-  auth_service:
-    build:
-      context: ./AuthenticationService
-    restart: on-failure
-    container_name: delivery-service-auth_service
-    ports:
-      - 8000:8000
-  
-  postgres:
+services:
+
+  db_postgres:
     image: postgres:14-alpine
     ports:
       - 5433:5432
     volumes:
       - ./pg_data:/var/lib/postgresql/data
+    container_name: delivery-service-postgres
     environment:
       - POSTGRES_PASSWORD=Dimash2003
       - POSTGRES_USER=postgres
       - POSTGRES_DB=delivery_service
+    networks:
+     - deliver_network
+
+  auth_service:
+    build:
+      context: ./AuthenticationService
+    restart: on-failure
+    depends_on:
+      - db_postgres
+    container_name: delivery-service-auth_service
+    ports:
+      - 8000:8000
+    networks:
+     - deliver_network
+
+  customer_service:
+    build: 
+      context: ./CustomerService
+    restart: on-failure
+    depends_on:
+      - db_postgres
+    container_name: delivery-servic-customer_service
+    ports:
+      - 8001:8000
+    networks:
+     - deliver_network
+
+networks:
+  deliver_network:
+    driver: bridge
 
 volumes:
   pg_data: { }

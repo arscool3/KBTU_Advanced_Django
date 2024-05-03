@@ -4,7 +4,10 @@ from starlette import status
 from fastapi import FastAPI, Depends, HTTPException
 import auth
 import database as db
+from models import Base
+from database import engine
 
+Base.metadata.create_all(engine)
 app = FastAPI()
 app.include_router(auth.router)
 

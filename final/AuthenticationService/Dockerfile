@@ -6,7 +6,7 @@ COPY . /app
 
 RUN pip install -r requirements.txt
 
-RIN alembic upgrade head
+# RUN alembic upgrade head
 
 EXPOSE 8000
 
