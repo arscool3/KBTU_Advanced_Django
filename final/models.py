@@ -7,8 +7,6 @@ from sqlalchemy.orm import mapped_column, Mapped, relationship
 from database import Base
 
 _id = Annotated[int, mapped_column(sqlalchemy.Integer, primary_key=True)]
-from pydantic import BaseModel, Field, EmailStr
-
 
 # genres and books relationship, author and books relationship, user and reviews relationship
 #reviews and books relationship, quote and author
@@ -54,3 +52,4 @@ class BookReview(Base):
     user:Mapped[User]=relationship("User",back_populates='bookreviews')
     book_id: Mapped[int]=mapped_column(sqlalchemy.ForeignKey('books.id'))
     book: Mapped[Book] = relationship("Book", back_populates='reviews')
+
