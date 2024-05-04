@@ -177,7 +177,7 @@ def create_product(product_data: ProductCreate, db: Session = Depends(get_db)):
     return db_product
 
 @app.get("/products/{product_id}", response_model=None)
-def get_product(product_id: int, db: Session = Depends(get_db)):
+def get_productt(product_id: int, db: Session = Depends(get_db)):
     product = db.query(Product).filter(Product.id == product_id).first()
     if product is None:
         raise HTTPException(status_code=404, detail="Product not found")
