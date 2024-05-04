@@ -1,22 +1,19 @@
 from fastapi import FastAPI, BackgroundTasks, Depends, HTTPException
 from sqlalchemy.orm import Session
 from database import SessionLocal, engine, User, Product, Order, Category, Review
-from typing import List
+from typing import List, Optional
 import time
 from kafka import KafkaProducer, KafkaConsumer
 import json
 from pydantic import BaseModel
 import dramatiq
 
-# Initialize FastAPI app
 app = FastAPI()
 
-# Kafka configuration
 KAFKA_BOOTSTRAP_SERVER = 'localhost:9092'
 KAFKA_TOPIC_LOGS = 'logs'
 KAFKA_TOPIC_USER_ACTIONS = 'user_actions'
 
-# Dependency to get the database session
 def get_db():
     db = SessionLocal()
     try:
@@ -39,12 +36,25 @@ class UserResponse(BaseModel):
     username: str
     email: str
 
-# Function to calculate total price of an order
+class ProductCreate(BaseModel):
+    name: str
+    description: str
+    price: float
+    category_id: int
+
+class CategoryCreate(BaseModel):
+    name: str
+
+class ReviewCreate(BaseModel):
+    user_id: int
+    product_id: int
+    rating: int
+    comment: Optional[str] = None
+
 def calculate_total_price(order_data: OrderCreate, products: List[Product]):
     total_price = sum(product.price for product in products)
     return total_price
 
-# Function to validate user input
 def validate_user_input(order_data: OrderCreate):
     # Logic to validate user input
     pass
@@ -59,36 +69,29 @@ class EmailSender:
         # Logic to send email
         print(f"Sending email to {email} with subject '{subject}' and message '{message}'")
 
-# Define Dramatiq actors for background tasks
 @dramatiq.actor
 def send_confirmation_email(order_id: int, email: str, email_sender: EmailSender):
-    time.sleep(5)  # Simulate email sending delay
-    # Logic to send confirmation email
+    time.sleep(5) 
     email_sender.send_email(email=email, subject="Order Confirmation", message=f"Your order with ID {order_id} has been confirmed.")
 
 @dramatiq.actor
 def process_payment(order_id: int):
-    time.sleep(10)  # Simulate payment processing delay
-    # Logic to process payment
+    time.sleep(10)  
     print(f"Payment processed for order {order_id}")
 
-# Kafka producer initialization
 producer = KafkaProducer(bootstrap_servers=KAFKA_BOOTSTRAP_SERVER,
                          value_serializer=lambda v: json.dumps(v).encode('utf-8'))
 
-# Kafka consumer initialization
 consumer = KafkaConsumer(KAFKA_TOPIC_LOGS,
                          bootstrap_servers=KAFKA_BOOTSTRAP_SERVER,
                          auto_offset_reset='earliest',
                          enable_auto_commit=True,
                          group_id='my-group')
 
-# Logging function for user actions
 def log_user_action(action: str, user_id: int):
     log_data = {'action': action, 'user_id': user_id}
     producer.send(KAFKA_TOPIC_USER_ACTIONS, value=log_data)
 
-# Endpoint to create an order
 def get_products(db: Session = Depends(get_db)):
     products = db.query(Product).all()
     return products
@@ -101,24 +104,19 @@ def create_order(
     db: Session = Depends(get_db),
     email_sender: EmailSender = Depends()
 ):
-    # Validate user input
+
     validate_user_input(order_data)
 
-    # Calculate total price
     total_price = calculate_total_price(order_data, products)
 
-    # Save order to database
     db_order = Order(**order_data.dict(), total_price=total_price)
     db.add(db_order)
     db.commit()
     db.refresh(db_order)
-    
-    # Send confirmation email asynchronously
+
     background_tasks.add_task(send_confirmation_email, db_order.id, order_data.email, email_sender)
-    # Process payment asynchronously
     background_tasks.add_task(process_payment, db_order.id)
-    
-    # Log order creation event
+
     log_user_action('order_created', order_data.user_id)
     
     return db_order
@@ -133,8 +131,7 @@ def create_user(user_data: UserCreate, db: Session = Depends(get_db)):
     db.add(db_user)
     db.commit()
     db.refresh(db_user)
-    
-    # Log user creation event
+
     log_user_action('user_created', db_user.id)
     
     return db_user
@@ -166,7 +163,46 @@ def delete_user(user_id: int, db: Session = Depends(get_db)):
     db.commit()
     return {"message": "User deleted successfully"}
 
-# Kafka consumer to log events
+
+@app.get("/products/", response_model=None)
+def get_products(skip: int = 0, limit: int = 10, db: Session = Depends(get_db)):
+    return db.query(Product).offset(skip).limit(limit).all()
+
+@app.post("/products/", response_model=Product)
+def create_product(product_data: ProductCreate, db: Session = Depends(get_db)):
+    db_product = Product(**product_data.dict())
+    db.add(db_product)
+    db.commit()
+    db.refresh(db_product)
+    return db_product
+
+@app.get("/products/{product_id}", response_model=None)
+def get_product(product_id: int, db: Session = Depends(get_db)):
+    product = db.query(Product).filter(Product.id == product_id).first()
+    if product is None:
+        raise HTTPException(status_code=404, detail="Product not found")
+    return product
+
+@app.put("/products/{product_id}", response_model=None)
+def update_product(product_id: int, product_data: ProductCreate, db: Session = Depends(get_db)):
+    db_product = db.query(Product).filter(Product.id == product_id).first()
+    if db_product is None:
+        raise HTTPException(status_code=404, detail="Product not found")
+    for key, value in product_data.dict().items():
+        setattr(db_product, key, value)
+    db.commit()
+    db.refresh(db_product)
+    return db_product
+
+@app.delete("/products/{product_id}")
+def delete_product(product_id: int, db: Session = Depends(get_db)):
+    db_product = db.query(Product).filter(Product.id == product_id).first()
+    if db_product is None:
+        raise HTTPException(status_code=404, detail="Product not found")
+    db.delete(db_product)
+    db.commit()
+    return {"message": "Product deleted successfully"}
+
 @app.on_event("startup")
 def start_kafka_consumer():
     def consume():
