@@ -14,7 +14,6 @@ Endterm + Final + meta info
 FastApi 
 1) 6 models
 2) 4 Relationships
-AUTHORIZATION
 4) Background Tasks (Dramatiq / Celery)
 5) Postgres DB
 6) 3 DI (2 func, 1 class)
