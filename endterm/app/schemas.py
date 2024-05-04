@@ -1,4 +1,4 @@
-from typing import List
+from typing import List, Optional
 
 from pydantic import BaseModel
 
@@ -26,6 +26,26 @@ class Studio(Base):
 
 class Director(Base):
     pass
+
+
+class Journal(BaseModel):
+    id: int
+    method: str
+    request: str
+    data: Optional[dict]
+    created_at: str
+
+    class Config:
+        from_attributes = True
+
+
+class JournalMessage(BaseModel):
+    method: str
+    request: str
+    data: Optional[dict]
+
+    class Config:
+        from_attributes = True
 
 
 class Movie(Base):

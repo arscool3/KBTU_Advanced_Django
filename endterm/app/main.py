@@ -31,4 +31,3 @@ app.include_router(genre_router)
 app.include_router(movie_router)
 app.include_router(director_router)
 app.include_router(studio_router)
-

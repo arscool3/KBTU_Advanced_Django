@@ -2,10 +2,8 @@ import sqlalchemy
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import Session, sessionmaker
 
-from app.config import settings
 
-url = (f'postgresql://{settings.database_username}:{settings.database_password}@'
-       f'{settings.database_hostname}:{settings.database_port}/{settings.database_name}')
+url = 'postgresql://postgres:123@localhost:5432/endterm_db'
 
 engine = sqlalchemy.create_engine(url)
 

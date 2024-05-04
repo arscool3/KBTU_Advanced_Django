@@ -1,7 +1,7 @@
 from typing import Annotated
-from datetime import date
+from datetime import date, datetime
 import sqlalchemy
-from sqlalchemy import Table, Column, Integer, ForeignKey
+from sqlalchemy import Table, Column, Integer, ForeignKey, JSON, func
 
 from sqlalchemy.orm import mapped_column, Mapped, relationship
 
@@ -55,3 +55,13 @@ class Movie(Base, GeneralInfo):
     genre: Mapped[Genre] = relationship(back_populates='movie')
     studio: Mapped['Studio'] = relationship(back_populates='movie')
     actors: Mapped[list[Actor]] = relationship('Actor', secondary=movie_actor, back_populates='movies')
+
+
+class AccessLogJournal(Base):
+    __tablename__ = 'access_log_journal'
+    id: Mapped[_id]
+    data = Column(JSON, nullable=True)
+    method: Mapped[str]
+    request: Mapped[str]
+    created_at: Mapped[datetime] = mapped_column(server_default=func.now())
+
