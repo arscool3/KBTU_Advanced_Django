@@ -13,11 +13,14 @@ from category.schemas import CreateCategory
 from database import get_db
 from firm.repository import FirmRepo
 from firm.schemas import CreateFirm
+from analys_product.repository import AnalysProductRepo
+from producer import produce_inventory_update
 from product.repository import ProductRepo
 from product.schemas import CreateProduct
 from user.models import User
 from user.repository import UserRepo
 from user.schemas import BaseUser, CreateUser
+
 
 app = FastAPI()
 
@@ -44,6 +47,16 @@ def get_cart_item_repo(session: Session = Depends(get_db)):
 
 def get_cart_repo(session: Session = Depends(get_db)):
     return CartRepo(session)
+
+
+def get_popular_product_repo(session: Session = Depends(get_db)):
+    return AnalysProductRepo(session)
+
+
+@app.get("/popular_product/")
+def get_popular_product(analys_product_repo: AnalysProductRepo = Depends(get_popular_product_repo)):
+    product = analys_product_repo.get_most_popular_product()
+    return product
 
 
 @app.post("/users/")
@@ -113,6 +126,9 @@ async def get_category(id: int, category_repo: CategoryRepo = Depends(get_catego
 async def delete_category(id: int, category_repo: CategoryRepo = Depends(get_category_repo)):
     return category_repo.delete(id)
 
+@app.post("/process_cart/{cart_id}")
+async def process_cart(id: int, cart_repo: CartRepo = Depends(get_cart_repo)):
+    return cart_repo.process(id)
 
 @app.post("/firms/")
 async def create_firm(firm: CreateFirm, firm_repo: FirmRepo = Depends(get_firm_repo)):

@@ -5,6 +5,7 @@ class BaseProduct(BaseSchema):
     name: str
     description: str
     price: float
+    amount: int
 
 
 class Product(BaseProduct):

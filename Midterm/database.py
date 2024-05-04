@@ -3,7 +3,7 @@ import sqlalchemy
 from sqlalchemy.orm import Session, sessionmaker
 
 
-url = f"postgresql://postgres:December1225@localhost/midterm_2"
+url = f"postgresql://postgres:December1225@localhost/final_3"
 engine = sqlalchemy.create_engine(url)
 session = Session(engine)
 Base = declarative_base()
