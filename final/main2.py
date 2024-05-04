@@ -123,11 +123,11 @@ def create_order(
     
     return db_order
 
-@app.get("/users/", response_model=List[dict])
+@app.get("/users/", response_model=None)
 def get_users(skip: int = 0, limit: int = 10, db: Session = Depends(get_db)):
     return db.query(User).offset(skip).limit(limit).all()
 
-@app.post("/users/", response_model=User)
+@app.post("/users/", response_model=None)
 def create_user(user_data: UserCreate, db: Session = Depends(get_db)):
     db_user = User(**user_data.dict())
     db.add(db_user)
@@ -139,14 +139,14 @@ def create_user(user_data: UserCreate, db: Session = Depends(get_db)):
     
     return db_user
 
-@app.get("/users/{user_id}", response_model=User)
+@app.get("/users/{user_id}", response_model=None)
 def get_user(user_id: int, db: Session = Depends(get_db)):
     user = db.query(User).filter(User.id == user_id).first()
     if user is None:
         raise HTTPException(status_code=404, detail="User not found")
     return user
 
-@app.put("/users/{user_id}", response_model=User)
+@app.put("/users/{user_id}", response_model=None)
 def update_user(user_id: int, user_data: UserCreate, db: Session = Depends(get_db)):
     db_user = db.query(User).filter(User.id == user_id).first()
     if db_user is None:
