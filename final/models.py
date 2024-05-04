@@ -20,7 +20,10 @@ class User(Base):
     posts: Mapped['Post'] = relationship(back_populates='user')
     messages: Mapped['Message'] = relationship(back_populates='sender')
 
-    profile: Mapped['Profile'] = relationship(uselist=False, back_populates='user')
+    profile: Mapped['Profile'] = relationship(back_populates='user')
+
+    contribution_id: Mapped[int] = mapped_column(sa.ForeignKey('contributions.id'))
+    contribution: Mapped['Contribution'] = relationship(back_populates='users')
 
 
 class Profile(Base):
@@ -58,6 +61,7 @@ class Project(Base):
     creator_id: Mapped[int] = mapped_column(sa.ForeignKey('users.id'))
 
     user: Mapped[User] = relationship(back_populates='projects')
+    contribution: Mapped['Contribution'] = relationship(back_populates='project')
 
 
 class Post(Base):
@@ -71,3 +75,11 @@ class Post(Base):
 
     user: Mapped[User] = relationship(back_populates='posts')
 
+
+class Contribution(Base):
+    __tablename__ = 'posts'
+    id: Mapped[_id]
+    project_id: Mapped[int] = mapped_column(sa.ForeignKey('projects.id'), nullable=False)
+
+    project: Mapped[Project] = relationship(back_populates='contribution')
+    contributors: Mapped[User] = relationship(back_populates='users')
