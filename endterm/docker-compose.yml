@@ -1,36 +1,36 @@
 version: '3'
 
 services:
-#  movie-app:
-#    container_name: movie-app
-#    depends_on:
-#      - db
-#      - kafka
-#      - zookeeper
-#      - redis
-#    build:
-#      context: .
-#      dockerfile: Dockerfile
-#    restart: on-failure
-#    entrypoint:
-#      - /start.fastapi.sh
-#    ports:
-#      - "8000:8000"
-#    expose:
-#      - 8000
-#
-#  db:
-#    container_name: db
-#    image: postgres:14
-#    restart: on-failure
-#    volumes:
-#      - postgres_data:/var/lib/postgresql/data/
-#    expose:
-#      - 5432
-#    environment:
-#      - POSTGRES_USER=postgres
-#      - POSTGRES_PASSWORD=123
-#      - POSTGRES_DB=endterm_db
+  #  movie-app:
+  #    container_name: movie-app
+  #    depends_on:
+  #      - db
+  #      - kafka
+  #      - zookeeper
+  #      - redis
+  #    build:
+  #      context: .
+  #      dockerfile: Dockerfile
+  #    restart: on-failure
+  #    entrypoint:
+  #      - /start.fastapi.sh
+  #    ports:
+  #      - "8000:8000"
+  #    expose:
+  #      - 8000
+  #
+  #  db:
+  #    container_name: db
+  #    image: postgres:14
+  #    restart: on-failure
+  #    volumes:
+  #      - postgres_data:/var/lib/postgresql/data/
+  #    expose:
+  #      - 5432
+  #    environment:
+  #      - POSTGRES_USER=postgres
+  #      - POSTGRES_PASSWORD=123
+  #      - POSTGRES_DB=endterm_db
   zookeeper:
     image: wurstmeister/zookeeper:latest
     container_name: zookeeper
@@ -80,4 +80,4 @@ services:
 #    entrypoint:
 #      - /start.dramatiq.sh
 volumes:
-      postgres_data:
+  postgres_data:
