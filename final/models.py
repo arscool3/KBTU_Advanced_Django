@@ -18,6 +18,7 @@ class User(Base):
 
     projects: Mapped['Project'] = relationship(back_populates='user')
     posts: Mapped['Post'] = relationship(back_populates='user')
+    messages: Mapped['Message'] = relationship(back_populates='sender')
 
     profile: Mapped['Profile'] = relationship(uselist=False, back_populates='user')
 
@@ -39,8 +40,11 @@ class Profile(Base):
 class Message(Base):
     __tablename__ = 'messages'
     id: Mapped[_id]
-    sender_id: Mapped[int]
-    receiver_id: Mapped[int]
+    content: Mapped[str]
+
+    sender_id: Mapped[int] = mapped_column(sa.ForeignKey('users.id'))
+
+    sender: Mapped[User] = relationship(back_populates='messages')
 
 
 class Project(Base):
