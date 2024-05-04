@@ -1,0 +1,35 @@
+from sqlalchemy import create_engine
+from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy.orm import Session
+from datetime import datetime
+
+from typing import Annotated
+
+import sqlalchemy
+from sqlalchemy.orm import Mapped, mapped_column
+
+url = "postgresql://postgres:postgres@localhost/postgres"
+
+engine = create_engine(url)
+
+session = Session(engine)
+
+Base = declarative_base()
+
+# alembic init
+
+# docker
+# docker run --name postgres  -e POSTGRES_PASSWORD=postgres -p 5432:5432 -d postgres
+
+
+# alembic revision -m "initial_migration" --autogenerate
+# alembic upgrade head / hash
+
+_id = Annotated[int, mapped_column(sqlalchemy.Integer, primary_key=True)]
+
+
+class HeatMapData(Base):
+    __tablename__ = "heat_map_data"
+    id: Mapped[_id]
+    timestamp: Mapped[datetime]
+    data = mapped_column(sqlalchemy.JSON)

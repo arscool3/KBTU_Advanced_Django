@@ -1,0 +1,6 @@
+celery
+fastapi
+uvicorn
+redis
+sqlalchemy
+psycopg2-binary

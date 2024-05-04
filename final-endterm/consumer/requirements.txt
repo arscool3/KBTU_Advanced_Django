@@ -1,0 +1,4 @@
+confluent_kafka
+httpx
+celery
+redis
