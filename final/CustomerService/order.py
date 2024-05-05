@@ -28,17 +28,19 @@ def get_db():
 db_dependency = Annotated[Session, Depends(get_db)]
 
 
-# customer can see history, create order, order_detail,
+def create_order_item(order_id: str, menu_items_id: list[str]):
+    pass
+
+
 @router.post("")
-def create_order(db: db_dependency, order: schemas.CreateOrder):
+def create_order(db: db_dependency, order: schemas.CreateOrder, menu_items: list[str]):
     try:
         db.add(models.Order(**order.model_dump(), total=1000))
+        # create_order_item()
         return {'message': 'order is created!'}
     except Exception as e:
         raise HTTPException(status_code=500, detail=f'error: {e}')
 
-
-# -> list[Order] | dict
 
 @router.get("/{customer_id}")
 def history_order(db: db_dependency, customer_id: str):

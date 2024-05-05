@@ -23,5 +23,4 @@ class Order(BaseModel):
 class CreateOrder(BaseModel):
     customer_id: str
     restaurant_id: str
-    courier: str
-
+    items: list[str]
