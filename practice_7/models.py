@@ -29,3 +29,4 @@ class Film(Cinema, Base):
     genre_id: Mapped[int] = mapped_column(sqlalchemy.ForeignKey('genres.id'))
     directors: Mapped[list[Director]] = relationship(back_populates='film')
     genres: Mapped[list[Genre]] = relationship(back_populates='film')
+

@@ -1,12 +1,22 @@
-from pydantic import BaseModel
-from typing import List
+import confluent_kafka
+from schemas import Film
+from typing import NewType
 
-class Film(BaseModel):
-    name: str
-    director: str
-    genre: str
-    recommendations: List[str] = []
 
+
+Message = NewType('Message', str)
+
+producer = confluent_kafka.Producer(
+    {"bootstrap.servers": "localhost:9092"}
+)
+
+topic = 'main_topic'
+
+
+def produce(film: Film):
+    producer.produce(topic=topic, value=film.model_dump_json())
+    producer.flush()
+    
 def generate_recommendations(films):
     genre_map = {}
     for film in films:
@@ -28,7 +38,7 @@ if __name__ == '__main__':
         Film(name='the amazing spiderman', director='idk', genre='action'),
         Film(name='spiderman with miles morales in it idk', director='idk', genre='Action'),
     ]
-
+    
     generate_recommendations(films)
 
     for film in films:
