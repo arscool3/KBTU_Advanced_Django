@@ -1,0 +1,7 @@
+fastapi[all]
+psycopg2-binary
+sqlalchemy
+pytest
+pytest-order
+pre-commit
+redis

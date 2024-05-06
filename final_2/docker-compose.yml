@@ -1,0 +1,94 @@
+version: "2.2"
+# version: "3.8"
+
+services:
+
+  db:
+    container_name: postgresql_db
+    image: postgres:14.1-alpine
+    restart: always
+    ports:
+      - 5432:5432
+    environment:
+      - POSTGRES_USER=${DB_USER}
+      - POSTGRES_PASSWORD=${DB_PASSWORD}
+      - POSTGRES_DB=${DB_NAME}
+
+  pgadmin:
+    container_name: pgadmin2
+    image: dpage/pgadmin4
+    environment:
+      - PGADMIN_DEFAULT_EMAIL=${PGADMIN_EMAIL}
+      - PGADMIN_DEFAULT_PASSWORD=${PGADMIN_PASSWORD}
+    ports:
+      - 5050:80
+    depends_on:
+      - db
+  app:
+    container_name: app
+    build: .
+    command: bash -c "alembic upgrade head && uvicorn main:app --host 0.0.0.0 --port 8000 --reload"
+    volumes:
+      - .:/app
+    ports:
+      - 8000:8000
+    restart: always
+    depends_on:
+      - db
+
+  redis:
+    container_name: redis
+    image: redis:6.2-alpine
+    # environment:
+    #   - TZ=Asia/Shanghai # 设置时区=value
+    # volumes:
+    #   - redis:/data
+      # - ~/apps/redis/data:/data
+      # - ~/apps/redis/conf/redis.conf:/usr/local/etc/redis/redis.conf
+      # - $PWD/redis-data:/var/lib/redis
+      # - $PWD/redis.conf:/usr/local/etc/redis/redis.conf
+    ports:
+      - 6379:6379
+    # networks:
+    #   - postgres
+    # restart: unless-stopped
+    # # command: redis-server /usr/local/etc/redis/redis.conf
+    # # command: redis-server --requirepass root
+    # command: redis-server --save 20 1 --loglevel warning --requirepass 123456
+
+  celery_worker:
+    container_name: celery_worker
+    build: .
+    command: celery -A celery_worker.celery worker --loglevel=info
+    volumes:
+      - .:/app
+    environment:
+      - CELERY_BROKER_URL=${CELERY_BROKER_URL}
+      - CELERY_RESULT_BACKEND=${CELERY_RESULT_BACKEND}
+    depends_on:
+      - app
+      - redis
+  
+  flower:
+    container_name: flower
+    build: .
+    command: celery -A celery_worker.celery flower --port=5555
+    ports:
+      - 5556:5555
+    environment:
+      - CELERY_BROKER_URL=${CELERY_BROKER_URL}
+      - CELERY_RESULT_BACKEND=${CELERY_RESULT_BACKEND}
+    depends_on:
+      - app
+      - redis
+      - celery_worker
+
+  # flower_5:
+  #   image: mher/flower
+  #   command: ["--app your_app", "--url_prefix=flower", "--broker=redis://redis"]
+  #   ports:
+  #     - 5555:5555
+  #   restart: unless-stopped
+
+
+
