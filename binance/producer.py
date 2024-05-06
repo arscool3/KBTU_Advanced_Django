@@ -1,38 +1,33 @@
 import confluent_kafka
-import json
+from schemas import BitcoinCreate
 import time
 from datetime import datetime
+import random
+
+producer = confluent_kafka.Producer({"bootstrap.servers": "localhost:9092"})
+topic = 'binance_topic'
+
+COINS = ["BTC", "ETH", "LTC", "XRP"]
 
 
-class BitcoinProducer:
-    def __init__(self, bootstrap_servers='localhost:9092', topic='binance_topic'):
-        self.bootstrap_servers = bootstrap_servers
-        self.topic = topic
-        self.producer = confluent_kafka.Producer({'bootstrap.servers': self.bootstrap_servers})
+def generate_random_price():
+    return random.uniform(100, 200) 
 
-    def produce_data(self):
-        counter = 0
-        while counter < 20:
-            bitcoin1 = {
-                "time": datetime.now().isoformat(),
-                "price": 100 + time.time() % 50,
-                "coin": "BTC"
-            }
-            bitcoin2 = {
-                "time": datetime.now().isoformat(),
-                "price": 100 + time.time() % 40,
-                "coin": "ETH"
-            }
-            self.produce_message(bitcoin1)
-            self.produce_message(bitcoin2)
-            counter += 1
-            time.sleep(2)
 
-    def produce_message(self, message):
-        self.producer.produce(self.topic, value=json.dumps(message))
-        self.producer.flush()
+def produce_bitcoin_data(coin, num_messages=20, interval=2):
+    counter = 0
+    while counter < num_messages:
+        bitcoin = BitcoinCreate(
+            time=datetime.now().isoformat(),
+            price=generate_random_price(),
+            coin=coin
+        )
+        print(bitcoin.model_dump_json())
+        producer.produce(topic=topic, value=bitcoin.model_dump_json())
+        counter += 1
+        time.sleep(interval)
 
 
 if __name__ == '__main__':
-    producer = BitcoinProducer()
-    producer.produce_data()
+    for coin in COINS:
+        produce_bitcoin_data(coin)

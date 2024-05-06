@@ -1,56 +1,58 @@
-from fastapi import FastAPI, WebSocket
-from typing import List
-from kafka import KafkaConsumer
+import matplotlib
+from fastapi import FastAPI, BackgroundTasks
+from fastapi.responses import FileResponse
+import numpy as np
+from consumer import consume
+from producer import produce
+from repository import get_from_db
 
-import json
-import asyncio
-
-
+matplotlib.use('Agg')
 app = FastAPI()
 
-consumer = KafkaConsumer('binance_topic', bootstrap_servers=['localhost:9092'])
+
+def create_heatmap(bitcoin):
+    prices = [entry.price for entry in bitcoin]
+    matrix_size = min(len(prices), 40)
+    data = np.zeros((matrix_size, matrix_size))
+
+    for i in range(matrix_size):
+        for j in range(matrix_size):
+            data[i, j] = abs(prices[i] - prices[j])
+
+    plt.figure(figsize=(8, 6))
+    plt.imshow(data, cmap='hot', interpolation='nearest')
+    plt.colorbar()
+    heatmap_file = "/tmp/heatmap.png"
+    plt.savefig(heatmap_file)
+    plt.close()
+    return FileResponse(heatmap_file)
 
 
+def run_producer_and_consumer():
+    produce()
+    consume()
 
-@app.websocket("/historical")
-async def websocket_historical(websocket: WebSocket):
-    await websocket.accept()
-  
 
-    consumer.subscribe(['binance_topic'])
-    
-    try:
-        # Function to send data from Kafka to WebSocket client
-        async def send_data():
-            for message in consumer:
-                bitcoin_data = json.loads(message.value)
-                await websocket.send_text(json.dumps(bitcoin_data))
+@app.get("/bitcoin/run", summary="Start producer and consumer tasks")
+def run_server(background_tasks: BackgroundTasks):
+    background_tasks.add_task(run_producer_and_consumer)
+    return "Producer and consumer tasks started"
 
-        # Run send_data function in a separate task
-        await asyncio.create_task(send_data())
-    finally:
-        # Unsubscribe from Kafka topic upon WebSocket connection closure
-        consumer.unsubscribe()
-        consumer.close()
 
-# WebSocket endpoint for live data retrieval
-@app.websocket("/live")
-async def websocket_live(websocket: WebSocket):
-    await websocket.accept()
-    
-    # Subscribe to Kafka topic
-    consumer.subscribe(['binance_topic'])
-    
-    try:
-        # Function to send data from Kafka to WebSocket client
-        async def send_data():
-            for message in consumer:
-                bitcoin_data = json.loads(message.value)
-                await websocket.send_text(json.dumps(bitcoin_data))
+@app.get("/bitcoin/{coin_name}", summary="Get Bitcoin prices and generate heatmap")
+async def get_bitcoin_prices(coin_name: str):
+    bitcoin = get_from_db(coin_name)
+    return create_heatmap(bitcoin)
 
-        # Run send_data function in a separate task
-        await asyncio.create_task(send_data())
-    finally:
-        # Unsubscribe from Kafka topic upon WebSocket connection closure
-        consumer.unsubscribe()
-        consumer.close()
+
+@app.get("/heatmap", summary="Generate random heatmap")
+def random_heat_map():
+    data = np.random.rand(10, 10)
+
+    plt.imshow(data, cmap='hot', interpolation='nearest')
+    plt.colorbar()
+
+    heatmap_file = "/tmp/heatmap.png"
+    plt.savefig(heatmap_file)
+    plt.close()
+    return FileResponse(heatmap_file)
