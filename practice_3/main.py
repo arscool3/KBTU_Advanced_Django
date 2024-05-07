@@ -11,18 +11,6 @@ class FootballTeam(BaseModel):
     title: str
     country: str
 
-# def add_football_team(football_team: FootballTeam):
-#     football.append(football_team)
-#     return f"{football_team.title} was added "
-
-
-# def delete_football_team(del_team: FootballTeam):
-#     for team in football:
-#         if team.title == del_team.title:
-#             football.remove(team)
-#             return f'{team.title} was deleted'
-
-
 class FootballSubLayer:
     def __init__(self, log_message: str):
         self.log_message = log_message
@@ -73,6 +61,3 @@ def add_team(football_team: Annotated[str, Depends(get_container().resolve(Footb
 @app.delete('/remove_team')
 def del_team(football_team: Annotated[str, Depends(get_container().resolve(FootballMainLayer).delete_football_team)]) -> str:
     return football_team
-
-# @app.post('/magazines')
-# def add_magazine()
