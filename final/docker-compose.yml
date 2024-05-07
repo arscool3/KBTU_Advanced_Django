@@ -2,12 +2,12 @@ version: '3'
 
 services:
   zookeeper:
-    image: wurstmeister/zookeeper:latest
+    image: confluentinc/cp-zookeeper:6.2.0
     container_name: zookeeper
     ports:
       - "2181:2181"
   kafka:
-    image: wurstmeister/kafka:latest
+    image: confluentinc/cp-kafka:6.2.0
     container_name: kafka
     ports:
       - "9092:9092"
@@ -23,13 +23,9 @@ services:
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
 
-  kafka-ui:
-    image: "provectuslabs/kafka-ui:latest"
-    container_name: kafka-ui
-    ports:
-      - "8080:8080"
-    depends_on:
-      - zookeeper
-    environment:
-      - KAFKA_CLUSTERS_0_NAME=local
-      - KAFKA_CLUSTERS_0_BOOTSTRAP_SERVERS=kafka:9093
+#  fastapi-app:
+#    build: .
+#    ports:
+#      - "8000:8000"
+#    depends_on:
+#      - kafka

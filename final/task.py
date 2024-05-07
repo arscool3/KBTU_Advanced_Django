@@ -1,6 +1,16 @@
 import dramatiq
+from dramatiq.results.backends.redis import RedisBackend
+from dramatiq.brokers.redis import RedisBroker
+from dramatiq.results import Results
+from background_task import process_payment
 
-@dramatiq.actor
-def process_payment(payment_id):
-    # Assuming you have a function to handle payment processing
-    handle_payment_processing(payment_id)
+result_backend = RedisBackend()
+broker = RedisBroker()
+broker.add_middleware(Results(backend=result_backend))
+dramatiq.set_broker(broker)
+
+
+@dramatiq.actor(store_results=True)
+def async_process_payment(payment_id, amount):
+    result = process_payment(payment_id, amount)
+    print(f"Payment processed: {result}")

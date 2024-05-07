@@ -7,7 +7,8 @@ from sqlalchemy import select, insert
 from fastapi import FastAPI, HTTPException
 from kafka_utils import create_kafka_producer
 import json
-from task import process_payment
+from task import async_process_payment
+from sqlalchemy.orm import joinedload
 
 import models as db
 from sqlalchemy.orm.session import Session
@@ -109,9 +110,13 @@ def add_rooms(room: CreateRoom) -> str:
 
 @app.get("/customers/{customer_id}/payments", tags=["Customer"])
 async def get_customer_payments(customer_id: int):
-    customer_reservations = session.query(db.Reservation).filter_by(customer_id=customer_id).all()
-    customer_payments = [reservation.payment for reservation in customer_reservations if reservation.payment is not None]
-    return [Payment.model_validate(customer) for customer in customer_payments]
+    customer_reservations = session.query(db.Reservation).options(
+        joinedload(db.Reservation.payment)
+    ).filter_by(customer_id=customer_id).all()
+
+    customer_payments = [res.payment for res in customer_reservations if res.payment is not None]
+
+    return [Payment.model_validate(payment) for payment in customer_payments]
 
 
 @app.post("/customer", tags=["Customer"])
@@ -121,7 +126,7 @@ def add_customers(customer: CreateCustomer) -> str:
     session.close()
     return "Customer was added"
 
-
+###############################
 @app.post("/reservation", tags=["Reservation"])
 def add_reservation(reservation: CreateReservation) -> str:
     room = session.query(db.Room).filter(db.Room.id == reservation.room_id).first()
@@ -141,16 +146,23 @@ def add_reservation(reservation: CreateReservation) -> str:
     session.close()
     return "Reservation was added"
 
-
+###################
 @app.post("/payment", tags=["Payment"])
-def add_payment(payment: CreatePayment) -> str:
-    session.add(db.Payment(**payment.model_dump()))
+def add_payment(payment: CreatePayment):
+    reservation = session.query(db.Reservation).get(payment.reservation_id)
+    if not reservation:
+        raise HTTPException(status_code=404, detail="Reservation not found.")
+
+    new_payment = db.Payment(
+        amount=payment.amount,
+        reservation_id=payment.reservation_id
+    )
+    session.add(new_payment)
     session.commit()
 
-    process_payment.send(payment.id)
+    async_process_payment.send(new_payment.id, new_payment.amount)
 
-    session.close()
-    return "Payment was added"
+    return {"message": "Payment initiated", "payment_id": new_payment.id}
 
 
 @app.post("/review", tags=["Review"])
