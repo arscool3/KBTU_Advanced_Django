@@ -1,4 +1,4 @@
-from typing import List
+from typing import List, Any
 from pydantic import BaseModel
 
 
@@ -7,6 +7,15 @@ class OrderItem(BaseModel):
     price: int
     quantity: int
     order_id: str
+    restaurant_item_id: str
+
+    class Config:
+        from_attributes = True
+
+
+class CreateOrderItem(BaseModel):
+    quantity: int
+    # order_id: str
     restaurant_item: str
 
 
@@ -19,8 +28,20 @@ class Order(BaseModel):
     courier_id: str
     total: int
 
+    class Config:
+        from_attributes = True
+
 
 class CreateOrder(BaseModel):
     customer_id: str
     restaurant_id: str
-    items: list[str]
+
+
+class Restaurant(BaseModel):
+    id: str
+    address: str
+    email: str
+    status: str
+
+    class Config:
+        from_attributes = True

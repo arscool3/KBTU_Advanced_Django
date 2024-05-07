@@ -34,8 +34,7 @@ class RestaurantMenuItem(Base):
     description: Mapped[str] = Column(Text)
     restaurant_id: Mapped[str] = mapped_column(ForeignKey("restaurants.id"))
     restaurant: Mapped["Restaurant"] = relationship("Restaurant", back_populates="menu")
-    order_item: Mapped["OrderItem"] = relationship("OrderItem", back_populates="restaurant_item")
-    order_item_id: Mapped[str] = mapped_column(ForeignKey("order_items.id"))
+    order_items: Mapped[List["OrderItem"]] = relationship("OrderItem", back_populates="restaurant_item")
 
 
 class Order(Base):
@@ -43,6 +42,7 @@ class Order(Base):
 
     ORDER_STATUSES = (
         ('PENDING', 'pending'),
+        ('ACCEPTED', 'accepted by restaurant'),
         ('IN-TRANSIT', 'in-transit'),
         ('DELIVERED', 'delivered'),
     )
@@ -67,7 +67,8 @@ class OrderItem(Base):
     quantity: Mapped[int] = mapped_column(nullable=False, default=1)
     order_id: Mapped[str] = mapped_column(ForeignKey("orders.id"))
     order: Mapped["Order"] = relationship("Order", back_populates="items")
-    restaurant_item: Mapped["RestaurantMenuItem"] = relationship("RestaurantMenuItem", back_populates="order_item")
+    restaurant_item: Mapped["RestaurantMenuItem"] = relationship("RestaurantMenuItem", back_populates="order_items")
+    restaurant_item_id: Mapped[str] = mapped_column(ForeignKey('menu_items.id'))
 
 
 class Customer(Base):
