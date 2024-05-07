@@ -1,8 +1,9 @@
 from typing import Annotated
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, Query, HTTPException
+from sqlalchemy import select
 from sqlalchemy.orm import Session
-
 import database as db
+import models
 
 router = APIRouter(
     prefix='/restaurants',
@@ -24,16 +25,6 @@ def get_db():
 db_dependency = Annotated[Session, Depends(get_db)]
 
 
-@router.get("/orders")
-async def get_orders(status: str, db: db_dependency):
-    pass
-
-
-@router.post("/orders/status/{id}")
-async def deny_order(id: str, action: str):
-    pass
-
-
-@router.patch("/menu_item")
-async def add_menu_item():
-    pass
+# TODO add new item to menu
+# TODO update item from menu
+# TODO change status restaurant open/closed
