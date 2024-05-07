@@ -15,8 +15,7 @@ class OrderItem(BaseModel):
 
 class CreateOrderItem(BaseModel):
     quantity: int
-    # order_id: str
-    restaurant_item: str
+    restaurant_item_id: str
 
 
 class Order(BaseModel):

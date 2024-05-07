@@ -40,6 +40,7 @@ async def list_of_restaurants(db: db_dependency):
     restaurant_db = db.execute(select(models.Restaurant)).scalars().all()
     test = deepcopy(restaurant_db)
     for t in test:
+        t.id = str(t.id)
         t.status = str(t.status)
     ans = [schemas.Restaurant.model_validate(x) for x in test]
     del test
@@ -52,8 +53,8 @@ async def list_of_foods(db: db_dependency):
     return menu_items
 
 
-@app.get("/restaurants{id}", tags=['restaurants'])
+@app.get("/restaurants{_id}", tags=['restaurants'])
 async def list_of_food(_id: str, db: db_dependency):
     menu_items = db.execute(select(models.RestaurantMenuItem)).scalars().all()
-    filter_items = [x for x in menu_items if x.restaurant_id == _id]
+    filter_items = [x for x in menu_items if str(x.restaurant_id) == _id]
     return filter_items
