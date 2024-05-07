@@ -17,12 +17,11 @@ class CreateCourierRequest(BaseModel):
     email: str
     phone_number: str
     hashed_password: SecretStr
-    status: str
 
 
 class CreateRestaurantRequest(BaseModel):
     email: str
     phone_number: str
     hashed_password: SecretStr
-    status: str
+    name: str
     address: str

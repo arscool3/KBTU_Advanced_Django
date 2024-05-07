@@ -62,7 +62,7 @@ async def create_restaurant(dp: db_dependency, restaurant_request: CreateRestaur
             phone_number=restaurant_request.phone_number,
             address=restaurant_request.address,
             hashed_password=bcrypt_context.hash(restaurant_request.hashed_password.get_secret_value()),
-            status='NOT APPROVED',
+            name=restaurant_request.name
         )
         dp.add(customer)
         return {"message": "restaurant successfully created!"}
@@ -77,8 +77,7 @@ async def create_courier(dp: db_dependency, courier_request: CreateCourierReques
         courier = Courier(
             email=courier_request.email,
             phone_number=courier_request.phone_number,
-            hashed_password=bcrypt_context.hash(courier_request.hashed_password.get_secret_value()),
-            status=courier_request.status
+            hashed_password=bcrypt_context.hash(courier_request.hashed_password.get_secret_value())
         )
         dp.add(courier)
         return {"message": "courier successfully created!"}
@@ -93,7 +92,7 @@ async def login(form_data: Annotated[OAuth2PasswordRequestForm, Depends()], dp: 
 
     if not entity:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail='Could not validate user.')
-    token = create_access_token(entity.email, entity.id, timedelta(minutes=20))
+    token = create_access_token(entity.email, str(entity.id), timedelta(minutes=20))
     return {'access_token': token, 'token_type': 'bearer'}
 
 
@@ -103,7 +102,7 @@ async def login_as_courier(form_data: Annotated[OAuth2PasswordRequestForm, Depen
 
     if not entity:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail='Could not validate user.')
-    token = create_access_token(entity.email, entity.id, timedelta(minutes=20))
+    token = create_access_token(entity.email, str(entity.id), timedelta(minutes=20))
     return {'access_token': token, 'token_type': 'bearer'}
 
 
@@ -113,7 +112,7 @@ async def login_as_restaurant(form_data: Annotated[OAuth2PasswordRequestForm, De
 
     if not entity:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail='Could not validate user.')
-    token = create_access_token(entity.email, entity.id, timedelta(minutes=20))
+    token = create_access_token(entity.email, str(entity.id), timedelta(minutes=20))
     return {'access_token': token, 'token_type': 'bearer'}
 
 
