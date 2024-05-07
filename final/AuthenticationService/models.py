@@ -43,7 +43,9 @@ class Order(Base):
 
     ORDER_STATUSES = (
         ('PENDING', 'pending'),
-        ('ACCEPTED', 'accepted by restaurant'),
+        ('PAID', 'paid'),
+        ('DENY', 'deny'),
+        ('ACCEPTED', 'accepted'),
         ('IN-TRANSIT', 'in-transit'),
         ('DELIVERED', 'delivered'),
     )
@@ -51,10 +53,10 @@ class Order(Base):
     id: Mapped[uuid.UUID] = mapped_column(primary_key=True, default=uuid.uuid4)
     items: Mapped[List["OrderItem"]] = relationship("OrderItem", back_populates="order")
     total: Mapped[int] = mapped_column(nullable=False)
-    status = Column(ChoiceType(ORDER_STATUSES), default="pending")
-    customer_id: Mapped[str] = mapped_column(ForeignKey("users.id"), nullable=True)
+    status = Column(ChoiceType(ORDER_STATUSES), default="PENDING")
+    customer_id: Mapped[str] = mapped_column(ForeignKey("users.id"))
     customer: Mapped["Customer"] = relationship("Customer", back_populates="orders")
-    restaurant_id: Mapped[str] = mapped_column(ForeignKey("restaurants.id"), nullable=True)
+    restaurant_id: Mapped[str] = mapped_column(ForeignKey("restaurants.id"))
     restaurant: Mapped["Restaurant"] = relationship("Restaurant", back_populates="orders")
     courier_id: Mapped[str] = mapped_column(ForeignKey("couriers.id"), nullable=True)
     courier: Mapped["Courier"] = relationship("Courier", back_populates="orders")
