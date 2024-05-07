@@ -1,2 +1,7 @@
 SQLAlchemy~=2.0.29
 alembic~=1.13.1
+fastapi~=0.111.0
+pydantic~=2.7.1
+starlette~=0.37.2
+passlib~=1.7.4
+python-dotenv~=1.0.1
