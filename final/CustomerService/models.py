@@ -45,6 +45,7 @@ class Order(Base):
         ('PENDING', 'pending'),
         ('PAID', 'paid'),
         ('DENY', 'deny'),
+        ('READY', 'ready'),
         ('ACCEPTED', 'accepted'),
         ('IN-TRANSIT', 'in-transit'),
         ('DELIVERED', 'delivered'),

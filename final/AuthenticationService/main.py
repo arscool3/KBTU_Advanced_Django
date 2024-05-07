@@ -8,7 +8,9 @@ from models import Base
 from database import engine
 
 Base.metadata.create_all(engine)
+
 app = FastAPI()
+
 app.include_router(auth.router)
 
 
