@@ -5,7 +5,7 @@ from sqlalchemy import select
 from pydantic import BaseModel
 from database import session,engine
 from fastapi import FastAPI, BackgroundTasks, Query
-from celery_worker import create_task,calculate_average_ratings
+from celery_worker import create_task
 from fastapi import BackgroundTasks
 from fastapi.responses import JSONResponse
 from typing import List
@@ -36,7 +36,35 @@ def get_db():
     finally:
         session.close()
 
+import time
 
+from pydantic import BaseModel
+from fastapi import FastAPI
+from dramatiq.results.errors import ResultMissing
+
+from dramatiq_job.main import  send_request_to_our_server, result_backend
+
+
+
+class Employee(BaseModel):
+    name: str
+    age: int
+
+
+@app.post("/add_employee")
+def add_employee(employee: Employee):
+    task = send_request_to_our_server.send(employee.name)
+    return {'id': task.message_id}
+
+
+@app.get("/result")
+def result(id: str):
+    try:
+        task = send_request_to_our_server.message().copy(message_id=id)
+        return result_backend.get_result(task)
+    except ResultMissing:
+        return "Waiting for all requests"
+    
 class Ex1Request(BaseModel):
     amount: int
     x: int
