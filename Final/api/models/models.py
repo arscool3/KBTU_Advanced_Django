@@ -38,7 +38,7 @@ class Order(Base):
     status: Mapped[str] = mapped_column(default= "Created")
     pay: Mapped[bool] = mapped_column(default= False)
     total: Mapped[int] = mapped_column(default = 0, nullable= False)
-    order_item: Mapped['OrderItem'] = relationship(back_populates='order')
+    order_item: Mapped['OrderItem'] = relationship(back_populates='order', cascade="all, delete-orphan")
 
 class OrderItem(Base):
     __tablename__ = "orderitems"

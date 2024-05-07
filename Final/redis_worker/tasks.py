@@ -1,14 +1,12 @@
 from api.models.models import Order, History
-import dramatiq
-from dramatiq.results.backends.redis import RedisBackend
-from dramatiq.brokers.redis import RedisBroker
-from dramatiq.results import Results
-from requests.exceptions import ReadTimeout
 from api.repositories.Repository import *
 import datetime
 from sqlalchemy.exc import SQLAlchemyError
 
-def update_order_status(reservation_id: int, db: Session = Depends(get_db)):
+from sqlalchemy.orm import Session
+from api.models.models import Order
+
+def update_order_status(reservation_id: int, db: Session):
     order = db.query(Order).filter(Order.reservation == reservation_id).first()
     if order:
         order.status = "Оплата прошла"
@@ -54,15 +52,16 @@ def total_orders_revenue_by_month(db: Session = Depends(get_db)):
             History.datetime <= current_month_end
         ).scalar()
 
-        return total_revenue
+        return float(total_revenue)
     except SQLAlchemyError as e:
-        raise HTTPException(status_code=500, detail="Database error.")
+        return 0
 def average_order_price(db: Session = Depends(get_db)):
     try:
         average_order_price = db.query(func.avg(History.total)).scalar()
-        return average_order_price
+        return float(average_order_price)
     except SQLAlchemyError as e:
-        raise HTTPException(status_code=500, detail="Database error.")
+        return 0
+
 
 
 
@@ -70,7 +69,8 @@ def average_order_price(db: Session = Depends(get_db)):
 def revenue_per_visitor(db: Session = Depends(get_db)):
     try:
         revenue_per_visitor = db.query(func.sum(History.total) / func.count(History.reservation)).scalar()
-        return revenue_per_visitor
+        return float(revenue_per_visitor)
     except SQLAlchemyError as e:
-        raise HTTPException(status_code=500, detail="Database error.")
+        return 0
+
 

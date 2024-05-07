@@ -76,37 +76,27 @@ class OrderRepository:
             order.created_at = func.now()
             self.db.commit()
         return order
+    
     def pay(self, reservation: int):
         order = self.get_order_by_reservation(reservation)
         if order:
             order.pay = True
             self.db.commit()
         return order
-    def delete_category(self, id: int):
+    def delete_order(self, id: int):
         order = self.get_order_by_reservation(id)
         if order:
+            orderitems = self.db.query(mdl.OrderItem).filter(mdl.OrderItem.order_id == order.id).all()
+            for orderitem in orderitems:
+                self.db.delete(orderitem)
             self.db.delete(order)
             self.db.commit()
             return order
         return None
         
-
-
-        
-        
-    
-    
-    
     def get_orders(self):
         return self.db.query(mdl.Order).all()
     
-    def delete_order(self, id: int):
-        order = self.get_Order(id)
-        if order:
-            self.db.delete(order)
-            self.db.commit()
-            return order
-        return None
 
 class OrderItemRepository:
     def __init__(self, db: Session):
@@ -125,16 +115,18 @@ class OrderItemRepository:
             return "Order not found"
     
     def get_order_items_by_order(self, reservation: int):
-        order = self.db.query(mdl.Order).filter(mdl.Order.reservation == reservation).first()
-        return self.db.query(mdl.OrderItem).filter(mdl.OrderItem.order_id == order.id).all()
+        try:
+            order = self.db.query(mdl.Order).filter(mdl.Order.reservation == reservation).first()
+            return self.db.query(mdl.OrderItem).filter(mdl.OrderItem.order_id == order.id).all()
+        except Exception:
+            return "smth wrong"
     
-    def get_orders(self):
-        self.db.query(mdl.Order).all()
     
-    def delete_order(self, id: int):
-        order = self.get_Order(id)
-        if order:
-            self.db.delete(order)
+    def delete_orderitem_from_order(self, reservation_id: int, orderitem_id: int):
+        order = self.db.query(mdl.Order).filter(mdl.Order.reservation == reservation_id).first()
+        if order and not order.pay:
+            orderitem = self.db.query(mdl.OrderItem).filter(mdl.OrderItem.food_id == orderitem_id and mdl.OrderItem.order_id == order.id)
+            self.db.delete(orderitem)
             self.db.commit()
             return order
         return None

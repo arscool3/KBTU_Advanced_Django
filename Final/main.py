@@ -59,13 +59,16 @@ def get_order_items(reservation_id:int ,service: OrderRepository = Depends(get_o
 
 @app.get('/orders/{reservation_id}')
 def get_order_items(reservation_id:int ,service: OrderItemRepository = Depends(get_order_item_repo) ):
-    result = service.get_order_items_by_order(reservation_id)
-    return [sch.OrderItem.model_validate(food) for food in result]
+    try:
+        result = service.get_order_items_by_order(reservation_id)
+        return [sch.OrderItem.model_validate(food) for food in result]
+    except Exception:
+        return "smth wrong"
     
 @app.post('/payment/{reservation_id}')
 def pay_order(reservation_id: int, db: Session = Depends(get_db), service: OrderRepository = Depends(get_order_repo)):
     service.update_status(reservation_id, "Ожидается оплата")
-    task = payment_operations.send(reservation_id, db)
+    task = payment_operations.send(reservation_id)
     status = mdl.PaymentStatus(reservation_id = reservation_id, status_code = task.message_id)
     db.add(status)
     return sch.PaymentStatus.model_validate(status)
@@ -96,16 +99,18 @@ def pay(reservation_id: int, service: OrderRepository = Depends(get_order_repo) 
 @app.post('/status/{reservation_id}/ready')
 def update_status(reservation_id: int, service: OrderRepository = Depends(get_order_repo)):
     order = service.get_order_by_reservation(reservation_id)
-    if order and order.status == "Заказ готовится":
+    if order and (order.status == "Заказ готовится" or order.status == "Оплата прошла") :
         service.update_status(reservation_id, "Заказ готов")
 
 @app.post('/status/{reservation_id}/completed')
 def update_status(reservation_id: int, service: OrderRepository = Depends(get_order_repo)):
     order = service.get_order_by_reservation(reservation_id)
-    if order and order.status == "Заказ готов":
+    if order:
         service.update_status(reservation_id, "Заказ выдан")
-        order = service.delete_order(reservation_id)
-        produce(order)
+        produce(sch.Order.model_validate(order))
+        return "Deleted"
+    else:
+        return "smth"
 
 @app.post('/add/history')
 def add_history(history: sch.History ,db: Session = Depends(get_db)):
