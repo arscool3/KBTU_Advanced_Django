@@ -4,7 +4,7 @@ from pydantic import BaseModel
 from fastapi import FastAPI
 from dramatiq.results.errors import ResultMissing
 
-from main import factorial, send_request_to_our_server, result_backend
+from dramatiq_job.main import factorial, send_request_to_our_server, result_backend
 
 app = FastAPI()
 
