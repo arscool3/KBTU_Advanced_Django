@@ -12,5 +12,5 @@ async def health_check() -> dict:
 
 @app.post("/send_message", tags=['test'])
 def send_message(info: Info):
-    send_email_check.delay(info.username, info.email)
+    send_email_check.delay(info.username, info.email, info.total, info.order_id, info.restaurant_id)
     return {'message': 'message send to email'}

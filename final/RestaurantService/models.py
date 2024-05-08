@@ -44,8 +44,12 @@ class Order(Base):
     ORDER_STATUSES = (
         ('PENDING', 'pending'),
         ('PAID', 'paid'),
+        ('DENY-CUSTOMER', 'deny by customer'),
+        ('DENY-RESTAURANT', 'deny by restaurant'),
+        ('DENY-COURIER', 'deny by courier'),
         ('DENY', 'deny'),
-        ('ACCEPTED', 'accepted'),
+        ('ACCEPTED-COURIER', 'accepted by courier'),
+        ('ACCEPTED-RESTAURANT', 'accepted by restaurant'),
         ('READY', 'ready'),
         ('IN-TRANSIT', 'in-transit'),
         ('DELIVERED', 'delivered'),

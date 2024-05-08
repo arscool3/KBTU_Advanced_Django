@@ -47,8 +47,9 @@ async def order_detail(db: db_dependency, order_id: str, restaurant_id: str):
 @app.get("/orders/{restaurant_id}", tags=['orders'])
 async def history_orders(db: db_dependency, restaurant_id: str,
                          status_req: str = Query('DENY',
-                                                 enum=['PENDING', 'DENY', 'PAID', 'ACCEPTED', 'READY', 'IN-TRANSIT',
-                                                       'DELIVERED'])):
+                                                 enum=['PENDING', 'DENY-COURIER','DENY-RESTAURANT', 'DENY-CUSTOMER', 'PAID', 'ACCEPTED-RESTAURANT', 'ACCEPTED-COURIER', 'READY',
+                                                            'IN-TRANSIT',
+                                                            'DELIVERED'])):
     try:
         orders = db.execute(select(models.Order).filter(models.Order.restaurant_id == restaurant_id)).scalars().all()
         res = [x for x in orders if x.status == status_req]
@@ -61,7 +62,7 @@ async def history_orders(db: db_dependency, restaurant_id: str,
 
 @app.patch("/orders/{order_id}/{restaurant_id}", tags=['orders'])
 async def change_status(db: db_dependency, order_id: str, restaurant_id: str,
-                        status: str = Query('DENY', enum=['ACCEPTED', 'DENY', 'READY'])):
+                        status: str = Query('DENY-RESTAURANT', enum=['ACCEPTED-RESTAURANT', 'DENY-RESTAURANT', 'READY'])):
     try:
         orders = db.execute(select(models.Order).filter(models.Order.restaurant_id == restaurant_id).
                             filter(models.Order.id == order_id)).scalars().all()

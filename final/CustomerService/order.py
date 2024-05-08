@@ -1,7 +1,7 @@
 from typing import Annotated
 from fastapi import APIRouter, Depends, HTTPException, Query, BackgroundTasks
 from sqlalchemy import select
-# from fastapi.params import Query
+from config import EMAIL_SERVICE
 from sqlalchemy.orm import Session
 from starlette import status
 import models
@@ -73,14 +73,14 @@ async def add_order_item(order_id: str, item: schemas.CreateOrderItem, db: db_de
 
 @router.patch("/buy_order/{order_id}")
 async def change_order_status(db: db_dependency, order_id: str, background_task: BackgroundTasks,
-                              status_request: str = Query('PAID', enum=['PAID', 'DENY'])) -> dict:
+                              status_request: str = Query('PAID', enum=['PAID', 'DENY-CUSTOMER'])) -> dict:
     try:
         order = db.query(models.Order).filter(models.Order.id == order_id).first()
         if not order:
             HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=f'order not found by id: {order_id}')
         order.status = status_request
         if order.status == "PAID":
-            background_task.add_task(buy_test, 'd_korganbek@kbtu.kz')
+            background_task.add_task(buy_test, 'd_korganbek@kbtu.kz', '1', '1', 1000)
         print(order.status)
         return {'message': 'order successfully changed!'}
     except Exception as e:
@@ -90,7 +90,6 @@ async def change_order_status(db: db_dependency, order_id: str, background_task:
 @router.get("/history/{customer_id}")
 async def history_order(db: db_dependency, customer_id: str):
     try:
-        # orders = db.query(models.Order).filter(models.Order.customer_id == customer_id).all()
         orders = db.execute(select(models.Order).filter(models.Order.customer_id == customer_id)).scalars().all()
         if not orders:
             return {"message": "orders not found!"}
@@ -99,8 +98,8 @@ async def history_order(db: db_dependency, customer_id: str):
         raise HTTPException(status_code=500, detail=f"Error: {e}")
 
 
-def buy_test(email: str):
-    url = 'http://0.0.0.0:8000/send_message'
+def buy_test(email: str = 'd_korganbek@kbtu.kz', restaurant_id: str = '1', order_id: str = '1', total: int = 1000):
+    url = EMAIL_SERVICE
     headers = {
         'accept': 'application/json',
         'Content-Type': 'application/json',
@@ -108,7 +107,10 @@ def buy_test(email: str):
 
     data = {
         'email': email,
-        'username': 'Customer',
+        'username': email,
+        'total': total,
+        'order_id': order_id,
+        'restaurant_id': restaurant_id
     }
 
     response = httpx.post(url, headers=headers, json=data)
