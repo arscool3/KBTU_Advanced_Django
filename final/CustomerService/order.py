@@ -1,5 +1,5 @@
 from typing import Annotated
-from fastapi import APIRouter, Depends, HTTPException, Query
+from fastapi import APIRouter, Depends, HTTPException, Query, BackgroundTasks
 from sqlalchemy import select
 # from fastapi.params import Query
 from sqlalchemy.orm import Session
@@ -72,13 +72,15 @@ async def add_order_item(order_id: str, item: schemas.CreateOrderItem, db: db_de
 
 
 @router.patch("/buy_order/{order_id}")
-async def change_order_status(db: db_dependency, order_id: str,
+async def change_order_status(db: db_dependency, order_id: str, background_task: BackgroundTasks,
                               status_request: str = Query('PAID', enum=['PAID', 'DENY'])) -> dict:
     try:
         order = db.query(models.Order).filter(models.Order.id == order_id).first()
         if not order:
             HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=f'order not found by id: {order_id}')
         order.status = status_request
+        if order.status == "PAID":
+            background_task.add_task(buy_test, 'd_korganbek@kbtu.kz')
         print(order.status)
         return {'message': 'order successfully changed!'}
     except Exception as e:
@@ -97,8 +99,7 @@ async def history_order(db: db_dependency, customer_id: str):
         raise HTTPException(status_code=500, detail=f"Error: {e}")
 
 
-@router.post("/buy")
-async def buy_test():
+def buy_test(email: str):
     url = 'http://0.0.0.0:8000/send_message'
     headers = {
         'accept': 'application/json',
@@ -106,10 +107,9 @@ async def buy_test():
     }
 
     data = {
-        'email': 'd_korganbek@kbtu.kz',
+        'email': email,
         'username': 'Customer',
     }
 
     response = httpx.post(url, headers=headers, json=data)
     print(response)
-    return {'message': 'test'}
