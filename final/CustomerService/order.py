@@ -7,6 +7,7 @@ from starlette import status
 import models
 import database as db
 import schemas
+import httpx
 
 router = APIRouter(
     prefix="/orders",
@@ -71,7 +72,8 @@ async def add_order_item(order_id: str, item: schemas.CreateOrderItem, db: db_de
 
 
 @router.patch("/buy_order/{order_id}")
-async def change_order_status(db: db_dependency, order_id: str, status_request: str = Query('PAID', enum=['PAID', 'DENY'])) -> dict:
+async def change_order_status(db: db_dependency, order_id: str,
+                              status_request: str = Query('PAID', enum=['PAID', 'DENY'])) -> dict:
     try:
         order = db.query(models.Order).filter(models.Order.id == order_id).first()
         if not order:
@@ -93,3 +95,21 @@ async def history_order(db: db_dependency, customer_id: str):
         return orders
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Error: {e}")
+
+
+@router.post("/buy")
+async def buy_test():
+    url = 'http://0.0.0.0:8000/send_message'
+    headers = {
+        'accept': 'application/json',
+        'Content-Type': 'application/json',
+    }
+
+    data = {
+        'email': 'd_korganbek@kbtu.kz',
+        'username': 'Customer',
+    }
+
+    response = httpx.post(url, headers=headers, json=data)
+    print(response)
+    return {'message': 'test'}
