@@ -1,8 +1,6 @@
 import matplotlib
 from fastapi import FastAPI, BackgroundTasks
 from fastapi.responses import FileResponse
-import matplotlib.pyplot as plt
-import numpy as np
 from consumer import consume
 from producer import produce
 from repository import get_from_db
