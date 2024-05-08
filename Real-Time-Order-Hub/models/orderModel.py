@@ -1,6 +1,7 @@
 from sqlalchemy import (
     Integer, String, ForeignKey, DateTime, Date
 )
+from datetime import date
 import sqlalchemy
 from sqlalchemy.orm import relationship, Mapped, mapped_column
 from typing_extensions import Annotated
@@ -16,9 +17,8 @@ class Order(Base):
     user_id: Mapped[int] = mapped_column(Integer, ForeignKey('users.id'), nullable=False)
     total_price: Mapped[int] = mapped_column(Integer, nullable=False)
     status: Mapped[str] = mapped_column(String, nullable=False)
-    order_date: Mapped[DateTime] = mapped_column(DateTime, nullable=False)
+    order_date: Mapped[date] = mapped_column(sqlalchemy.DATE, nullable=False)
     delivery_address: Mapped[str] = mapped_column(String, nullable=False)
-    expected_delivery_date: Mapped[Date] = mapped_column(Date, nullable=True)
 
     items: Mapped[list] = relationship("OrderItem", back_populates="order", cascade="all, delete-orphan")
 

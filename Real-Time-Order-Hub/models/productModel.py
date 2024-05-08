@@ -3,12 +3,12 @@ from sqlalchemy import (
 )
 import sqlalchemy
 from sqlalchemy.orm import Mapped, mapped_column
-
 from typing_extensions import Annotated
 from database import Base
 
 
 _id = Annotated[int, mapped_column(sqlalchemy.Integer, primary_key=True)]
+
 
 class Product(Base):
     __tablename__ = 'products'
