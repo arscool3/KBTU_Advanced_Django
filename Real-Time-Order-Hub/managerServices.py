@@ -1,27 +1,43 @@
-from sqlalchemy.orm import sessionmaker, Session
+import json
+
+from sqlalchemy.orm import sessionmaker
 from database.db import engine
-from models.orderModel import *
+from models import Order, OrderItem
 from datetime import datetime
+from models.userModel import *
 
 SessionLocal = sessionmaker(bind=engine)
 
 
-def process_order_request(data):
+def process_order_request(raw_data):
     db = SessionLocal()
     try:
+        data = json.loads(raw_data)
+        print("Converted data:", json.dumps(data, indent=4))
 
-        total_price = sum(item['price'] for item in data)
+        if not isinstance(data, dict) or 'products' not in data or 'chat_id' not in data:
+            raise ValueError("Invalid data format")
+
+        total_price = sum(item['price'] for item in data['products'])
+        chat_id = data['chat_id']
+
+        user = db.query(User).join(UserChatID, User.name == UserChatID.username).filter(UserChatID.chat_id == chat_id).first()
+
+        if not user:
+            print("User not found")
+            return
+
         new_order = Order(
-            user_id=1,
+            user_id=user.id,
             total_price=total_price,
             status='new',
             order_date=datetime.now().date(),
-            delivery_address='123 Example St'
+            delivery_address=user.address
         )
         db.add(new_order)
         db.commit()
 
-        for item in data:
+        for item in data['products']:
             order_item = OrderItem(
                 order_id=new_order.id,
                 product_id=item['id'],
@@ -31,7 +47,7 @@ def process_order_request(data):
             db.add(order_item)
 
         db.commit()
-        print(f"Processed order {new_order.id} with {len(data)} items.")
+        print(f"Processed order {new_order.id} with {len(data['products'])} items.")
     except Exception as e:
         db.rollback()
         print(f"Failed to process order: {str(e)}")
@@ -39,12 +55,8 @@ def process_order_request(data):
         db.close()
 
 
-def consume_orders():
-    consumer = consumer('orders_topic', 'order_group')
-    for message in consumer:
-        print(f"Received message: {message.value}")
-        process_order_request(message.value)
-
-
-if __name__ == '__main__':
-    consume_orders()
+def receive_kafka_message(raw_message):
+    try:
+        process_order_request(raw_message)
+    except json.JSONDecodeError as e:
+        print("Failed to decode JSON:", str(e))
