@@ -1,7 +1,6 @@
 import aiohttp
 import functools
 
-
 from importlib import import_module
 from fastapi import Request, Response, HTTPException, status
 from typing import List
@@ -20,7 +19,6 @@ def route(
         service_header_generator: str = 'auth.create_access_token',
         response_model: str = None,
         response_list: bool = False,
-        tags: str = None
 ):
     """
     it is an advanced wrapper for FastAPI router, purpose is to make FastAPI
@@ -38,7 +36,6 @@ def route(
         service_header_generator: generates headers for inner services from jwt token payload # noqa
         response_model: shows return type and details on api docs
         response_list: decides whether response structure is list or not
-        tags: is tag in openapi swagger
     Returns:
         wrapped endpoint result as is
 
@@ -53,7 +50,7 @@ def route(
 
     app_any = request_method(
         path, status_code=status_code,
-        response_model=response_model, tags=[tags]
+        response_model=response_model  # , tags=[tags]
     )
 
     def wrapper(f):
@@ -117,7 +114,7 @@ def route(
             payload = payload_obj.dict() if payload_obj else {}
 
             url = f'{service_url}{path}'
-
+            print(url)
             try:
                 resp_data, status_code_from_service = await make_request(
                     url=url,

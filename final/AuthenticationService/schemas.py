@@ -44,3 +44,25 @@ class Food(BaseModel):
     image: str
     description: str
     restaurant_id: str
+
+    class Config:
+        from_attributes = True
+
+
+class CreateOrder(BaseModel):
+    customer_id: str
+    restaurant_id: str
+
+
+class OrderDetail(BaseModel):
+    id: str
+    courier_id: str | None
+    restaurant_id: str
+    customer_id: str
+    status: dict
+    total: int
+
+
+class CreateOrderItem(BaseModel):
+    quantity: int
+    restaurant_item_id: str
