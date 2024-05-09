@@ -67,7 +67,12 @@ class Category(Base):
     id = Column(Integer, primary_key=True, index=True)
     name = Column(String, index=True, unique=True)
 
-    products = relationship("Product", back_populates="categories")
+    products = relationship(
+        "Product",
+        secondary=product_category_association,
+        back_populates="categories",
+        primaryjoin="Category.id == product_category_association.c.category_id"
+    )
 
 
 class Address(Base):
