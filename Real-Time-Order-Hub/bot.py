@@ -7,7 +7,7 @@ import os
 from dotenv import load_dotenv
 from sqlalchemy.orm import sessionmaker
 from database.db import Base, engine
-from models.userModel import UserChatID, User, Product
+from models import *
 from kafka.producer import send_to_kafka
 
 load_dotenv()
@@ -159,7 +159,9 @@ async def process_order(message: types.Message, state: FSMContext):
 async def confirm_order(message: types.Message, state: FSMContext):
     if message.text.lower() == 'confirm':
         async with state.proxy() as data:
-            await send_to_kafka(data['products'])
+            products = data['products']
+            chat_id = message.from_user.id
+            await send_to_kafka(products, chat_id)
         await message.answer("Your order has been placed and sent for processing.")
         await state.finish()
     else:
