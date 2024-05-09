@@ -21,3 +21,25 @@ class CreateProfileRequest(BaseModel):
     user_id: int
 
 
+class CreateProjectRequest(BaseModel):
+    title: str
+    description: str
+    github_link: str
+    creator_id: int
+
+
+class UpdateProjectRequest(BaseModel):
+    title: str
+    desciprion: str
+    github_link: str
+
+
+class CreatePostRequest(BaseModel):
+    title: str
+    description: str
+    author_id: str
+
+
+class UpdatePostRequest(BaseModel):
+    title: str
+    description: str

@@ -54,7 +54,7 @@ class Message(Base):
 class Project(Base):
     __tablename__ = 'projects'
     id: Mapped[_id]
-    title: Mapped[str] = mapped_column(nullable=False)
+    title: Mapped[str] = mapped_column(nullable=False, unique=True)
     description: Mapped[str]
     github_link: Mapped[str]
     created_at: Mapped[datetime] = mapped_column(default=datetime.now())
