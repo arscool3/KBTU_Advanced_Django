@@ -1,7 +1,7 @@
 from fastapi import FastAPI, Depends, HTTPException
 from sqlalchemy.orm import Session
 from app.dependencies import get_db
-from app import models, schemas
+from app import database, schemas
 
 from app.background.workers import send_email
 
@@ -16,7 +16,7 @@ async def trigger_send_email(email: str, message: str):
 
 @app.post("/users/", response_model=None)
 def create_user(user: schemas.UserCreate, db: Session = Depends(get_db)):
-    db_user = models.User(**user.dict())
+    db_user = database.User(**user.dict())
     db.add(db_user)
     db.commit()
     db.refresh(db_user)
@@ -24,14 +24,14 @@ def create_user(user: schemas.UserCreate, db: Session = Depends(get_db)):
 
 @app.get("/users/{user_id}", response_model=None)
 def read_user(user_id: int, db: Session = Depends(get_db)):
-    user = db.query(models.User).filter(models.User.id == user_id).first()
+    user = db.query(database.User).filter(database.User.id == user_id).first()
     if user is None:
         raise HTTPException(status_code=404, detail="User not found")
     return user
 
 @app.put("/users/{user_id}", response_model=None)
 def update_user(user_id: int, user: schemas.UserCreate, db: Session = Depends(get_db)):
-    db_user = db.query(models.User).filter(models.User.id == user_id).first()
+    db_user = db.query(database.User).filter(database.User.id == user_id).first()
     if db_user is None:
         raise HTTPException(status_code=404, detail="User not found")
     for attr, value in user.dict().items():
@@ -42,7 +42,7 @@ def update_user(user_id: int, user: schemas.UserCreate, db: Session = Depends(ge
 
 @app.delete("/users/{user_id}", response_model=None)
 def delete_user(user_id: int, db: Session = Depends(get_db)):
-    db_user = db.query(models.User).filter(models.User.id == user_id).first()
+    db_user = db.query(database.User).filter(database.User.id == user_id).first()
     if db_user is None:
         raise HTTPException(status_code=404, detail="User not found")
     db.delete(db_user)
@@ -53,7 +53,7 @@ def delete_user(user_id: int, db: Session = Depends(get_db)):
 
 @app.post("/products/", response_model=None)
 def create_product(product: schemas.ProductCreate, db: Session = Depends(get_db)):
-    db_product = models.Product(**product.dict())
+    db_product = database.Product(**product.dict())
     db.add(db_product)
     db.commit()
     db.refresh(db_product)
@@ -61,14 +61,14 @@ def create_product(product: schemas.ProductCreate, db: Session = Depends(get_db)
 
 @app.get("/products/{product_id}", response_model=None)
 def read_product(product_id: int, db: Session = Depends(get_db)):
-    product = db.query(models.Product).filter(models.Product.id == product_id).first()
+    product = db.query(database.Product).filter(database.Product.id == product_id).first()
     if product is None:
         raise HTTPException(status_code=404, detail="Product not found")
     return product
 
 @app.put("/products/{product_id}", response_model=None)
 def update_product(product_id: int, product: schemas.ProductCreate, db: Session = Depends(get_db)):
-    db_product = db.query(models.Product).filter(models.Product.id == product_id).first()
+    db_product = db.query(database.Product).filter(database.Product.id == product_id).first()
     if db_product is None:
         raise HTTPException(status_code=404, detail="Product not found")
     for attr, value in product.dict().items():
@@ -79,7 +79,7 @@ def update_product(product_id: int, product: schemas.ProductCreate, db: Session 
 
 @app.delete("/products/{product_id}", response_model=None)
 def delete_product(product_id: int, db: Session = Depends(get_db)):
-    db_product = db.query(models.Product).filter(models.Product.id == product_id).first()
+    db_product = db.query(database.Product).filter(database.Product.id == product_id).first()
     if db_product is None:
         raise HTTPException(status_code=404, detail="Product not found")
     db.delete(db_product)
@@ -90,7 +90,7 @@ def delete_product(product_id: int, db: Session = Depends(get_db)):
 
 @app.post("/orders/", response_model=None)
 def create_order(order: schemas.OrderCreate, db: Session = Depends(get_db)):
-    db_order = models.Order(**order.dict())
+    db_order = database.Order(**order.dict())
     db.add(db_order)
     db.commit()
     db.refresh(db_order)
@@ -98,14 +98,14 @@ def create_order(order: schemas.OrderCreate, db: Session = Depends(get_db)):
 
 @app.get("/orders/{order_id}", response_model=None)
 def read_order(order_id: int, db: Session = Depends(get_db)):
-    order = db.query(models.Order).filter(models.Order.id == order_id).first()
+    order = db.query(database.Order).filter(database.Order.id == order_id).first()
     if order is None:
         raise HTTPException(status_code=404, detail="Order not found")
     return order
 
 @app.put("/orders/{order_id}", response_model=None)
 def update_order(order_id: int, order: schemas.OrderCreate, db: Session = Depends(get_db)):
-    db_order = db.query(models.Order).filter(models.Order.id == order_id).first()
+    db_order = db.query(database.Order).filter(database.Order.id == order_id).first()
     if db_order is None:
         raise HTTPException(status_code=404, detail="Order not found")
     for attr, value in order.dict().items():
@@ -116,7 +116,7 @@ def update_order(order_id: int, order: schemas.OrderCreate, db: Session = Depend
 
 @app.delete("/orders/{order_id}", response_model=None)
 def delete_order(order_id: int, db: Session = Depends(get_db)):
-    db_order = db.query(models.Order).filter(models.Order.id == order_id).first()
+    db_order = db.query(database.Order).filter(database.Order.id == order_id).first()
     if db_order is None:
         raise HTTPException(status_code=404, detail="Order not found")
     db.delete(db_order)
@@ -127,7 +127,7 @@ def delete_order(order_id: int, db: Session = Depends(get_db)):
 
 @app.post("/categories/", response_model=None)
 def create_category(category: schemas.CategoryCreate, db: Session = Depends(get_db)):
-    db_category = models.Category(**category.dict())
+    db_category = database.Category(**category.dict())
     db.add(db_category)
     db.commit()
     db.refresh(db_category)
@@ -135,14 +135,14 @@ def create_category(category: schemas.CategoryCreate, db: Session = Depends(get_
 
 @app.get("/categories/{category_id}", response_model=None)
 def read_category(category_id: int, db: Session = Depends(get_db)):
-    category = db.query(models.Category).filter(models.Category.id == category_id).first()
+    category = db.query(database.Category).filter(database.Category.id == category_id).first()
     if category is None:
         raise HTTPException(status_code=404, detail="Category not found")
     return category
 
 @app.put("/categories/{category_id}", response_model=None)
 def update_category(category_id: int, category: schemas.CategoryCreate, db: Session = Depends(get_db)):
-    db_category = db.query(models.Category).filter(models.Category.id == category_id).first()
+    db_category = db.query(database.Category).filter(database.Category.id == category_id).first()
     if db_category is None:
         raise HTTPException(status_code=404, detail="Category not found")
     for attr, value in category.dict().items():
@@ -153,7 +153,7 @@ def update_category(category_id: int, category: schemas.CategoryCreate, db: Sess
 
 @app.delete("/categories/{category_id}", response_model=None)
 def delete_category(category_id: int, db: Session = Depends(get_db)):
-    db_category = db.query(models.Category).filter(models.Category.id == category_id).first()
+    db_category = db.query(database.Category).filter(database.Category.id == category_id).first()
     if db_category is None:
         raise HTTPException(status_code=404, detail="Category not found")
     db.delete(db_category)
@@ -164,7 +164,7 @@ def delete_category(category_id: int, db: Session = Depends(get_db)):
 
 @app.post("/addresses/", response_model=None)
 def create_address(address: schemas.AddressCreate, db: Session = Depends(get_db)):
-    db_address = models.Address(**address.dict())
+    db_address = database.Address(**address.dict())
     db.add(db_address)
     db.commit()
     db.refresh(db_address)
@@ -172,14 +172,14 @@ def create_address(address: schemas.AddressCreate, db: Session = Depends(get_db)
 
 @app.get("/addresses/{address_id}", response_model=None)
 def read_address(address_id: int, db: Session = Depends(get_db)):
-    address = db.query(models.Address).filter(models.Address.id == address_id).first()
+    address = db.query(database.Address).filter(database.Address.id == address_id).first()
     if address is None:
         raise HTTPException(status_code=404, detail="Address not found")
     return address
 
 @app.put("/addresses/{address_id}", response_model=None)
 def update_address(address_id: int, address: schemas.AddressCreate, db: Session = Depends(get_db)):
-    db_address = db.query(models.Address).filter(models.Address.id == address_id).first()
+    db_address = db.query(database.Address).filter(database.Address.id == address_id).first()
     if db_address is None:
         raise HTTPException(status_code=404, detail="Address not found")
     for attr, value in address.dict().items():
@@ -190,7 +190,7 @@ def update_address(address_id: int, address: schemas.AddressCreate, db: Session 
 
 @app.delete("/addresses/{address_id}", response_model=None)
 def delete_address(address_id: int, db: Session = Depends(get_db)):
-    db_address = db.query(models.Address).filter(models.Address.id == address_id).first()
+    db_address = db.query(database.Address).filter(database.Address.id == address_id).first()
     if db_address is None:
         raise HTTPException(status_code=404, detail="Address not found")
     db.delete(db_address)
@@ -201,7 +201,7 @@ def delete_address(address_id: int, db: Session = Depends(get_db)):
 
 @app.post("/payments/", response_model=None)
 def create_payment(payment: schemas.PaymentCreate, db: Session = Depends(get_db)):
-    db_payment = models.Payment(**payment.dict())
+    db_payment = database.Payment(**payment.dict())
     db.add(db_payment)
     db.commit()
     db.refresh(db_payment)
@@ -209,14 +209,14 @@ def create_payment(payment: schemas.PaymentCreate, db: Session = Depends(get_db)
 
 @app.get("/payments/{payment_id}", response_model=None)
 def read_payment(payment_id: int, db: Session = Depends(get_db)):
-    payment = db.query(models.Payment).filter(models.Payment.id == payment_id).first()
+    payment = db.query(database.Payment).filter(database.Payment.id == payment_id).first()
     if payment is None:
         raise HTTPException(status_code=404, detail="Payment not found")
     return payment
 
 @app.put("/payments/{payment_id}", response_model=None)
 def update_payment(payment_id: int, payment: schemas.PaymentCreate, db: Session = Depends(get_db)):
-    db_payment = db.query(models.Payment).filter(models.Payment.id == payment_id).first()
+    db_payment = db.query(database.Payment).filter(database.Payment.id == payment_id).first()
     if db_payment is None:
         raise HTTPException(status_code=404, detail="Payment not found")
     for attr, value in payment.dict().items():
@@ -227,7 +227,7 @@ def update_payment(payment_id: int, payment: schemas.PaymentCreate, db: Session 
 
 @app.delete("/payments/{payment_id}", response_model=None)
 def delete_payment(payment_id: int, db: Session = Depends(get_db)):
-    db_payment = db.query(models.Payment).filter(models.Payment.id == payment_id).first()
+    db_payment = db.query(database.Payment).filter(database.Payment.id == payment_id).first()
     if db_payment is None:
         raise HTTPException(status_code=404, detail="Payment not found")
     db.delete(db_payment)
