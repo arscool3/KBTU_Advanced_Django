@@ -1,29 +1,32 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, Path, Query
 from pydantic import BaseModel, Field
+from typing import Annotated
 
 app = FastAPI()
 
-
 class Film(BaseModel):
-    name : str
+    name: str
     description: str
-    rating: float = Field(ge=0, le=10)
-    director: str
+    rating: float = Field(ge=0, le = 10)
+    director: str 
 
-films : Film = []
+films = []
 
-@app.get('/films')
-def allFilms() -> list[Film]:
+@app.get("/films")
+def getFilms() -> list[Film]:
     return films
 
-@app.get('/films/{id}')
-def filmbyId(id:int) -> Film:
+@app.get("/films/{id}")
+def getFilmsById(id: Annotated[int, Path(ge = 0)]) -> Film:
     return films[id]
 
-@app.post('/addFilm')
-def addFilm(film : Film) -> str:
+@app.post("/films")
+def addFilm(film: Film) -> str:
     films.append(film)
-    return 'Success'
-@app.get('/films/rating/{rating}')
-def filmsByRating(rating: float) -> list[Film]:
-    return sorted([i for i in films if i.rating >= rating], key=lambda f : f.rating)
+    return "Film was added"  
+
+@app.get("/films_r/")
+def getFilmsByRating() -> list[Film]:
+    temp_films = films
+    temp_films.sort(key=lambda f: f.rating)
+    return films
