@@ -1,4 +1,4 @@
-from python import pytest
+import pytest
 import sqlalchemy
 from sqlalchemy.orm import Session
 

@@ -8,7 +8,7 @@ from database import Base, engine
 
 client = TestClient(app)
 
-url = 'postgresql://postgres:postgres@localhost:5432/midterm'
+url = 'postgresql://postgres:postgres@localhost:5432/midtermm'
 engine = sqlalchemy.create_engine(url)
 test_session = Session(engine)
 

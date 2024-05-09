@@ -59,7 +59,6 @@ def get_film(session: Session = Depends(get_db)):
     return [Director.model_validate(director) for director in directors]
 
 
-
 @app.get("/genre")
 def get_genres(session: Session = Depends(get_db)) -> list[Genre]:
     db_genres = session.execute(select(db.Genre)).scalars().all()

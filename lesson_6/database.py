@@ -7,6 +7,7 @@ engine = create_engine(url)
 
 def get_db():
     dbb = Session(engine)
+
     try:
         yield dbb
     finally:
