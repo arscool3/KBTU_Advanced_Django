@@ -1,0 +1,8 @@
+SQLAlchemy
+alembic
+fastapi
+pydantic
+dramatiq
+redis
+kafka
+uvicorn
