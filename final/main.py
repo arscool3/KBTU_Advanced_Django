@@ -160,9 +160,15 @@ def add_payment(payment: CreatePayment):
     session.add(new_payment)
     session.commit()
 
+    room = session.query(db.Room).get(reservation.room_id)
+    room.available = True
+    session.delete(reservation)
+    session.commit()
+
     async_process_payment.send(new_payment.id, new_payment.amount)
 
-    return {"message": "Payment initiated", "payment_id": new_payment.id}
+    return {"message": "Payment completed and reservation deleted", "payment_id": new_payment.id}
+
 
 
 @app.post("/review", tags=["Review"])
@@ -171,3 +177,19 @@ def add_review(review: CreateReview) -> str:
     session.commit()
     session.close()
     return "Review was added"
+
+
+@app.delete("/reservation/{reservation_id}", tags=["Reservation"])
+def delete_reservation(reservation_id: int):
+    reservation = session.query(db.Reservation).get(reservation_id)
+    if not reservation:
+        raise HTTPException(status_code=404, detail="Reservation not found.")
+
+    room = session.query(db.Room).get(reservation.room_id)
+    if room:
+        room.available = True
+
+    session.delete(reservation)
+    session.commit()
+    return {"message": "Reservation deleted and room updated"}
+
