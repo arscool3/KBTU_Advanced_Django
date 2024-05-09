@@ -15,8 +15,6 @@ router = APIRouter(
 )
 
 
-# List Restaurants, ListofMenuItems, OnlyListofOneRestaurant, UpdateOrder by adding orderitem*, Buy Order*
-
 def get_db():
     try:
         session = db.session
@@ -42,8 +40,11 @@ async def create_order(db: db_dependency, order: schemas.CreateOrder):
 
 @router.get("/{order_id}")
 async def detail(order_id: str, db: db_dependency):
-    order = db.query(models.Order).filter_by(id=order_id).first()
-    return order
+    try:
+        order = db.query(models.Order).filter_by(id=order_id).first()
+        return order
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f'{e}')
 
 
 @router.patch("/{order_id}")
