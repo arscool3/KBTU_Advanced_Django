@@ -4,6 +4,8 @@ from typing import Annotated
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 from starlette import status
+# import jwt
+from exceptions import AuthTokenMissing
 from models import Customer, Courier, Restaurant
 from config import SECRET_KEY
 from passlib.context import CryptContext
@@ -159,6 +161,17 @@ def create_access_token(email: str, entity_id: str, expires_delta: timedelta):
     return jwt.encode(encode, SECRET_KEY, algorithm=ALGORITHM)
 
 
+def decode_access_token(authorization: str = None):
+    if not authorization:
+        raise AuthTokenMissing('Auth token is missing in headers.')
+    token = authorization.replace('Bearer ', '')
+    try:
+        payload = jwt.decode(token, SECRET_KEY, [ALGORITHM])
+        return payload
+    except Exception as e:
+        raise e
+
+
 async def get_current_entity(token: Annotated[str, Depends(oauth2_bearer)]):
     try:
         payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
@@ -169,3 +182,11 @@ async def get_current_entity(token: Annotated[str, Depends(oauth2_bearer)]):
         return {"email": email, 'id': entity_id}
     except JWTError:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Could not validate user.")
+
+
+def is_default_user(token_payload):
+    return len(token_payload.get('sub')) > 0
+
+
+def generate_request_header(token_payload):
+    return {'request-user-id': str(token_payload['id'])}

@@ -25,3 +25,22 @@ class CreateRestaurantRequest(BaseModel):
     hashed_password: SecretStr
     name: str
     address: str
+
+
+class Restaurant(BaseModel):
+    id: str
+    address: str
+    email: str
+    status: str
+
+    class Config:
+        from_attributes = True
+
+
+class Food(BaseModel):
+    id: str
+    name: str
+    price: int
+    image: str
+    description: str
+    restaurant_id: str

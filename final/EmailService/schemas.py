@@ -7,4 +7,3 @@ class Info(BaseModel):
     total: int
     order_id: str
     restaurant_id: str
-    # data: dict

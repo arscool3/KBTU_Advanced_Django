@@ -53,7 +53,7 @@ async def list_of_foods(db: db_dependency):
     return menu_items
 
 
-@app.get("/restaurants{_id}", tags=['restaurants'])
+@app.get("/restaurants/{_id}", tags=['restaurants'])
 async def list_of_food(_id: str, db: db_dependency):
     menu_items = db.execute(select(models.RestaurantMenuItem)).scalars().all()
     filter_items = [x for x in menu_items if str(x.restaurant_id) == _id]

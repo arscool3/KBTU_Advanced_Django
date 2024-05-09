@@ -1,9 +1,12 @@
+import asyncio
 from config import TG_BOT_TOKEN
 from aiogram import Bot, Dispatcher, html
 from aiogram.client.default import DefaultBotProperties
 from aiogram.enums import ParseMode
 from aiogram.filters import CommandStart
 from aiogram.types import Message
+import logging
+import sys
 
 TOKEN = TG_BOT_TOKEN
 
@@ -32,5 +35,12 @@ async def echo_handler(message: Message) -> None:
 
 
 async def main() -> None:
+    # Initialize Bot instance with default bot properties which will be passed to all API calls
     bot = Bot(token=TOKEN, default=DefaultBotProperties(parse_mode=ParseMode.HTML))
+    # And the run events dispatching
     await dp.start_polling(bot)
+
+
+if __name__ == "__main__":
+    logging.basicConfig(level=logging.INFO, stream=sys.stdout)
+    asyncio.run(main())
