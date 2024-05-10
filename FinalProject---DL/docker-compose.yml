@@ -1,0 +1,64 @@
+version: '3.8'
+
+services:
+  digital_library_db:
+    container_name: postgresql_db
+    image: postgres
+    environment:
+      - POSTGRES_DB=postgres
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=password
+    ports:
+      - "5433:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data/
+    restart: on-failure
+
+#  zookeeper:
+#    image: zookeeper:3.4.10
+#    environment:
+#      ZOO_MY_ID: 1
+#      ZOO_PORT: 2181
+#      ZOO_SERVERS: server.1=zookeeper:2888:3888
+#    healthcheck:
+#      test: [ "CMD-SHELL", "echo ruok | nc localhost 2181 | grep imok" ]
+#      interval: 10s
+#      timeout: 10s
+#      retries: 5
+#
+#  kafka:
+#    image: confluentinc/cp-kafka:4.1.4
+#    depends_on:
+#      - zookeeper
+#    ports:
+#      - 9092:9092
+#    environment:
+#      KAFKA_ADVERTISED_LISTENERS: INTERNAL://kafka:19092,EXTERNAL://127.0.0.1:9092
+#      KAFKA_BROKER_ID: 1
+#      KAFKA_INTER_BROKER_LISTENER_NAME: INTERNAL
+#      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: INTERNAL:PLAINTEXT,EXTERNAL:PLAINTEXT
+#      KAFKA_LOG4J_LOGGERS: "kafka.controller=INFO,kafka.producer.async.DefaultEventHandler=INFO,state.change.logger=INFO"
+#      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+#      KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
+#      KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
+#      KAFKA_ZOOKEEPER_CONNECT: "zookeeper:2181"
+#      TOPIC_AUTO_CREATE: 1
+#    healthcheck:
+#      test: [ "CMD-SHELL", "kafka-broker-api-versions --bootstrap-server kafka:19092" ]
+#      interval: 10s
+#      timeout: 10s
+#      retries: 5
+#
+#  kafka-ui:
+#    image: provectuslabs/kafka-ui:latest
+#    restart: unless-stopped
+#    ports:
+#      - 8080:8080
+#    environment:
+#      KAFKA_CLUSTERS_0_NAME: local
+#      KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS: kafka:19092
+#    depends_on:
+#      - kafka
+
+volumes:
+  postgres_data:
