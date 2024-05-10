@@ -22,7 +22,7 @@ class PaymentCreate(BaseModel):
     user_id: int
     amount: float
     payment_type: str
-    status: str 
+
 
 class CoworkingCreate(BaseModel):
     name: str
@@ -145,8 +145,8 @@ def delete_order(order_id: int, db: Session = Depends(get_db)):
 # Example endpoint to process payment
 @app.post("/payments/")
 def process_payment(payment: PaymentCreate, db: Session = Depends(get_db)):
-    from models import Payment
-    new_payment = Payment(user_id=payment.user_id, amount=payment.amount, status=payment.status, payment_type=PaymentType[payment.payment_type])
+    # from models import Payment
+    new_payment = Payment(user_id=payment.user_id, amount=payment.amount, status="not realized", payment_type=payment.payment_type)
     db.add(new_payment)
     db.commit()
 
@@ -155,8 +155,8 @@ def process_payment(payment: PaymentCreate, db: Session = Depends(get_db)):
         "payment_id": new_payment.id,
         "user_id": new_payment.user_id,
         "amount": new_payment.amount,
-        "status": new_payment.status,
-        "payment_type": new_payment.payment_type.value  # Include payment_type in the event
+        "status": "not realized",
+        "payment_type": new_payment.payment_type  # Include payment_type in the event
     }
     producer.send('payment_events', value=json.dumps(payment_event).encode('utf-8'))
 
