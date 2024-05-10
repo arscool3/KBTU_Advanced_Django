@@ -4,9 +4,9 @@ from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 from starlette import status
 
-import models
+from schemas import KafkaRequest
 from database import session
-from tasks import send_contribution_request_notification
+from producer import produce
 
 router = APIRouter(prefix='/contributions', tags=['contribution'])
 
@@ -23,14 +23,10 @@ db_dependency = Annotated[Session, Depends(get_db)]
 
 
 @router.patch('/contribute/{project_id}/{user_id}')
-def contribute_to_project(project_id: int, user_id: int, db: db_dependency):
+def contribute_to_project(project_id: int, user_id: int):
     try:
-        contribution = db.query(models.Contribution).filter_by(project_id=project_id).first()
-
-        send_contribution_request_notification(contribution.id, user_id, db)
-
-        user = db.query(models.User).filter_by(id=user_id).first()
-        user.contribution_id = contribution.id
+        body = KafkaRequest(project_id=project_id, user_id=user_id)
+        produce(body)
 
         return {'message': 'contribution accepted! You can develop the project further!'}
     except Exception as e:

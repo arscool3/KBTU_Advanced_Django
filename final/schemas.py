@@ -43,3 +43,8 @@ class CreatePostRequest(BaseModel):
 class UpdatePostRequest(BaseModel):
     title: str
     description: str
+
+
+class KafkaRequest(BaseModel):
+    project_id: int
+    user_id: int
