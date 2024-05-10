@@ -109,11 +109,11 @@ def route(
 
             method = scope['method'].lower()
             path = scope['path']
-
+            query_string = str(scope.get('query_string')).replace("b", "").replace("'", '')
             payload_obj = kwargs.get(payload_key)
             payload = payload_obj.dict() if payload_obj else {}
 
-            url = f'{service_url}{path}'
+            url = f'{service_url}{path}?{query_string}'
             print(url)
             try:
                 resp_data, status_code_from_service = await make_request(
