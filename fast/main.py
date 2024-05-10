@@ -8,7 +8,7 @@ from fastapi import FastAPI,Depends,HTTPException
 from fastapi.responses import JSONResponse
 
 from dramatiq.results.errors import ResultMissing
-from dramatiq_job.main import send_request_to_server,send_email_after_registration,result_backend
+from dramatiq_job.main import send_request_to_server,send_email_after_registration,result_backend,send_pdf
 
 
 from sqlalchemy import func
@@ -20,10 +20,11 @@ from app.schemas import UserSchema,UserLoginSchema,CreateAuthor,Author,CreateBoo
 import app.models as db
 import bcrypt
 
-
 db.Base.metadata.create_all(bind=engine)
 
 app = FastAPI()
+
+
 def get_db():
     try:
         yield session
@@ -34,17 +35,7 @@ def get_db():
         session.close()
 
 
-# class Employee(BaseModel):
-#     name: str
-#     age: int
-
-
-# @app.get("/send_email")
-# def sent_email(email:str):
-#     task=send_email_after_registration.send(email)
-#     return {'id': task.message_id}
-
-@app.get("/result_email")
+@app.get("/result_email", tags=["dramatiq"])
 def result_email(id: str):
     try:
         task = send_email_after_registration.message().copy(message_id=id)
@@ -52,19 +43,21 @@ def result_email(id: str):
     except ResultMissing:
         return "Waiting for all requests"
 
+@app.get("/result_tg", tags=["dramatiq"])
+def result_email(id: str):
+    try:
+        task = send_pdf.message().copy(message_id=id)
+        return result_backend.get_result(task)
+    except ResultMissing:
+        return "Waiting for all requests"
 
-# @app.post("/add_employee")
-# def add_employee(employee: Employee):
-#     task = send_request_to_our_server.send(employee.name)
-#     return {'id': task.message_id}
-
-@app.post("/add_kid_friendly_genre")
+@app.post("/add_kid_friendly_genre", tags=["dramatiq"])
 def add_kid_friendly_genre(genre:Genre):
     task = send_request_to_server.send(genre.name)
     print("add_kid_friendly_genre")
     return {'id': task.message_id}
 
-@app.get("/result_kid_friedly")
+@app.get("/result_kid_friedly", tags=["dramatiq"])
 def result_kid_friendly(id: str):
     print("no result")
     try:
@@ -74,7 +67,7 @@ def result_kid_friendly(id: str):
     except ResultMissing:
         return "Waiting for all requests"
     
-@app.delete("/users/{email}")
+@app.delete("/users/{email}", tags=["Admin"])
 def delete_user(email: str):
     db_user = session.execute(select(db.User).filter_by(email=email)).scalar()
     if db_user is None:
@@ -85,22 +78,14 @@ def delete_user(email: str):
     return {"message": "User deleted successfully"}
 
     
-@app.get("/users")
+@app.get("/users", tags=["Admin"])
 def get_users():
     db_users = session.execute(select(db.User)).scalars().all()
     users = []
     for db_user in db_users:
         users.append(UserSchema.model_validate(db_user))
-
     return users
 
-# @app.get("/result")
-# def result(id: str):
-#     try:
-#         task = send_request_to_our_server.message().copy(message_id=id)
-#         return result_backend.get_result(task)
-#     except ResultMissing:
-#         return "Waiting for all requests"
     
 @app.post("/user/signup", tags=["user"])
 def create_user(user: UserSchema) -> str:
@@ -119,13 +104,10 @@ def create_user(user: UserSchema) -> str:
     except SQLAlchemyError as e:
         raise HTTPException(status_code=500, detail="Database error occurred")
 
-
-    
-# @app.post("/add_employee")
-# def add_employee(employee: Employee):
-#     task = send_request_to_our_server.send(employee.name)
-#     return {'id': task.message_id}
-
+@app.post("/send_pdf_to_tg" ,tags=["dramatiq"])
+def send_pdf_to_tg(chatID:str)->str: 
+    task=send_pdf.send(chatID)
+    return task.message_id
 
 def check_user(data: UserLoginSchema, session: Session):
     user = session.query(db.User).filter(db.User.email == data.email).first()

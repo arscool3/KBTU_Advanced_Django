@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, String
+from sqlalchemy import Column, Integer, String,JSON,func
 from sqlalchemy.orm import relationship
 from database import Base
 #sqlaclhemy models
@@ -8,7 +8,7 @@ import sqlalchemy
 from sqlalchemy.orm import mapped_column, Mapped, relationship
 from pydantic import BaseModel
 from database import Base
-
+from datetime import date, datetime
 _id = Annotated[int, mapped_column(sqlalchemy.Integer, primary_key=True)]
 
 
@@ -72,3 +72,19 @@ class BookReview(Base):
     rating:Mapped[int]
     book_id: Mapped[int]=mapped_column(sqlalchemy.ForeignKey('books.id'))
     book: Mapped[Book] = relationship("Book", back_populates='bookreviews')
+
+class AccessLogJournal(Base):
+    __tablename__ = 'access_log_journal'
+    id: Mapped[_id]
+    data = Column(JSON, nullable=True)
+    method: Mapped[str]
+    request: Mapped[str]
+    created_at: Mapped[datetime] = mapped_column(server_default=func.now())
+# class Film(BaseModel):
+#     name: str
+#     director: str
+class Film(Base):
+    __tablename__ = 'film'
+    id:Mapped[_id]
+    name:Mapped[str]
+    director:Mapped[str]

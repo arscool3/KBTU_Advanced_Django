@@ -24,10 +24,6 @@ from email.mime.text import MIMEText
 from email.message import EmailMessage
 from email.mime.application import MIMEApplication
 
-
-
-
-
 result_backend = RedisBackend()
 broker = RedisBroker()
 broker.add_middleware(Results(backend=result_backend))
@@ -87,7 +83,6 @@ def save_images(img_urls):
             print(f"Failed to download image {index}: HTTP status code {response.status_code}")
     return image_paths
 
-
 def generate_pdf(data_arrays,image_paths):
     buffer = io.BytesIO()
     pdf = canvas.Canvas(buffer, pagesize=A4)
@@ -107,7 +102,7 @@ def generate_pdf(data_arrays,image_paths):
         start_index = page_num * 3
         for i, data_array in enumerate(data_arrays[start_index: start_index + 3], start=1):
             x_position = 240
-            y_position = 750 - ((i - 1) * 245)
+            y_position = 255 + (i - 1) * 245
             pdf.drawString(x_position, y_position, data_array[0])  # Book title
             pdf.drawString(x_position, y_position - 25, data_array[1])  # Author
             pdf.drawString(x_position, y_position - 45, data_array[2])  # Publisher
@@ -179,3 +174,45 @@ def send_email_after_registration(email_receiver:str):
         smtp.login(email_sender, email_password)
         smtp.sendmail(email_sender, [email_receiver], message.as_bytes())
     return "Greeting email send succesfully"
+
+
+
+@dramatiq.actor(store_results=True)
+def send_pdf(chat_id: str):
+    token = os.environ.get("TG_API_TOKEN")
+    names, authors, publishers, descriptions, img_urls = scraping()
+    data_arrays = list(zip(names, authors, publishers, descriptions))
+    image_paths = save_images(img_urls)
+
+    pdf_attachment = generate_pdf(data_arrays, image_paths)
+
+    caption = 'Your recommendation list for May'
+
+    url_doc = f'https://api.telegram.org/bot{token}/sendDocument'
+
+    files = {'document': ('recommendations.pdf', pdf_attachment, 'application/pdf')}
+
+    params = {'chat_id': chat_id, 'caption': caption}
+    try:
+        response = requests.post(url_doc, files=files, params=params)
+        response.raise_for_status()  # raise an exception for any HTTP error
+    except requests.exceptions.RequestException as e:
+        # Handle any request exceptions here
+        print("Request error:", e)
+    else:
+        return response
+
+# @dramatiq.actor(store_results=True)
+# def send_pdf(chat_id:str):
+#     token = os.environ.get("TG_API_TOKEN")
+#     names, authors, publishers, descriptions, img_urls= scraping()
+#     data_arrays = list(zip(names, authors, publishers, descriptions))
+#     image_paths=save_images(img_urls)
+
+#     pdf_attachment = generate_pdf(data_arrays,image_paths).getvalue()
+
+#     caption = f'Ur recommendation list for may'
+
+#     url_doc = f'https://api.telegram.org/bot{token}/sendDocument?chat_id={chat_id}&caption={caption}'
+
+#     return requests.post(url_doc, files={'document': pdf_attachment})

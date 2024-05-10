@@ -5,9 +5,6 @@ from fastapi import FastAPI
 #PG-13: Some Material May Be Inappropriate For Children Under 13
 app = FastAPI()
 
-def test(name: str):
-    print("hallo")
-    return not name == "Arslan"
 
 def test_pg13(name: str):
     non_kid_friendly_genres = [
@@ -24,6 +21,8 @@ def test_pg13(name: str):
         "Erotic Thriller",
         "Absurdist Fiction"
     ]
+    #imagine there is some deep analytic operations
+    #that would determine if the book is pg13 or not
     print("test_pg13")
     return name in non_kid_friendly_genres
 
@@ -34,19 +33,3 @@ def pg13_endpoint(name: str):
     return  test_pg13(name)
 
 
-@app.get("/drug")
-def drug_endpoint(name: str):
-    time.sleep(5)
-    return test(name)
-
-
-@app.get("/psycho")
-def psycho_endpoint(name: str):
-    time.sleep(5)
-    return test(name)
-
-
-@app.get("/crime")
-def crime_endpoint(name: str):
-    time.sleep(5)
-    return test(name)
