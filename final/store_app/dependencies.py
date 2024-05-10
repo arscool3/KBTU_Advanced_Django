@@ -53,8 +53,9 @@ def send_order_details(order_data):
 
 
 def take_order_details():
+    consumer = KafkaManager.get_consumer()
     while True:
-        msg = KafkaManager.get_consumer().poll(1)
+        msg = consumer.poll(1)
         if msg is None:
             continue
 
