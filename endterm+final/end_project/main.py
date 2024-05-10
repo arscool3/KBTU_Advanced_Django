@@ -5,11 +5,15 @@ from app import database, schemas
 
 from app.background.workers import send_email
 
+from dotenv import dotenv_values
+
+vals = dotenv_values('data.env')
+
 app = FastAPI()
 
 @app.post("/send-email/")
-async def trigger_send_email(email: str, message: str):
-    send_email.send(email, message)
+async def trigger_send_email(username: str, recipient: str, text: str):
+    send_email.send(username, vals['password'], recipient, text)
     return {"message": "Email will be sent in the background"}
 
 ##############################################
