@@ -68,59 +68,56 @@ services:
     build: 
       context: ./CustomerService
     restart: on-failure
+    command: sh -c "uvicorn main:app --reload --host 0.0.0.0 --port 8000"
     depends_on:
       - db_postgres
     container_name: delivery-service-customer_service
-    ports:
-      - 8001:8000
   
   courier_service:
     build: 
       context: ./CourierService
     restart: on-failure
+    command: sh -c "uvicorn main:app --reload --host 0.0.0.0 --port 8000"    
     depends_on:
       - db_postgres
     container_name: delivery-service-courier_service
-    ports:
-      - 8002:8000  
 
   restaurant_service:
     build: 
       context: ./RestaurantService
     restart: on-failure
+    command: sh -c "uvicorn main:app --reload --host 0.0.0.0 --port 8000"
     depends_on:
       - db_postgres
     container_name: delivery-service-restaurant_service
-    ports:
-      - 8003:8000  
 
   email_service:
     build:
       context: ./EmailService
     restart: on-failure
+    command: sh -c "./start.sh"
     depends_on:
       - redis
     container_name: delivery-service-email_service
     ports:
-      - 8004:8000
+      - 5555:5555
   
-  flower:
-    image: mher/flower:0.9.7
-    command: ['flower', '--broker=redis://redis:6379', '--port=5555']
-    expose:
-      - 5555
-    depends_on:
-      - redis
+  # flower:
+  #   image: mher/flower:0.9.7
+  #   command: ['flower', '--broker=redis://redis:6379', '--port=5555']
+  #   expose:
+  #     - 5555
+  #   depends_on:
+  #     - redis
 
   notification_service:
     build:
       context: ./NotificationService
     restart: on-failure
+    command: sh -c "./start.sh"
     depends_on:
       - auth_service
     container_name: delivery-service-notification_service
-    ports:
-      - 8005:8000
 
 volumes:
   pg_data: { }

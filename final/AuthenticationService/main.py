@@ -1,7 +1,7 @@
 from typing import Annotated
 from sqlalchemy.orm import Session
 from starlette import status
-from fastapi import FastAPI, Depends, HTTPException, Request, Response
+from fastapi import FastAPI, Depends, HTTPException
 import auth
 import database as db
 from models import Base

@@ -3,7 +3,7 @@ from email.message import EmailMessage
 from celery import Celery
 import config
 
-celery = Celery('tasks', broker='redis://172.17.0.2:6379')
+celery = Celery('tasks', broker='redis://redis:6379')
 
 
 def get_email_template(username: str, rec_email: str, total: int, order_id: str, restaurant_id: str):
