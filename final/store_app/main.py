@@ -18,9 +18,6 @@ from repository import (UserRepository, ProductRepository, CategoryRepository,
 
 app = FastAPI()
 
-consumer = KafkaManager.get_consumer()
-consumer.subscribe(['order_topic'])
-
 
 # USER
 @app.post("/users/", response_model=UserCreate)
@@ -172,14 +169,18 @@ def delete_review(review_id: int, db: Session = Depends(get_db)):
     return {"detail": "Review deleted successfully"}
 
 
-def take_order_details():
-    while True:
-        msg = consumer.poll(5.0)
-        if msg is None:
-            continue
-        print(msg.value())
-        order_data = json.dumps(msg.value().decode('utf-8'))
-        process_order.send(order_data['id'])
-
-
-threading.Thread(target=take_order_details, daemon=True).start()
+# consumer = KafkaManager.get_consumer()
+# consumer.subscribe(['order_topic'])
+#
+#
+# def take_order_details():
+#     while True:
+#         msg = consumer.poll(1.0)
+#         if msg is None:
+#             continue
+#         order_data = json.loads(msg.value().decode('utf-8'))
+#         print(order_data)
+#         # process_order.send(order_data["id"])
+#
+#
+# threading.Thread(target=take_order_details, daemon=True).start()

@@ -32,8 +32,8 @@ class KafkaManager:
     @staticmethod
     def get_consumer():
         config = {'bootstrap.servers': 'localhost:9092',
-                  'group.id': 'order_group',
-                  'auto.offset.reset': 'earliest'}
+                  'group.id': 'order-group',
+                  'auto.offset.reset': 'latest'}
         return Consumer(config)
 
 
