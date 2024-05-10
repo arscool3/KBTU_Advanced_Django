@@ -66,3 +66,36 @@ class OrderDetail(BaseModel):
 class CreateOrderItem(BaseModel):
     quantity: int
     restaurant_item_id: str
+
+
+class CreateMenuItem(BaseModel):
+    name: str
+    price: int
+    image: str
+    description: str
+    restaurant_id: str
+
+
+class UpdateMenuItem(BaseModel):
+    name: str
+    price: str
+    image: str
+    description: str
+
+
+class MenuItem(BaseModel):
+    id: str
+    name: str
+    price: int
+    image: str
+    description: str
+    restaurant_id: str
+
+
+class CourierOrderDetail(BaseModel):
+    id: str
+    courier_id: str | None
+    restaurant_id: str
+    customer_id: str
+    status: str
+    total: int

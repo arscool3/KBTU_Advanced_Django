@@ -4,7 +4,6 @@ from typing import Annotated
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 from starlette import status
-# import jwt
 from exceptions import AuthTokenMissing
 from models import Customer, Courier, Restaurant
 from config import SECRET_KEY
@@ -23,7 +22,10 @@ SECRET_KEY = SECRET_KEY
 ALGORITHM = 'HS256'
 
 bcrypt_context = CryptContext(schemes=['bcrypt'], deprecated='auto')
-oauth2_bearer = OAuth2PasswordBearer(tokenUrl='auth/login')
+
+oauth2_bearer_customer = OAuth2PasswordBearer(tokenUrl='auth/login')
+oauth2_bearer_restaurant = OAuth2PasswordBearer(tokenUrl='auth/login_restaurant')
+oauth2_bearer_courier = OAuth2PasswordBearer(tokenUrl='auth/login_courier')
 
 
 def get_db():
@@ -172,7 +174,31 @@ def decode_access_token(authorization: str = None):
         raise e
 
 
-async def get_current_entity(token: Annotated[str, Depends(oauth2_bearer)]):
+async def get_current_entity(token: Annotated[str, Depends(oauth2_bearer_customer)]):
+    try:
+        payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
+        email: str = payload.get('sub')
+        entity_id: str = payload.get("id")
+        if email is None or entity_id is None:
+            raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Could not validate user.")
+        return {"email": email, 'id': entity_id}
+    except JWTError:
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Could not validate user.")
+
+
+async def get_current_restaurant(token: Annotated[str, Depends(oauth2_bearer_restaurant)]):
+    try:
+        payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
+        email: str = payload.get('sub')
+        entity_id: str = payload.get("id")
+        if email is None or entity_id is None:
+            raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Could not validate user.")
+        return {"email": email, 'id': entity_id}
+    except JWTError:
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Could not validate user.")
+
+
+async def get_current_courier(token: Annotated[str, Depends(oauth2_bearer_courier)]):
     try:
         payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
         email: str = payload.get('sub')

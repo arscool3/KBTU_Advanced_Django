@@ -7,7 +7,9 @@ import database as db
 from models import Base
 from database import engine
 import customer
-from core import route
+import restaurant
+import courier
+from fastapi.middleware.cors import CORSMiddleware
 
 Base.metadata.create_all(engine)
 
@@ -15,6 +17,16 @@ app = FastAPI()
 
 app.include_router(auth.router)
 app.include_router(customer.router)
+app.include_router(restaurant.router)
+app.include_router(courier.router)
+
+# app.add_middleware(
+#     CORSMiddleware,
+#     allow_origins=["*"],
+#     allow_credentials=True,
+#     allow_methods=["*"],
+#     allow_headers=["*"],
+# )
 
 
 def get_db():
@@ -42,4 +54,3 @@ async def entity(entity: entity_dependency, db: db_dependency):
     if entity is None:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail='Authentication failed!')
     return entity
-

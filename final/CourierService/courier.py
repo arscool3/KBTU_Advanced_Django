@@ -5,8 +5,8 @@ import database as db
 import models
 
 router = APIRouter(
-    prefix='/courier',
-    tags=['courier']
+    prefix='/couriers',
+    tags=['couriers']
 )
 
 

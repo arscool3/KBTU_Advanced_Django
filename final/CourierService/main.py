@@ -1,6 +1,6 @@
 from copy import deepcopy
 from typing import Annotated
-from fastapi import FastAPI, Depends, HTTPException, Query
+from fastapi import FastAPI, Depends, HTTPException, Query, APIRouter
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 
@@ -10,7 +10,8 @@ from courier import router
 import database as db
 
 app = FastAPI()
-app.include_router(router)
+main_router = APIRouter(prefix="/courier")
+main_router.include_router(router)
 
 
 def get_db():
@@ -27,13 +28,13 @@ def get_db():
 db_dependency = Annotated[Session, Depends(get_db)]
 
 
-@app.get("/health_check", tags=['check'])
+@main_router.get("/health_check", tags=['check'])
 async def health_check() -> dict:
     return {'message': "I'm alive"}
 
 
 # TODO - Accept/Deny/Delivered change status
-@app.patch("/orders/{order_id}/{courier_id}", tags=['orders'])
+@main_router.patch("/orders/{order_id}/{courier_id}", tags=['orders'])
 async def change_order_status(db: db_dependency, order_id: str, courier_id: str,
                               status_req: str = Query('DENY-COURIER', enum=['DENY-COURIER', 'ACCEPTED-COURIER', 'DELIVERED'])):
     try:
@@ -48,7 +49,7 @@ async def change_order_status(db: db_dependency, order_id: str, courier_id: str,
 
 
 # TODO - See history order by status
-@app.get("/orders", tags=['orders'])
+@main_router.get("/orders/{courier_id}", tags=['orders'])
 async def history_order_by_id(db: db_dependency, courier_id: str | None = None,
                               status_req: str = Query('READY',
                                                       enum=['PENDING', 'DENY-COURIER','DENY-RESTAURANT', 'DENY-CUSTOMER', 'PAID', 'ACCEPTED-RESTAURANT', 'ACCEPTED-COURIER', 'READY',
@@ -65,7 +66,7 @@ async def history_order_by_id(db: db_dependency, courier_id: str | None = None,
 
 
 # TODO - Order detail
-@app.get("/orders/{order_id}", tags=['orders'])
+@main_router.get("/orders/{order_id}/{courier_id}", tags=['orders'])
 async def order_detail(session: db_dependency, order_id: str, courier_id: str):
     try:
         orders = session.execute(select(models.Order).filter(models.Order.id == order_id).filter(models.Order.courier_id == courier_id)).scalars().all()
@@ -78,3 +79,6 @@ async def order_detail(session: db_dependency, order_id: str, courier_id: str):
     except Exception as e:
         print(e)
         raise HTTPException(status_code=500, detail=f'{e}')
+
+
+app.include_router(main_router)

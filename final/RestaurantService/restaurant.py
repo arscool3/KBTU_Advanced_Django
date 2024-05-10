@@ -61,3 +61,4 @@ async def update_status_restaurant(db: db_dependency, restaurant_id: str,
         return {'message': 'status updated successfully!'}
     except Exception as e:
         raise HTTPException(status_code=500, detail=f'{e}')
+    

@@ -50,7 +50,7 @@ def route(
 
     app_any = request_method(
         path, status_code=status_code,
-        response_model=response_model  # , tags=[tags]
+        response_model=response_model
     )
 
     def wrapper(f):
