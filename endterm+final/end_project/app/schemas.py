@@ -16,21 +16,21 @@ class ProductCreate(BaseModel):
     price: float
 
 class OrderCreate(BaseModel):
-    name: str
-    description: str
-    price: float
+    user_id: int
 
 class CategoryCreate(BaseModel):
     name: str
-    description: str
-    price: float
 
 class AddressCreate(BaseModel):
-    name: str
-    description: str
-    price: float
+    street: str
+    city: str
+    state: str
+    postal_code: str
+    country: str
+    user_id: int
 
 class PaymentCreate(BaseModel):
-    name: str
-    description: str
-    price: float
+    amount: float
+    status: str
+    transaction_id: str
+    user_id: int
