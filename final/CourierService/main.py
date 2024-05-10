@@ -36,14 +36,16 @@ async def health_check() -> dict:
 # TODO - Accept/Deny/Delivered change status
 @main_router.patch("/orders/{order_id}/{courier_id}", tags=['orders'])
 async def change_order_status(db: db_dependency, order_id: str, courier_id: str,
-                              status_req: str = Query('DENY-COURIER', enum=['DENY-COURIER', 'ACCEPTED-COURIER', 'DELIVERED'])):
+                              status_req: str = Query('DENY-COURIER', enum=['DENY-COURIER', 'ACCEPTED-COURIER', 'DELIVERED', 'IN-TRANSIT'])):
     try:
         orders = db.execute(select(models.Order).filter(models.Order.courier_id == courier_id).
                             filter(models.Order.id == order_id)).scalars().all()
         if not orders:
             return {'message': 'order not found!'}
-        orders[0].status = status_req
-        return {'message': 'status is changed!'}
+        if orders[0].status in ['READY', 'ACCEPTED-COURIER', 'IN-TRANSIT']:
+            orders[0].status = status_req
+            return {'message': 'status is changed!'}
+        return {'message': 'You cant change status!'}
     except Exception as e:
         raise HTTPException(status_code=500, detail=f'{e}')
 
@@ -51,8 +53,9 @@ async def change_order_status(db: db_dependency, order_id: str, courier_id: str,
 # TODO - See history order by status
 @main_router.get("/orders/{courier_id}", tags=['orders'])
 async def history_order_by_id(db: db_dependency, courier_id: str | None = None,
-                              status_req: str = Query('READY',
-                                                      enum=['PENDING', 'DENY-COURIER','DENY-RESTAURANT', 'DENY-CUSTOMER', 'PAID', 'ACCEPTED-RESTAURANT', 'ACCEPTED-COURIER', 'READY',
+                              status_req: str = Query('DELIVERED',
+                                                      enum=['DENY-COURIER',
+                                                            'ACCEPTED-COURIER',
                                                             'IN-TRANSIT',
                                                             'DELIVERED'])):
     try:

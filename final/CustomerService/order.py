@@ -77,13 +77,18 @@ async def change_order_status(db: db_dependency, order_id: str, background_task:
                               status_request: str = Query('PAID', enum=['PAID', 'DENY-CUSTOMER'])) -> dict:
     try:
         order = db.query(models.Order).filter(models.Order.id == order_id).first()
+
         if not order:
             HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=f'order not found by id: {order_id}')
-        order.status = status_request
-        if order.status == "PAID":
-            background_task.add_task(buy_test, 'd_korganbek@kbtu.kz', '1', '1', 1000)
-        print(order.status)
-        return {'message': 'order successfully changed!'}
+
+        if order.status == "PENDING" or order.status == 'PAID':
+            order.status = status_request
+
+            if order.status == "PAID":
+                background_task.add_task(buy_test, 'd_korganbek@kbtu.kz', '1', '1', 1000)
+
+            return {'message': 'order successfully changed!'}
+        return {'message': 'your order denied. You cant change status'}
     except Exception as e:
         HTTPException(status_code=500, detail=f'{e}')
 

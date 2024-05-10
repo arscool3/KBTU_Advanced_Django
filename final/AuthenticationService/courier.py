@@ -43,7 +43,7 @@ async def update_courier_status(_id: str, courier: courier_dependency, request: 
 )
 async def change_order_status(order_id: str, courier_id: str, request: Request, response: Response,
                               status_req: str = Query('DENY-COURIER', enum=
-                              ['DENY-COURIER', 'ACCEPTED-COURIER', 'DELIVERED'])):
+                              ['DENY-COURIER', 'ACCEPTED-COURIER', 'DELIVERED', 'IN-TRANSIT'])):
     pass
 
 
@@ -62,12 +62,10 @@ async def change_order_status(order_id: str, courier_id: str, request: Request, 
     response_list=True,
 )
 async def history_order_by_id(request: Request, response: Response, courier_id: str | None = None,
-                              status_req: str = Query('READY', enum=['PENDING', 'DENY-COURIER',
-                                                                     'DENY-RESTAURANT',
-                                                                     'DENY-CUSTOMER', 'PAID',
-                                                                     'ACCEPTED-RESTAURANT',
-                                                                     'ACCEPTED-COURIER', 'READY',
-                                                                     'IN-TRANSIT', 'DELIVERED'])):
+                              status_req: str = Query('READY', enum=['DENY-COURIER',
+                                                                     'ACCEPTED-COURIER',
+                                                                     'IN-TRANSIT',
+                                                                     'DELIVERED'])):
     pass
 
 

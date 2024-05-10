@@ -45,7 +45,7 @@ async def order_detail(db: db_dependency, order_id: str, restaurant_id: str):
 @main_router.get("/orders/{restaurant_id}", tags=['orders'])
 async def history_orders(db: db_dependency, restaurant_id: str,
                          status_req: str = Query('DENY',
-                                                 enum=['PENDING', 'DENY-COURIER', 'DENY-RESTAURANT', 'DENY-CUSTOMER',
+                                                 enum=['DENY-COURIER', 'DENY-RESTAURANT', 'DENY-CUSTOMER',
                                                        'PAID', 'ACCEPTED-RESTAURANT', 'ACCEPTED-COURIER', 'READY',
                                                        'IN-TRANSIT',
                                                        'DELIVERED'])):
@@ -68,8 +68,10 @@ async def change_status(db: db_dependency, order_id: str, restaurant_id: str,
                             filter(models.Order.id == order_id)).scalars().all()
         if not orders:
             return {'message': 'order not found!'}
-        orders[0].status = status
-        return {'message': 'status is changed!'}
+        if orders[0].status in ['PAID', 'ACCEPTED-RESTAURANT']:
+            orders[0].status = status
+            return {'message': 'status is changed!'}
+        return {'message': 'You cant change status.!'}
     except Exception as e:
         raise HTTPException(status_code=500, detail=f'{e}')
 

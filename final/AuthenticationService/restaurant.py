@@ -121,7 +121,7 @@ async def change_status(order_id: str, restaurant_id: str, request: Request, res
 )
 async def history_orders(restaurant_id: str, request: Request, response: Response,
                          status_req: str = Query('DENY', enum =
-                         ['PENDING', 'DENY-COURIER', 'DENY-RESTAURANT',
+                         ['DENY-COURIER', 'DENY-RESTAURANT',
                           'DENY-CUSTOMER', 'PAID', 'ACCEPTED-RESTAURANT',
                           'ACCEPTED-COURIER', 'READY', 'IN-TRANSIT', 'DELIVERED'])):
     pass
