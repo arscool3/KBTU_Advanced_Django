@@ -2,8 +2,11 @@ from fastapi import FastAPI, Depends, HTTPException
 from sqlalchemy.orm.session import Session
 import json
 import redis
+import threading
 
-from dependencies import get_db, get_redis, send_order_details
+
+from tasks import process_order
+from dependencies import get_db, get_redis, KafkaManager, send_order_details
 from models import (User, Product, Category,
                     Order, OrderItem, Review)
 from schemas import (UserCreate, ProductCreate, CategoryCreate,
@@ -14,6 +17,9 @@ from repository import (UserRepository, ProductRepository, CategoryRepository,
                         OrderRepository, OrderItemRepository, ReviewRepository)
 
 app = FastAPI()
+
+consumer = KafkaManager.get_consumer()
+consumer.subscribe(['order_topic'])
 
 
 # USER
@@ -98,6 +104,7 @@ def create_order(order: OrderCreate, db: Session = Depends(get_db)):
     order_repo = OrderRepository(db, Order)
     created_order = order_repo.create(order)
     send_order_details(created_order)
+    process_order.send(created_order.id)
 
     return created_order
 
@@ -163,3 +170,16 @@ def delete_review(review_id: int, db: Session = Depends(get_db)):
     review_repo = ReviewRepository(db, Review)
     review_repo.delete(item_id=review_id)
     return {"detail": "Review deleted successfully"}
+
+
+def take_order_details():
+    while True:
+        msg = consumer.poll(5.0)
+        if msg is None:
+            continue
+        print(msg.value())
+        order_data = json.dumps(msg.value().decode('utf-8'))
+        process_order.send(order_data['id'])
+
+
+threading.Thread(target=take_order_details, daemon=True).start()

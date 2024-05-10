@@ -1,10 +1,9 @@
 from database import Session
 from schemas import OrderRead
-from tasks import process_order
+
 
 import json
 import redis
-import threading
 from confluent_kafka import Producer, Consumer
 
 
@@ -50,17 +49,3 @@ def send_order_details(order_data):
 
     producer.produce('order_topic', json.dumps(order_data).encode('utf-8'), callback=delivery_report)
     producer.flush()
-
-
-def take_order_details():
-    consumer = KafkaManager.get_consumer()
-    while True:
-        msg = consumer.poll(1)
-        if msg is None:
-            continue
-
-        order_data = json.dumps(msg.value().encode('utf-8'))
-        process_order(order_data)
-
-
-threading.Thread(target=take_order_details(), daemon=True).start()
