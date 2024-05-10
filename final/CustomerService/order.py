@@ -8,6 +8,7 @@ import models
 import database as db
 import schemas
 import httpx
+from producer import produce
 
 router = APIRouter(
     prefix="/orders",
@@ -85,6 +86,7 @@ async def change_order_status(db: db_dependency, order_id: str, background_task:
             order.status = status_request
 
             if order.status == "PAID":
+                produce(schemas.Order.model_validate(order))
                 background_task.add_task(buy_test, 'd_korganbek@kbtu.kz', '1', '1', 1000)
 
             return {'message': 'order successfully changed!'}

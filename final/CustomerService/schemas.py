@@ -21,7 +21,6 @@ class CreateOrderItem(BaseModel):
 class Order(BaseModel):
     id: str
     customer_id: str
-    items: List[OrderItem]
     status: str
     restaurant_id: str
     courier_id: str

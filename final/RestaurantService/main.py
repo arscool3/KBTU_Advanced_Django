@@ -5,6 +5,8 @@ from sqlalchemy.orm import Session
 import models
 from restaurant import router
 import database as db
+from producer import produce
+from schemas import Order
 
 app = FastAPI()
 main_router = APIRouter(
@@ -70,6 +72,8 @@ async def change_status(db: db_dependency, order_id: str, restaurant_id: str,
             return {'message': 'order not found!'}
         if orders[0].status in ['PAID', 'ACCEPTED-RESTAURANT']:
             orders[0].status = status
+            if status == 'READY':
+                produce(Order.model_validate(orders[0]))
             return {'message': 'status is changed!'}
         return {'message': 'You cant change status.!'}
     except Exception as e:
