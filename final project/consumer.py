@@ -1,21 +1,17 @@
 import json
-
+import models as db
 import confluent_kafka
-
-from config import KAFKA_HOST, KAFKA_PORT
-from database import session
-from journal.models import Journal
-from journal.schemas import JournalMessage
-
+from database import get_db
+from schemas import CreateLog
 
 consumer = confluent_kafka.Consumer(
     {
-        "bootstrap.servers": f"{KAFKA_HOST}:{KAFKA_PORT}",
+        "bootstrap.servers": "localhost:9092",
         "group.id": "main_group",
     }
 )
 
-topic = "access_logs_topic"
+topic = "logs_topic"
 
 consumer.subscribe([topic])
 
@@ -25,11 +21,11 @@ def consume():
         while True:
             messages = consumer.consume(num_messages=5, timeout=1.5)
             if not messages:
-                print("no messages")
+                print("no upcoming messages")
             for message in messages:
-                print(f"Incoming message: {message.value()}")
+                print(f"Incoming message is: {message.value()}")
                 message = json.loads(message.value().decode("utf-8"))
-                _process_access_logs_message(JournalMessage(**message))
+                save_log(CreateLog(**message))
                 print(f"Processed {message}")
     except Exception as e:
         print(f"Exception: {e}")
@@ -37,12 +33,12 @@ def consume():
         consumer.close()
 
 
-def _process_access_logs_message(message: JournalMessage):
-    db_session = session()
-
-    db_session.add(Journal(**message.model_dump()))
-    db_session.commit()
+def save_log(log: CreateLog):
+    with get_db() as session:
+        session.add(db.Log(**log.model_dump()))
 
 
 if __name__ == "__main__":
     consume()
+
+# 1 st round
