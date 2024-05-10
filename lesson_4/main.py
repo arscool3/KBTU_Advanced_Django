@@ -1,5 +1,6 @@
 from abc import abstractstaticmethod, abstractmethod
-from contextlib import contextmanager
+e
+from typing import Any
 
 import punq
 from fastapi import FastAPI, Depends
@@ -49,9 +50,20 @@ class RepoAbc:
 class PresidentRepo(RepoAbc):
     @staticmethod
     def get_by_id(id: int):
+        # try:
+        #     session = db.session
+        #     print(session.get(db.President, id))
+        #     return session.get(db.President, id)
+        #     session.commit()
+        # except Exception:
+        #     raise
+        # finally:
+        #     session.close()
         with get_db() as session:
             print(session.get(db.President, id))
             return session.get(db.President, id)
+
+
 
 
 class Dep:
@@ -60,6 +72,26 @@ class Dep:
 
     def __call__(self, id: int):
         return self.repo.get_by_id(id)
+
+
+class DepTest:
+    def __init__(self, model: type[db.President] | type[db.Country]) -> None:
+        self.model = model
+    
+    def __call__(self, id: int) -> Any:
+        with get_db() as session:
+            print(session.get(model, id))
+            return session.get(model, id)
+
+
+president_dep = DepTest(model=db.President)
+
+def president_dep(id: int):
+
+   with get_db() as session:
+        print(session.get(db.President, id))
+        return session.get(db.President, id)
+
 
 
 def container() -> punq.Container:

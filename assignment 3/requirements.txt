@@ -1,0 +1,4 @@
+fastapi~=0.110.0
+SQLAlchemy~=2.0.28
+pytest~=8.1.1
+pydantic~=2.6.4

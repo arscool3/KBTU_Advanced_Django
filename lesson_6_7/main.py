@@ -31,7 +31,7 @@ def get_db():
         yield session
         session.commit()
     except:
-        raise
+        raiseus
     finally:
         session.close()
 
