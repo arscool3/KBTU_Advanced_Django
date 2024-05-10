@@ -5,8 +5,9 @@ from schemas import Order
 consumer = confluent_kafka.Consumer(
     {"bootstrap.servers": "kafka:9092", "group.id": "main_group"}
 )
-topic = "restaurant_order_topic"
-consumer.subscribe([topic])
+topic1 = "restaurant_order_topic"
+topic2 = 'customer_order_topic'
+consumer.subscribe([topic2, topic1])
 number_of_messages = 20
 
 
@@ -16,7 +17,12 @@ def consume():
             messages = consumer.consume(num_messages=number_of_messages, timeout=1.5)
             for message in messages:
                 order = Order.model_validate(json.loads(message.value().decode('utf-8')))
-                print(order)
+                if order.status == 'PAID':
+                    print(order)
+                elif order.status == 'READY':
+                    print(order)
+                else:
+                    print(order)
     except Exception as e:
         print(f'Raised: {e}')
     finally:
