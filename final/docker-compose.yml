@@ -31,15 +31,15 @@ services:
     ports:
       - "6379:6379"
 
-  fastapi-app:
-    build: .
-    container_name: fastapi-app
-    ports:
-      - "8000:8000"
-    depends_on:
-      - kafka
-      - redis
-    command: uvicorn main:app --host 0.0.0.0 --port 8000
+#  fastapi-app:
+#    build: .
+#    container_name: fastapi-app
+#    ports:
+#      - "8000:8000"
+#    depends_on:
+#      - kafka
+#      - redis
+#    command: uvicorn main:app --host 0.0.0.0 --port 8000
 
   worker:
     build: .
