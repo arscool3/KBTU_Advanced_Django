@@ -3,7 +3,6 @@ from sqlalchemy.orm.session import Session
 import json
 import redis
 
-from tasks import process_order
 from dependencies import get_db, get_redis, send_order_details
 from models import (User, Product, Category,
                     Order, OrderItem, Review)
@@ -98,7 +97,6 @@ def delete_category(category_id: int, db: Session = Depends(get_db)):
 def create_order(order: OrderCreate, db: Session = Depends(get_db)):
     order_repo = OrderRepository(db, Order)
     created_order = order_repo.create(order)
-    process_order.send(created_order.id)
     send_order_details(created_order)
 
     return created_order
