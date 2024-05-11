@@ -1,4 +1,4 @@
-from fastapi import FastAPI,HTTPException
+from fastapi import FastAPI, HTTPException, Depends
 from database.db import *
 from repository import *
 from typing import Type
@@ -7,10 +7,24 @@ from typing import List
 from managerServices import receive_kafka_message
 from kafka.consumer import kafka_consume
 from confluent_kafka import KafkaError
+from sqlalchemy.exc import SQLAlchemyError
+import models.orderModel as _model
+from schemas.orderSchema import Order
 
 app = FastAPI()
-
 session = sessionmaker(bind=engine)
+
+
+def get_db():
+    db = SessionLocal()
+    try:
+        yield db
+        db.commit()
+    except SQLAlchemyError as e:
+        db.rollback()
+        raise HTTPException(status_code=400, detail=str(e))
+    finally:
+        db.close()
 
 
 class Dependency:
@@ -36,7 +50,6 @@ def get_container(repository: Type[AbcRepository]) -> punq.Container:
 
 
 app.add_api_route("/products", get_container(ProductRepository).resolve(Dependency), methods=["GET"])
-
 app.add_api_route("/product_by_id", get_container(ProductRepository).resolve(Dependency1), methods=["GET"])
 
 
@@ -58,3 +71,9 @@ async def manager_process_orders():
         raise HTTPException(status_code=500, detail=f"Error processing orders: {e}")
     finally:
         consumer.close()
+
+
+@app.get("/orders")
+def get_orders(session: Session = Depends(get_db)):
+    orders = session.execute(select(_model.Order)).scalars().all()
+    return [Order.model_validate(order) for order in orders]

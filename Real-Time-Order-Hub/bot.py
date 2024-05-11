@@ -6,9 +6,10 @@ from aiogram.contrib.fsm_storage.memory import MemoryStorage
 import os
 from dotenv import load_dotenv
 from sqlalchemy.orm import sessionmaker
-from database.db import Base, engine
+from database.db import engine
 from models import *
 from kafka.producer import send_to_kafka
+from tasks import generate_and_send_report
 
 load_dotenv()
 TOKEN = os.getenv('TELEGRAM_BOT_TOKEN')
@@ -167,6 +168,12 @@ async def confirm_order(message: types.Message, state: FSMContext):
     else:
         await message.answer("Order cancelled.")
         await state.finish()
+
+
+@dp.message_handler(commands=['get_report'])
+async def handle_get_report(message: types.Message):
+    generate_and_send_report.send()
+    await message.answer("Your report is being generated and will be sent to you shortly.")
 
 
 def main():

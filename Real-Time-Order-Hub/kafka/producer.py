@@ -6,6 +6,7 @@ producer = confluent_kafka.Producer(
 )
 
 topic = "topic1"
+topic2 = "topic2"
 
 
 async def send_to_kafka(products, chat_id):
@@ -15,3 +16,6 @@ async def send_to_kafka(products, chat_id):
     }
     producer.produce(topic=topic, value=json.dumps(order_data))
     producer.flush()
+
+
+

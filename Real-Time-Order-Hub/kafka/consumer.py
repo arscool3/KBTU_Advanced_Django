@@ -10,3 +10,4 @@ def kafka_consume(topic_name, group_id, bootstrap_servers='localhost:9092'):
     consumer = Consumer(conf)
     consumer.subscribe([topic_name])
     return consumer
+

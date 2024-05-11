@@ -18,10 +18,10 @@ class OrderBase(BaseModel):
     status: str
     order_date: date
     delivery_address: str
-    items: List[OrderItemBase]
+    # items: List[OrderItemBase]
 
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 
 class CreateOrder(BaseModel):
