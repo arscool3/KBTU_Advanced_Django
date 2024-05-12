@@ -1,0 +1,2 @@
+import confluent_kafka
+
