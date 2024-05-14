@@ -2,6 +2,8 @@ from http.client import HTTPException
 
 from fastapi import FastAPI
 
+from app.kafka.producer import produce_message
+from app.models import Reservation
 from app.reservations.routers import router as user_router
 from app.books.routers import router as account_router
 from app.members.routers import router as transaction_router
@@ -66,3 +68,8 @@ def trigger_check_availability():
 def trigger_send_promotional_emails():
     send_promotional_emails.delay()
     return {"message": "Promotional email task started"}
+
+
+@app.post("/consumer")
+def consumer_reservation(res: Reservation):
+    produce_message(res)
