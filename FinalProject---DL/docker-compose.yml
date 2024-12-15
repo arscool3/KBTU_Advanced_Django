@@ -1,0 +1,60 @@
+version: '3'
+
+services:
+  digital_library_db:
+    container_name: postgresql_db
+    image: postgres
+    environment:
+      - POSTGRES_DB=postgres
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=password
+    ports:
+      - "5433:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data/
+    restart: on-failure
+
+
+  zookeeper:
+    image: confluentinc/cp-zookeeper:7.3.0
+    container_name: zookeeper01
+    environment:
+      ZOOKEEPER_CLIENT_PORT: 2181
+    ports:
+      - "2181:2181"
+
+  broker:
+    image: confluentinc/cp-kafka:7.3.0
+    container_name: broker01
+    depends_on:
+      - zookeeper
+    environment:
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+      KAFKA_LISTENERS: PLAINTEXT://:29092,PLAINTEXT_INTERNAL://:9092,PLAINTEXT_EXTERNAL://:9093
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://broker:29092,PLAINTEXT_INTERNAL://127.0.0.1:9092,PLAINTEXT_EXTERNAL://host.docker.internal:9093
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_INTERNAL:PLAINTEXT,PLAINTEXT_EXTERNAL:PLAINTEXT
+      KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
+    ports:
+      - "9093:9093"
+      - "9092:9092"
+      - "29092:29092"
+
+  kafka-ui:
+    image: provectuslabs/kafka-ui:latest
+    container_name: kafka-ui
+    restart: always
+    depends_on:
+      - broker
+    environment:
+      KAFKA_CLUSTERS_0_NAME: local
+      KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS: 'broker:29092'
+      KAFKA_CLUSTERS_0_ZOOKEEPER: 'zookeeper:2181'
+    ports:
+      - "0.0.0.0:8080:8080"
+
+
+
+
+volumes:
+  postgres_data:
