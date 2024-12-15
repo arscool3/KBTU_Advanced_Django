@@ -1,0 +1,15 @@
+this assignment contains practices from 6th of april to 27th of april
+6 апреля  binance API в сделках есть пары биткоин
+ к доллару 65000  на 1 биткоин можно купить 6500 0долларов. 
+ в бинанс апи вы передаете start date and end date. вы получили 
+  списов ставок и вычислите среднее за год
+
+
+
+last task-1 = probably binance task(?)20th of april:https://kbtuedu.sharepoint.com/sites/Kbtudjangoadvanced/_layouts/15/stream.aspx?id=%2Fsites%2FKbtudjangoadvanced%2FShared%20Documents%2FGeneral%2FRecordings%2F%D0%A1%D0%BE%D0%B1%D1%80%D0%B0%D0%BD%D0%B8%D0%B5%20%D0%B2%20%D0%BA%D0%B0%D0%BD%D0%B0%D0%BB%D0%B5%20%5FGeneral%5F%2D20240420%5F162753%2D%D0%97%D0%B0%D0%BF%D0%B8%D1%81%D1%8C%20%D1%81%D0%BE%D0%B1%D1%80%D0%B0%D0%BD%D0%B8%D1%8F%2Emp4&referrer=StreamWebApp%2EWeb&referrerScenario=AddressBarCopied%2Eview%2Ef3868c95%2D22b1%2D4b81%2Daf7d%2Dc5fdbca97f87
+edited 00:1
+
+last task = binance task+ the test_websokets task(from 27 апреля 2024 г.)
+. 2 endpoints: hist_data HTTP and live_data WS. вместо того чтобы рандомные
+ данные генерировать и посылать запрос каждый раз к бинансу. теперь там вместо
+  чттп сделайте вебсокеты.

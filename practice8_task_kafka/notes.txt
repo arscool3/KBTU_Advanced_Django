@@ -1,0 +1,3 @@
+the task was to:
+create postgres table message
+insert name and director in the consume function in the consumer.py
